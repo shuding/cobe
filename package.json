@@ -1,0 +1,21 @@
+{
+  "name": "cobe",
+  "version": "0.2.3",
+  "type": "module",
+  "main": "./dist/index.esm.js",
+  "files": [
+    "dist/**"
+  ],
+  "repository": "shuding/cobe",
+  "license": "MIT",
+  "scripts": {
+    "build:esm": "node scripts/build.js",
+    "build": "yarn build:esm"
+  },
+  "dependencies": {
+    "phenomenon": "^1.6.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.13.14"
+  }
+}
