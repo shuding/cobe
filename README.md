@@ -51,6 +51,7 @@ This project is inspired & based on the great work of:
 - https://www.shadertoy.com/view/lllXz4, Inigo Quilez
 - https://github.blog/2020-12-21-how-we-built-the-github-globe
 - https://github.com/vaneenige/phenomenon
+- https://github.com/evanw/glslx
 
 World map asset from:
 
