@@ -1,6 +1,8 @@
 # ⚫️ COBE
 
-[**Demo**](https://cobe.vercel.app)
+A lightweight (5kB) WebGL globe lib. The name "COBE" stands for [Cosmic Background Explorer](https://en.wikipedia.org/wiki/Cosmic_Background_Explorer). 
+
+Check out the [**demo**](https://cobe.vercel.app).
 
 ## Example
 
@@ -43,8 +45,15 @@ const globe = createGlobe(canvas, {
 
 ## Acknowledgment
 
+This project is inspired & based on the great work of:
+
 - [Spherical Fibonacci Mapping](https://dl.acm.org/doi/10.1145/2816795.2818131), Benjamin Keinert et al.
 - https://www.shadertoy.com/view/lllXz4, Inigo Quilez
+- https://github.blog/2020-12-21-how-we-built-the-github-globe
+- https://github.com/vaneenige/phenomenon
+
+World map asset from:
+
 - https://de.wikipedia.org/wiki/Datei:World_map_blank_without_borders.svg
 
 ## License
