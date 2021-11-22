@@ -7,7 +7,7 @@
 ```js
 import createGlobe from 'cobe'
 
-const phi = 0
+let phi = 0
 
 const globe = createGlobe(canvas, {
   devicePixelRatio: 2,
