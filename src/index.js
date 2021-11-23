@@ -147,6 +147,9 @@ export default (canvas, opts) => {
           uniforms[GLSLX_NAME_MARKERS].value = mapMarkers(state[OPT_MARKERS]);
           uniforms[GLSLX_NAME_MARKERS_NUM].value = state[OPT_MARKERS].length;
         }
+        if (state.width && state.height) {
+          uniforms[GLSLX_NAME_U_RESOLUTION].value = [state.width, state.height];
+        }
       }
     },
   });
