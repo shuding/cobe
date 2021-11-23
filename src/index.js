@@ -10,6 +10,7 @@ const OPT_GLOW_COLOR = "glowColor";
 const OPT_MARKERS = "markers";
 const OPT_DIFFUSE = "diffuse";
 const OPT_DPR = "devicePixelRatio";
+const OPT_DARK = "dark";
 
 const OPT_MAPPING = {
   [OPT_PHI]: GLSLX_NAME_PHI,
@@ -20,6 +21,7 @@ const OPT_MAPPING = {
   [OPT_MARKER_COLOR]: GLSLX_NAME_MARKER_COLOR,
   [OPT_GLOW_COLOR]: GLSLX_NAME_GLOW_COLOR,
   [OPT_DIFFUSE]: GLSLX_NAME_DIFFUSE,
+  [OPT_DARK]: GLSLX_NAME_DARK,
 };
 
 const { PI, sin, cos } = Math;
@@ -111,6 +113,7 @@ export default (canvas, opts) => {
       [GLSLX_NAME_MARKER_COLOR]: createUniform("vec3", OPT_MARKER_COLOR),
       [GLSLX_NAME_DIFFUSE]: createUniform("float", OPT_DIFFUSE),
       [GLSLX_NAME_GLOW_COLOR]: createUniform("vec3", OPT_GLOW_COLOR),
+      [GLSLX_NAME_DARK]: createUniform("float", OPT_DARK),
       [GLSLX_NAME_MARKERS]: {
         type: "vec4",
         value: mapMarkers(opts[OPT_MARKERS]),

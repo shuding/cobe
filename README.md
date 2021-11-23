@@ -17,6 +17,7 @@ const globe = createGlobe(canvas, {
   height: 1000,
   phi: 0,
   theta: 0,
+  dark: 0,
   diffuse: 1.2,
   mapSamples: 16000,
   mapBrightness: 6,
