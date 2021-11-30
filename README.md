@@ -40,7 +40,7 @@ const globe = createGlobe(canvas, {
 // To pause requestAnimationFrame:
 // `globe.toggle()`
 // To remove the instance:
-// `globe.destory()`
+// `globe.destroy()`
 // ...
 ```
 
