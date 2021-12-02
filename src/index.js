@@ -34,7 +34,9 @@ const mapMarkers = (markers) => {
       b = (b * PI) / 180 - PI;
       const cx = cos(a);
       return [-cx * cos(b), sin(a), cx * sin(b), m.size];
-    })
+    }),
+    // Make sure to fill zeros
+    [0, 0, 0, 0]
   );
 };
 
