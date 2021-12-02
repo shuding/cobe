@@ -1,6 +1,9 @@
+
 ![COBE](card.png)
 
 <p align="center">A <b>lightweight (5kB)</b> WebGL globe lib. The name "COBE" stands for <a href="https://en.wikipedia.org/wiki/Cosmic_Background_Explorer" target="_blank">Cosmic Background Explorer</a>.</p>
+
+---
 
 - [**Demo** and configurations](https://cobe.vercel.app)
 - Use with React: https://codesandbox.io/s/eager-sky-r2q0g
