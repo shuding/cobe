@@ -1,5 +1,5 @@
 
-![COBE](card.png)
+[![COBE](card.png)](https://cobe.vercel.app)
 
 <p align="center">A <b>lightweight (5kB)</b> WebGL globe lib. The name "COBE" stands for <a href="https://en.wikipedia.org/wiki/Cosmic_Background_Explorer" target="_blank">Cosmic Background Explorer</a>.</p>
 
