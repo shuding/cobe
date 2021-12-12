@@ -1,16 +1,16 @@
-import esbuild from "esbuild";
+import esbuild from 'esbuild'
 
-import __TEXTURE__ from "../src/texture.js";
-import * as __SHADER__ from "../src/shader.js";
+import __TEXTURE__ from '../src/texture.js'
+import * as __SHADER__ from '../src/shader.min.js'
 
 esbuild
   .build({
-    entryPoints: ["src/index.js"],
+    entryPoints: ['src/index.js'],
     bundle: true,
     minify: true,
-    outfile: "dist/index.esm.js",
-    format: "esm",
-    external: ["phenomenon"],
+    outfile: 'dist/index.esm.js',
+    format: 'esm',
+    external: ['phenomenon'],
     define: {
       __TEXTURE__: JSON.stringify(__TEXTURE__),
       ...Object.entries(__SHADER__)
@@ -18,4 +18,4 @@ esbuild
         .reduce((o, entry) => ((o[entry[0]] = entry[1]), o), {}),
     },
   })
-  .catch(() => process.exit(1));
+  .catch(() => process.exit(1))
