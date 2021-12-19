@@ -26,6 +26,7 @@ uniform sampler2D uTexture;
 // const float twoPiOnPhi = kTau/kPhi;
 // const float phiMinusOne = kPhi-1.;
 // const float r = .8;
+// const float by2P32 = 1./4294967296.;
 
 const float sqrt5 = 2.23606797749979;
 const float PI = 3.141592653589793;
@@ -36,6 +37,7 @@ const float byLogPhiPlusOne = 0.7202100452062783;
 const float twoPiOnPhi = 3.8832220774509327;
 const float phiMinusOne = .618033988749895;
 const float r = .8;
+const float by2P32 = 2.3283064365386963e-10;
 
 float byDots = 1./dots;
 
@@ -72,8 +74,13 @@ vec3 nearestFibonacciLattice(vec3 p, out float m) {
     float idx = dot(f, c + o);
     if (idx > dots) continue;
 
-    float v = idx / kPhi;
-    float theta = (v - floor(v/3000.)*3000.)*kTau;
+    // float v = idx / kPhi;
+    // float theta = fract(v) * kTau;
+
+    int iFracV = int(idx) * 2654435769; // signed be like nearest-to-zero fmod
+    float fracV = float(iFracV) * by2P32;
+    float theta = fracV * kTau;
+
     float cosphi = 1. - 2. * idx * byDots;
     float sinphi = sqrt(1. - cosphi * cosphi);
     vec3 sample = vec3(cos(theta) * sinphi, sin(theta) * sinphi, cosphi);
