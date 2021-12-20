@@ -77,7 +77,7 @@ vec3 nearestFibonacciLattice(vec3 p, out float m) {
     // float v = idx / kPhi;
     // float theta = fract(v) * kTau;
 
-    int iFracV = int(idx) * 2654435769; // signed be like nearest-to-zero fmod
+    int iFracV = int(idx) * 2654435769; // signed be like nearest-to-zero fmod; 2^32/phi
     float fracV = float(iFracV) * by2P32;
     float theta = fracV * kTau;
 
