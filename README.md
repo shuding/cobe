@@ -7,13 +7,24 @@
 
 - [**Demo** and configurations](https://cobe.vercel.app)
 - Use with React: https://codesandbox.io/s/eager-sky-r2q0g
+- Use with vanilla JS: https://codesandbox.io/s/peaceful-gwen-m579y
 
 ## Quick Start
+
+```html
+<canvas
+  id="cobe"
+  style="width: 500px; height: 500px;"
+  width="1000"
+  height="1000"
+></canvas>
+```
 
 ```js
 import createGlobe from 'cobe'
 
 let phi = 0
+let canvas = document.getElementById("cobe")
 
 const globe = createGlobe(canvas, {
   devicePixelRatio: 2,
