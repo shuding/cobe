@@ -8,6 +8,7 @@
 - [**Demo** and configurations](https://cobe.vercel.app)
 - Use with React: https://codesandbox.io/s/eager-sky-r2q0g
 - Use with vanilla JS: https://codesandbox.io/s/peaceful-gwen-m579y
+- Use with Vue3: https://stackblitz.com/edit/vitejs-vite-l5a8xk?file=src/App.vue
 
 ## Quick Start
 
