@@ -14,9 +14,9 @@
 ```html
 <canvas
   id="cobe"
-  style="width: 300px; height: 300px;"
-  width="600"
-  height="600"
+  style="width: 500px; height: 500px;"
+  width="1000"
+  height="1000"
 ></canvas>
 ```
 
