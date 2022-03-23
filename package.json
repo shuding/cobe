@@ -6,10 +6,11 @@
   "files": [
     "dist/**"
   ],
+  "types": "./dist/index.d.ts",
   "repository": "shuding/cobe",
   "license": "MIT",
   "scripts": {
-    "build:esm": "node scripts/build.js",
+    "build:esm": "node scripts/build.js && cp src/index.d.ts dist/index.d.ts",
     "build": "yarn build:esm"
   },
   "dependencies": {
