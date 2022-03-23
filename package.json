@@ -1,6 +1,6 @@
 {
   "name": "cobe",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "type": "module",
   "main": "./dist/index.esm.js",
   "files": [
