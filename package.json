@@ -1,6 +1,6 @@
 {
   "name": "cobe",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "type": "module",
   "main": "./dist/index.esm.js",
   "files": [
@@ -11,7 +11,7 @@
   "license": "MIT",
   "scripts": {
     "build:esm": "node scripts/build.js && cp src/index.d.ts dist/index.d.ts",
-    "build": "yarn build:esm"
+    "build": "pnpm build:esm"
   },
   "dependencies": {
     "phenomenon": "^1.6.0"
