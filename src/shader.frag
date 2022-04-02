@@ -3,9 +3,11 @@
 
 precision highp float;
 uniform vec2 uResolution;
+uniform vec2 offset;
 uniform float phi;
 uniform float theta;
 uniform float dots;
+uniform float scale;
 uniform vec3 baseColor;
 uniform vec3 markerColor;
 uniform vec3 glowColor;
@@ -129,7 +131,7 @@ vec3 nearestFibonacciLattice(vec3 p, out float m) {
 }
 
 void main() {
-  vec2 uv = (gl_FragCoord.xy / uResolution) * 2. - 1.;
+  vec2 uv = ((gl_FragCoord.xy / uResolution) * 2. - 1.) / scale - offset * vec2(1., -1.) / uResolution;
   uv.x *= uResolution.x / uResolution.y;
 
   float l = dot(uv, uv);

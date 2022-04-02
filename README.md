@@ -36,11 +36,13 @@ const globe = createGlobe(canvas, {
   theta: 0,
   dark: 0,
   diffuse: 1.2,
+  scale: 1,
   mapSamples: 16000,
   mapBrightness: 6,
   baseColor: [0.3, 0.3, 0.3],
   markerColor: [1, 0.5, 1],
   glowColor: [1, 1, 1],
+  offset: [0, 0],
   markers: [
     { location: [37.7595, -122.4367], size: 0.03 },
     { location: [40.7128, -74.006], size: 0.1 },
