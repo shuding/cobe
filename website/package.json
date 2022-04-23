@@ -1,0 +1,22 @@
+{
+  "name": "cobe-site",
+  "version": "1.0.0",
+  "description": "",
+  "main": "theme.config.js",
+  "dependencies": {
+    "cobe": "^0.5.0",
+    "next": "^12.1.6-canary.6",
+    "nextra": "^2.0.0-alpha.49",
+    "nextra-theme-docs": "^2.0.0-alpha.50",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-spring": "^9.4.4"
+  },
+  "scripts": {
+    "build": "next build",
+    "dev": "next dev",
+    "start": "next start"
+  },
+  "author": "Shu Ding <g@shud.in>",
+  "license": "MIT"
+}
