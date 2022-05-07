@@ -1,0 +1,23 @@
+{
+  "*": {
+    "theme": {
+      "breadcrumb": false
+    }
+  },
+  "index": {
+    "title": "Home",
+    "theme": {
+      "sidebar": false,
+      "toc": false,
+      "//pagination": false,
+      "//typesetting": "article"
+    }
+  },
+  "playground": {
+    "title": "Playground",
+    "type": "page",
+    "theme": {
+      "layout": "raw"
+    }
+  }
+}
