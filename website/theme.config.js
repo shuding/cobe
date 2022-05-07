@@ -17,6 +17,7 @@ export default {
   projectLink: 'https://github.com/shuding/cobe',
   docsRepositoryBase: 'https://github.com/shuding/cobe/blob/main/website',
   search: true,
+  darkMode: false,
   titleSuffix: '',
   unstable_flexsearch: true,
   unstable_faviconGlyph: '⚫️',
@@ -95,22 +96,5 @@ export default {
       </>
     )
   },
-  footerEditLink: () => {
-    return 'Edit this page on GitHub →'
-  },
-  footerText: () => {
-    return (
-      <a
-        href='https://vercel.com/?utm_source=swr'
-        target='_blank'
-        rel='noopener'
-        className='inline-flex items-center no-underline text-current font-semibold'
-      >
-        <span className='mr-1'>Powered by</span>
-        <span>
-          <Vercel />
-        </span>
-      </a>
-    )
-  },
+  footer: false,
 }

@@ -31,22 +31,21 @@ export function Cobe() {
       height: width * 2,
       phi: 0,
       theta: 0.3,
-      dark: 0,
-      diffuse: 1.2,
+      dark: 1,
+      diffuse: 3,
       mapSamples: 16000,
-      mapBrightness: 4,
+      mapBrightness: 1.2,
       baseColor: [1, 1, 1],
       markerColor: [251 / 255, 100 / 255, 21 / 255],
-      glowColor: [0.8, 0.8, 0.8],
-      markers: [
-        { location: [37.7595, -122.4367], size: 0.03 },
-        { location: [40.7128, -74.006], size: 0.1 }
-      ],
+      glowColor: [1.2, 1.2, 1.2],
+      markers: [],
       onRender: (state) => {
         // Called on every animation frame.
         // `state` will be an empty object, return updated params.
         state.phi = phi + r.get()
         phi += 0.005
+        state.width = width * 2
+        state.height = width * 2
       }
     })
     setTimeout(() => canvasRef.current.style.opacity = '1')
@@ -61,17 +60,19 @@ export function Cobe() {
   }}>
     <h1 style={{
       width: '100%',
-      fontSize: '5em',
-      top: 240,
+      fontSize: 'min(8vw,3em)',
+      fontWeight: 700,
+      top: 'calc(50% - .8em)',
       margin: 'auto',
       zIndex: 1, 
-      letterSpacing: 24,
-      textIndent: 24,
+      letterSpacing: '.3em',
+      textIndent: '.3em',
       textAlign: 'center',
-      color: '#000000c9',
+      color: '#fff',
       pointerEvents: 'none',
       userSelect: 'none',
       position: 'absolute',
+      mixBlendMode: 'difference'
     }}>COBE</h1>
     <canvas
       ref={canvasRef}
@@ -120,9 +121,15 @@ export function Cobe() {
 
 <Cobe/>
 
-### Installation
+<div style={{ textAlign: 'center' }}>
+  A **lightweight (5kB)** WebGL globe lib. The name "COBE" stands for [Cosmic Background Explorer](https://en.wikipedia.org/wiki/Cosmic_Background_Explorer).
 
-Add `cobe` to your project:
+  Read about how the library was created on [Twitter](https://twitter.com/shuding_/status/1475916082875666441).
+<div style={{ marginTop: 100 }}/>
+
+### Quick Start
+
+</div>
 
 <Nextra.Tabs items={["npm", "yarn", "pnpm"]}>
   <Nextra.Tab>
@@ -142,14 +149,13 @@ Add `cobe` to your project:
   </Nextra.Tab>
 </Nextra.Tabs>
 
-### Quick Start
+
+<div style={{ textAlign: 'center' }}>
+### Examples
+</div>
 
 <Nextra.Tabs items={['React', 'Vue 3', 'Svetle', 'Vanilla JS']}>
   <Nextra.Tab>
-    <div style={{ margin: '.4em' }}/>
-
-    [Live Example →](https://codesandbox.io/s/eager-sky-r2q0g)
-
     ```jsx
     import createGlobe from 'cobe'
     import { useEffect, useRef } from "react'
@@ -173,6 +179,8 @@ Add `cobe` to your project:
           baseColor: [0.3, 0.3, 0.3],
           markerColor: [0.1, 0.8, 1],
           glowColor: [1, 1, 1],
+          scale: 1,
+          offset: [0, 0],
           markers: [
             { location: [37.7595, -122.4367], size: 0.03 },
             { location: [40.7128, -74.006], size: 0.1 }
@@ -200,12 +208,10 @@ Add `cobe` to your project:
       )
     }
     ```
+
+    [Live Example →](https://codesandbox.io/s/eager-sky-r2q0g)
   </Nextra.Tab>
   <Nextra.Tab>
-    <div style={{ margin: '.4em' }}/>
-
-    [Live Example →](https://stackblitz.com/edit/vitejs-vite-l5a8xk?file=src/App.vue)
-
     ```vue
     <script setup>
       import { ref, onMounted, onUnmounted } from 'vue'
@@ -250,12 +256,10 @@ Add `cobe` to your project:
       <canvas :style="{ width: '300px', height: '300px' }" ref="el"></canvas>
     </template>
     ```
+
+    [Live Example →](https://stackblitz.com/edit/vitejs-vite-l5a8xk?file=src/App.vue)
   </Nextra.Tab>
   <Nextra.Tab>
-    <div style={{ margin: '.4em' }}/>
-
-    [Live Example →](https://codesandbox.io/s/great-visvesvaraya-78yf6?file=/App.svelte)
-
     ```svelte
     <script>
       import { onMount, onDestroy } from 'svelte'
@@ -297,12 +301,10 @@ Add `cobe` to your project:
     
     <canvas bind:this={canvas} style="width: 300px; height: 300px" />
     ```
+
+    [Live Example →](https://codesandbox.io/s/great-visvesvaraya-78yf6?file=/App.svelte)
   </Nextra.Tab>
   <Nextra.Tab>
-    <div style={{ margin: '.4em' }}/>
-
-    [Live Example →](https://codesandbox.io/s/peaceful-gwen-m579y)
-
     ```html filename="html"
     <canvas
       id="cobe"
@@ -341,5 +343,7 @@ Add `cobe` to your project:
       }
     })
     ```
+
+    [Live Example →](https://codesandbox.io/s/peaceful-gwen-m579y)
   </Nextra.Tab>
 </Nextra.Tabs>

@@ -7,11 +7,17 @@
   "index": {
     "title": "Home",
     "theme": {
-      "//sidebar": false,
+      "sidebar": false,
       "toc": false,
       "//pagination": false,
       "//typesetting": "article"
     }
   },
-  "configurations": "Configurations"
+  "playground": {
+    "title": "Playground",
+    "type": "page",
+    "theme": {
+      "layout": "raw"
+    }
+  }
 }

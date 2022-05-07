@@ -3,12 +3,18 @@
 }
 
 body {
-  background: linear-gradient(180deg, hsla(0, 0%, 100%, 0) 0, #fff 300px),
-    fixed 0 0 /20px 20px radial-gradient(#d1d1d1 1px, transparent 0),
-    fixed 10px 10px /20px 20px radial-gradient(#d1d1d1 1px, transparent 0);
+  background: linear-gradient(
+      180deg,
+      hsla(0, 0%, 100%, 0) 0,
+      #fff min(110vw, 800px)
+    ),
+    fixed
+      repeating-radial-gradient(
+        circle at 50% min(calc(50vw + 3.5rem), calc(300px + 5rem)),
+        #f5f5f5 0,
+        #fff 40px
+      );
 }
-.dark body {
-  background: linear-gradient(180deg, transparent 0, #111 300px),
-    fixed 0 0 /20px 20px radial-gradient(#313131 1px, transparent 0),
-    fixed 10px 10px /20px 20px radial-gradient(#313131 1px, transparent 0);
+.nextra-body {
+  width: 100%;
 }
