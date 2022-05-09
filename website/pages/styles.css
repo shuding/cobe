@@ -20,7 +20,7 @@ body {
   body {
     background: linear-gradient(
       180deg,
-      hsla(0, 0%, 100%, 0) 0,
+      hsla(0, 0%, 100%, 0.1) 0,
       #000 min(110vw, 800px)
     ),
     fixed
