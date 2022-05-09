@@ -15,6 +15,23 @@ body {
         #fff 40px
       );
 }
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: linear-gradient(
+      180deg,
+      hsla(0, 0%, 100%, 0.1) 0,
+      #000 min(110vw, 800px)
+    ),
+    fixed
+      repeating-radial-gradient(
+        circle at 50% min(calc(50vw + 3.5rem), calc(300px + 5rem)),
+        #050505 0,
+        #000 40px
+      );
+  }
+}
+
 .nextra-body {
   width: 100%;
 }
