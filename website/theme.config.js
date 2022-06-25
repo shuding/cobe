@@ -1,3 +1,5 @@
+import Router, { useRouter } from 'next/router'
+
 const Logo = ({ height }) => (
   <svg height={height} viewBox='0 0 70 70' fill='none'>
     <circle cx='35' cy='35' r='35' fill='currentColor' />
@@ -17,22 +19,24 @@ export default {
   projectLink: 'https://github.com/shuding/cobe',
   docsRepositoryBase: 'https://github.com/shuding/cobe/blob/main/website',
   search: true,
-  darkMode: false,
   titleSuffix: '',
   unstable_flexsearch: true,
   unstable_faviconGlyph: '⚫️',
   floatTOC: true,
   logo: () => {
+    const { route } = useRouter()
     return (
       <>
         <Logo height={18} />
-        <span
-          className='mx-2 font-extrabold hidden md:inline select-none'
-          title='Cobe'
-          style={{ whiteSpace: 'nowrap' }}
-        >
-          COBE: 5kB WebGL Globe
-        </span>
+        {route === '/' ? null : (
+          <span
+            className='mx-2 font-extrabold hidden md:inline select-none'
+            title='COBE'
+            style={{ whiteSpace: 'nowrap' }}
+          >
+            COBE
+          </span>
+        )}
       </>
     )
   },
@@ -96,5 +100,36 @@ export default {
       </>
     )
   },
-  footer: false,
+  footerText: ({ locale }) => {
+    return (
+      <p className='no-underline text-current font-semibold'>
+        Made by{' '}
+        <a
+          href='https://twitter.com/shuding_'
+          target='_blank'
+          rel='noopener'
+          className='no-underline font-semibold'
+        >
+          @shuding_
+        </a>
+        , deployed on{' '}
+        <a
+          href='https://vercel.com/?utm_source=cobe'
+          target='_blank'
+          rel='noopener'
+          className='no-underline font-semibold'
+        >
+          Vercel
+        </a>
+        .
+      </p>
+    )
+  },
+  footerEditLink: () => {
+    const { route } = useRouter()
+    if (route.includes('/showcases/')) {
+      return null
+    }
+    return 'Edit this page on GitHub'
+  },
 }

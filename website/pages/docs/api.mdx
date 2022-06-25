@@ -1,0 +1,76 @@
+# API
+
+The library exports a default function `createGlobe`, which accepts two required parameters and returns a globe instance. Here’re the definitions:
+
+```ts
+import createGlobe from 'cobe'
+
+const globe = createGlobe(canvas, options)
+```
+
+## `canvas`
+
+A [HTML canvas element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas) with `width` and `height` defined.
+
+## `options`
+
+An object with the following properties:
+
+| Property | Description | Required |
+|---|---|---|
+| devicePixelRatio | The “[DPR](https://developer.fastly.com/reference/io/dpr)”, defaults to 1 |  |
+| width | The width of the canvas | Required |
+| height | The height of the canvas | Required |
+| phi | The [φ angle](https://en.wikipedia.org/wiki/Spherical_coordinate_system), 0 ≤ phi ≤ 2π | Required |
+| theta | The [θ angle](https://en.wikipedia.org/wiki/Spherical_coordinate_system), -π ≤ theta ≤ π | Required |
+| dark | Display the globe in dark or light mode, 0 ≤ dark ≤ 1 | Required |
+| diffuse | Control the [diffuse lighting](https://en.wikipedia.org/wiki/Computer_graphics_lighting#:~:text=of%20lighting%20interactions.-,Diffuse,the%20angle%20of%20incoming%20light.), 0 ≤ diffuse | Required |
+| mapSamples | Number of dots displayed, 0 ≤ mapSamples ≤ 100000 | Required |
+| mapBrightness | Brightness of the dots, 0 ≤ mapBrightness | Required |
+| baseColor | [r, g, b] of the base color, 0 ≤ r, g, b ≤ 1 | |
+| markerColor | [r, g, b] of the markers’ color, 0 ≤ r, g, b ≤ 1 | |
+| glowColor | [r, g, b] of the glow color, 0 ≤ r, g, b ≤ 1 | |
+| scale | Scales the globe, 0 ≤ scale |  |
+| offset | [offsetX, offsetY], offset of the globe in pixel |  |
+| markers | An array of markers displayed | |
+| onRender | A callback function called when a new frame is rendered | Required |
+
+You can check how some of them actually look like in the [Playground](https://cobe-playground.vercel.app).
+
+### `markers`
+
+A marker is an object of `location` and `size` properties. `location` is a pair of _latitude_ and _longitude_:
+
+```js
+markers: [
+  { location: [37.7595, -122.4367], size: 0.03 },
+  { location: [40.7128, -74.006], size: 0.1 },
+  ...
+]
+```
+
+For example San Francisco is at [37.7595, -122.4367](https://www.latlong.net/c/?lat=37.774929&long=-122.419418).
+
+### `onRender`
+
+A callback function that will be called on every re-render, you can re-assign some options to the `state` object to update them:
+
+```js
+let currentPhi = 0
+
+const globe = createGlobe(canvas, {
+  ...
+  onRender: (state) => {
+    // Called on every animation frame.
+    // `state` will be an empty object, return updated options.
+    state.phi = currentPhi
+
+    // Rotate the globe by 0.01 on every frame.
+    currentPhi += 0.01
+  },
+})
+```
+
+## `globe`
+
+A [Phenomenon](https://github.com/vaneenige/phenomenon) instance. It has methods like `globe.toggle()` to pause/resume rendering, and `globe.destroy()` to destroy itself. Please read its docs for more details.

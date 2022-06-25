@@ -1,23 +1,22 @@
 {
-  "*": {
-    "theme": {
-      "breadcrumb": false
-    }
-  },
   "index": {
     "title": "Home",
+    "type": "page",
+    "hidden": true,
     "theme": {
       "sidebar": false,
       "toc": false,
-      "//pagination": false,
-      "//typesetting": "article"
+      "footer": true,
+      "pagination": true,
+      "breadcrumb": false
     }
   },
+  "docs": {
+    "type": "page"
+  },
   "playground": {
-    "title": "Playground",
     "type": "page",
-    "theme": {
-      "layout": "raw"
-    }
+    "newWindow": true,
+    "href": "https://cobe-playground.vercel.app"
   }
 }

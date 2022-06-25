@@ -1,0 +1,91 @@
+# Get Started
+
+COBE does’t rely on any external libraries or UI framework. It is a vanilla JavaScript library that can be used in any web applications. 
+
+The easiest way to use this library is to create a canvas element and use a CDN to import the library:
+
+```html filename="index.html"
+<canvas
+  id="cobe"
+  style="width: 500px; height: 500px"
+  width="1000"
+  height="1000"
+></canvas>
+
+<script type="module">
+  import createGlobe from 'https://cdn.skypack.dev/cobe'
+
+  let phi = 0
+  let canvas = document.getElementById("cobe")
+
+  const globe = createGlobe(canvas, {
+    devicePixelRatio: 2,
+    width: 1000,
+    height: 1000,
+    phi: 0,
+    theta: 0,
+    dark: 0,
+    diffuse: 1.2,
+    scale: 1,
+    mapSamples: 16000,
+    mapBrightness: 6,
+    baseColor: [1, 1, 1],
+    markerColor: [1, 0.5, 1],
+    glowColor: [1, 1, 1],
+    offset: [0, 0],
+    markers: [
+      { location: [37.7595, -122.4367], size: 0.03 },
+      { location: [40.7128, -74.006], size: 0.1 },
+    ],
+    onRender: (state) => {
+      // Called on every animation frame.
+      // `state` will be an empty object, return updated params.
+      state.phi = phi
+      phi += 0.01
+    },
+  })
+</script>
+```
+
+Here’s a live demo of above: [https://codesandbox.io/s/cobe-basic-gb2ywq](https://codesandbox.io/s/cobe-basic-gb2ywq).
+
+If you are looking into using it in a UI framework, check out the next section.
+
+## With Frameworks
+
+### Installation
+
+This library is published to npm as `cobe`, you can install it to your project via:
+
+<Nextra.Tabs items={['npm', 'pnpm', 'yarn']}>
+  <Nextra.Tab>
+```bash
+npm i cobe
+```
+  </Nextra.Tab>
+  <Nextra.Tab>
+```bash
+pnpm i cobe
+```
+  </Nextra.Tab>
+  <Nextra.Tab>
+```bash
+yarn add cobe
+```
+  </Nextra.Tab>
+</Nextra.Tabs>
+
+Then, you can render the canvas and create a globe following the examples:
+
+### React
+
+Example: [https://codesandbox.io/s/eager-sky-r2q0g](https://codesandbox.io/s/eager-sky-r2q0g).
+
+### Vue 3
+
+Example: [https://stackblitz.com/edit/vitejs-vite-l5a8xk](https://stackblitz.com/edit/vitejs-vite-l5a8xk?file=src%2FApp.vue).
+
+### Svelte 
+
+Example: [https://codesandbox.io/s/great-visvesvaraya-78yf6](https://codesandbox.io/s/great-visvesvaraya-78yf6?file=/App.svelte).
+
