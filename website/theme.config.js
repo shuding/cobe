@@ -41,62 +41,27 @@ export default {
     )
   },
   head: ({ title, meta }) => {
-    const ogImage = 'https://swr.sh/assets/og-image.png'
+    const ogImage =
+      'https://repository-images.githubusercontent.com/429536908/62a4e686-8613-4b45-b7bb-fa35b558ae8e'
 
     return (
       <>
-        {/* Favicons, meta */}
-        <link
-          rel='apple-touch-icon'
-          sizes='180x180'
-          href='/favicon/apple-touch-icon.png'
-        />
-        <link
-          rel='icon'
-          type='image/png'
-          sizes='32x32'
-          href='/favicon/favicon-32x32.png'
-        />
-        <link
-          rel='icon'
-          type='image/png'
-          sizes='16x16'
-          href='/favicon/favicon-16x16.png'
-        />
-        <link rel='icon' type='image/svg+xml' href='/favicon/favicon.svg' />
-        <link rel='manifest' href='/favicon/site.webmanifest' />
-        <link
-          rel='mask-icon'
-          href='/favicon/safari-pinned-tab.svg'
-          color='#000000'
-        />
         <meta name='msapplication-TileColor' content='#ffffff' />
         <meta httpEquiv='Content-Language' content='en' />
         <meta
           name='description'
-          content={
-            meta.description ||
-            'SWR is a React Hooks library for data fetching. SWR first returns the data from cache (stale), then sends the fetch request (revalidate), and finally comes with the up-to-date data again.'
-          }
+          content={meta.description || 'A 5kB WebGL globe library.'}
         />
         <meta
           name='og:description'
-          content={
-            meta.description ||
-            'SWR is a React Hooks library for data fetching. SWR first returns the data from cache (stale), then sends the fetch request (revalidate), and finally comes with the up-to-date data again.'
-          }
+          content={meta.description || 'A 5kB WebGL globe library.'}
         />
         <meta name='twitter:card' content='summary_large_image' />
-        <meta name='twitter:site' content='@vercel' />
+        <meta name='twitter:site' content='@shuding_' />
         <meta name='twitter:image' content={ogImage} />
-        <meta
-          name='og:title'
-          content={
-            title ? title + ' – SWR' : 'SWR: React Hooks for Data Fetching'
-          }
-        />
+        <meta name='og:title' content={title ? title + ' – COBE' : 'COBE'} />
         <meta name='og:image' content={ogImage} />
-        <meta name='apple-mobile-web-app-title' content='SWR' />
+        <meta name='apple-mobile-web-app-title' content='COBE' />
       </>
     )
   },
