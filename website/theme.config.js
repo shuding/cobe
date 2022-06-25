@@ -132,4 +132,5 @@ export default {
     }
     return 'Edit this page on GitHub'
   },
+  gitTimestamp: false,
 }
