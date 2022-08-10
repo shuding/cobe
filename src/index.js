@@ -54,6 +54,7 @@ export default (canvas, opts) => {
 
   const p = new Phenomenon({
     canvas,
+    contextType: 'webgl',
     context: {
       alpha: true,
       stencil: false,
