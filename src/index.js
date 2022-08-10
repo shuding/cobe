@@ -52,9 +52,12 @@ export default (canvas, opts) => {
     }
   }
 
+  // See https://github.com/shuding/cobe/pull/34.
+  const contextType = canvas.getContext('webgl') ? 'webgl' : 'experimental-webgl'
+
   const p = new Phenomenon({
     canvas,
-    contextType: 'webgl',
+    contextType,
     context: {
       alpha: true,
       stencil: false,
