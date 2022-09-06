@@ -2,6 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   esbuild: ^0.13.14
+  glslx: ^0.2.13
   next: ^12.2.4
   nextra: 2.0.0-alpha.50
   nextra-theme-docs: 2.0.0-alpha.53
@@ -15,6 +16,7 @@ dependencies:
 
 devDependencies:
   esbuild: 0.13.15
+  glslx: 0.2.13
   next: 12.2.4_biqbaboplfbrettd7655fr4n2y
   nextra: 2.0.0-alpha.50_react@18.2.0
   nextra-theme-docs: 2.0.0-alpha.53_vyccxgqxcnj5vudpssiumaxlme
@@ -806,6 +808,11 @@ packages:
 
   /github-slugger/1.4.0:
     resolution: {integrity: sha512-w0dzqw/nt51xMVmlaV1+JRzN+oCa1KfcgGEWhxUG16wbdA+Xnt/yoFO8Z8x/V82ZcZ0wy6ln9QDup5avbhiDhQ==}
+    dev: true
+
+  /glslx/0.2.13:
+    resolution: {integrity: sha512-AjvDqcG3JGHFphnDpPraIiIVuNigblOGofr8EZFGlHUbpCuPzS43H3oqgd3m8h0+8a4Wf59fG5AMC1XirJjXfg==}
+    hasBin: true
     dev: true
 
   /graceful-fs/4.2.10:

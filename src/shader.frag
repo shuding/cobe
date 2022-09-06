@@ -16,6 +16,8 @@ uniform float markersNum;
 uniform float dotsBrightness;
 uniform float diffuse;
 uniform float dark;
+uniform float opacity;
+uniform float mapBaseBrightness;
 
 uniform sampler2D uTexture;
 
@@ -40,6 +42,7 @@ const float twoPiOnPhi = 3.8832220774509327;
 const float phiMinusOne = .618033988749895;
 const float r = .8;
 const float by2P32 = 2.3283064365386963e-10;
+const vec3 CAM = vec3(0.,0.,1.);
 
 float byDots = 1./dots;
 
@@ -135,47 +138,59 @@ void main() {
   uv.x *= uResolution.x / uResolution.y;
 
   float l = dot(uv, uv);
-  float dis;
+  vec4 color = vec4(0.);
 
-  // vec3 light=normalize(vec3(0.,-.1,1.));
-  vec3 light=(vec3(0.,0.,1.));
-  vec3 p = normalize(vec3(uv, sqrt(r*r - l)));
   if (l <= r * r) {
-    vec3 rP = p * rotate(theta, phi);
+    for (int side = 0; side <= 1; side++) {
+      vec4 layer = vec4(0.);
+      float dis;
 
-    float diff = -kTau * dots / kPhi;
+      vec3 light = vec3(0.,0.,1.);
+      vec3 p = normalize(vec3(uv, sqrt(r*r - l)));
 
-    vec3 gP = nearestFibonacciLattice(rP, dis);
+      p.z *= side > 0 ? -1. : 1.;
+      light.z *= side > 0 ? -1. : 1.;
 
-    float gPhi = asin(gP.y);
-    float gTheta = acos(-gP.x / cos(gPhi));
-    if (gP.z < 0.) gTheta = -gTheta;
+      vec3 rP = p * rotate(theta, phi);
 
-    float mapColor = texture2D(uTexture, vec2(((gTheta * .5) / PI), -(gPhi / PI + .5))).x;
-    float v = smoothstep(.008, .0, dis);
-    float dotNL = dot(p,light);
-    float lighting = pow(dotNL,diffuse)*dotsBrightness;
-    float sample = mapColor*v * lighting;
-    float colorFactor = mix((1. - sample) * pow(dotNL,.4), sample, dark) + .1;
-    gl_FragColor = vec4(baseColor*colorFactor,1.);
+      float diff = -kTau * dots / kPhi;
 
-    int num = int(markersNum);
-    float markerLight = 0.;
-    for (int m = 0; m < 64; m++) {
-      if (m >= num) break;
-      vec4 marker = markers[m];
-      vec3 c = marker.xyz;
-      vec3 l = c - rP;
-      float size = marker.w;
-      if (dot(l,l) > size * size * 4.) continue;
-      vec3 mP = nearestFibonacciLattice(c, dis);
-      dis = length(mP - rP);
-      if (dis < size) { markerLight += smoothstep(size*.5,0.,dis); }
+      vec3 gP = nearestFibonacciLattice(rP, dis);
+
+      float gPhi = asin(gP.y);
+      float gTheta = acos(-gP.x / cos(gPhi));
+      if (gP.z < 0.) gTheta = -gTheta;
+
+      float mapColor = max(texture2D(uTexture, vec2(((gTheta * .5) / PI), -(gPhi / PI + .5))).x, mapBaseBrightness);
+      float v = smoothstep(.008, .0, dis);
+      
+      float dotNL = dot(p, light);
+      float lighting = pow(dotNL,diffuse)*dotsBrightness;
+      float sample = mapColor*v * lighting;
+      float colorFactor = mix((1. - sample) * pow(dotNL,.4), sample, dark) + .1;
+      layer += vec4(baseColor * colorFactor, 1.);
+
+      int num = int(markersNum);
+      float markerLight = 0.;
+      for (int m = 0; m < 64; m++) {
+        if (m >= num) break;
+        vec4 marker = markers[m];
+        vec3 c = marker.xyz;
+        vec3 l = c - rP;
+        float size = marker.w;
+        if (dot(l,l) > size * size * 4.) continue;
+        vec3 mP = nearestFibonacciLattice(c, dis);
+        dis = length(mP - rP);
+        if (dis < size) { markerLight += smoothstep(size*.5,0.,dis); }
+      }
+      markerLight = min(1., markerLight * lighting);
+      layer.xyz = mix(layer.xyz, markerColor, markerLight);
+      layer.xyz += pow(1. - dotNL, 4.) * glowColor;
+
+      color += layer * (1. + (side > 0 ? -opacity : opacity)) / 2.;
     }
-    markerLight = min(1.,markerLight*lighting);
-    gl_FragColor.xyz = mix(gl_FragColor.xyz,markerColor,markerLight);
-    gl_FragColor.xyz += pow(1.-dot(p,light),4.)*glowColor;
   }
-  float glowFactor = pow(dot(normalize(vec3(-uv, sqrt(1.- l))),light),4.)*smoothstep(0.1,1.,.2/(l-r*r));
-  gl_FragColor += vec4(glowFactor*glowColor,glowFactor);
+
+  float glowFactor = pow(dot(normalize(vec3(-uv, sqrt(1.- l))), CAM), 4.) * smoothstep(0.1,1.,.2/(l-r*r));
+  gl_FragColor = color + vec4(glowFactor * glowColor, glowFactor);
 }
