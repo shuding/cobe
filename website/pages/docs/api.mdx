@@ -27,12 +27,14 @@ An object with the following properties:
 | diffuse | Control the [diffuse lighting](https://en.wikipedia.org/wiki/Computer_graphics_lighting#:~:text=of%20lighting%20interactions.-,Diffuse,the%20angle%20of%20incoming%20light.), 0 ≤ diffuse | Required |
 | mapSamples | Number of dots displayed, 0 ≤ mapSamples ≤ 100000 | Required |
 | mapBrightness | Brightness of the dots, 0 ≤ mapBrightness | Required |
+| mapBaseBrightness | Brightness of samples that are not on the map, 0 ≤ mapBaseBrightness | |
 | baseColor | [r, g, b] of the base color, 0 ≤ r, g, b ≤ 1 | |
 | markerColor | [r, g, b] of the markers’ color, 0 ≤ r, g, b ≤ 1 | |
 | glowColor | [r, g, b] of the glow color, 0 ≤ r, g, b ≤ 1 | |
 | scale | Scales the globe, 0 ≤ scale |  |
 | offset | [offsetX, offsetY], offset of the globe in pixel |  |
 | markers | An array of markers displayed | |
+| opacity | The transparency of the globe texture | |
 | onRender | A callback function called when a new frame is rendered | Required |
 
 You can check how some of them actually look like in the [Playground](https://cobe-playground.vercel.app).
