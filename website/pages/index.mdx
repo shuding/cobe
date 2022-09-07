@@ -30,15 +30,17 @@ export function Cobe() {
       width: width * 2,
       height: width * 2,
       phi: 0,
-      theta: 0.3,
+      theta: 0.2,
       dark: 1,
       diffuse: 3,
       mapSamples: 16000,
-      mapBrightness: 1.2,
-      baseColor: [1, 1, 1],
+      mapBrightness: 1.8,
+      // mapBaseBrightness: .05,
+      baseColor: [1, 1.1, 1.2],
       markerColor: [251 / 255, 100 / 255, 21 / 255],
-      glowColor: [1.2, 1.2, 1.2],
+      glowColor: [2., 2.1, 2.2],
       markers: [],
+      // opacity: .6,
       onRender: (state) => {
         // Called on every animation frame.
         // `state` will be an empty object, return updated params.

@@ -10,14 +10,16 @@
   "repository": "shuding/cobe",
   "license": "MIT",
   "scripts": {
+    "build:glslx": "glslx src/shader.frag --output=src/shader.min.js --format=js",
     "build:esm": "node scripts/build.js && cp src/index.d.ts dist/index.d.ts",
-    "build": "pnpm build:esm"
+    "build": "pnpm build:glslx && pnpm build:esm"
   },
   "dependencies": {
     "phenomenon": "^1.6.0"
   },
   "devDependencies": {
     "esbuild": "^0.13.14",
+    "glslx": "^0.2.13",
     "next": "^12.2.4",
     "nextra": "2.0.0-alpha.50",
     "nextra-theme-docs": "2.0.0-alpha.53",

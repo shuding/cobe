@@ -13,6 +13,8 @@ const OPT_DPR = 'devicePixelRatio'
 const OPT_DARK = 'dark'
 const OPT_OFFSET = 'offset'
 const OPT_SCALE = 'scale'
+const OPT_OPACITY = 'opacity'
+const OPT_MAP_BASE_BRIGHTNESS = 'mapBaseBrightness'
 
 const OPT_MAPPING = {
   [OPT_PHI]: GLSLX_NAME_PHI,
@@ -26,6 +28,8 @@ const OPT_MAPPING = {
   [OPT_DARK]: GLSLX_NAME_DARK,
   [OPT_OFFSET]: GLSLX_NAME_OFFSET,
   [OPT_SCALE]: GLSLX_NAME_SCALE,
+  [OPT_OPACITY]: GLSLX_NAME_OPACITY,
+  [OPT_MAP_BASE_BRIGHTNESS]: GLSLX_NAME_MAP_BASE_BRIGHTNESS,
 }
 
 const { PI, sin, cos } = Math
@@ -53,7 +57,9 @@ export default (canvas, opts) => {
   }
 
   // See https://github.com/shuding/cobe/pull/34.
-  const contextType = canvas.getContext('webgl') ? 'webgl' : 'experimental-webgl'
+  const contextType = canvas.getContext('webgl')
+    ? 'webgl'
+    : 'experimental-webgl'
 
   const p = new Phenomenon({
     canvas,
@@ -119,6 +125,10 @@ export default (canvas, opts) => {
       [GLSLX_NAME_THETA]: createUniform('float', OPT_THETA),
       [GLSLX_NAME_DOTS]: createUniform('float', OPT_DOTS),
       [GLSLX_NAME_DOTS_BRIGHTNESS]: createUniform('float', OPT_MAP_BRIGHTNESS),
+      [GLSLX_NAME_MAP_BASE_BRIGHTNESS]: createUniform(
+        'float',
+        OPT_MAP_BASE_BRIGHTNESS
+      ),
       [GLSLX_NAME_BASE_COLOR]: createUniform('vec3', OPT_BASE_COLOR),
       [GLSLX_NAME_MARKER_COLOR]: createUniform('vec3', OPT_MARKER_COLOR),
       [GLSLX_NAME_DIFFUSE]: createUniform('float', OPT_DIFFUSE),
@@ -134,6 +144,7 @@ export default (canvas, opts) => {
       },
       [GLSLX_NAME_OFFSET]: createUniform('vec2', OPT_OFFSET, [0, 0]),
       [GLSLX_NAME_SCALE]: createUniform('float', OPT_SCALE, 1),
+      [GLSLX_NAME_OPACITY]: createUniform('float', OPT_OPACITY, 1),
     },
     mode: 4,
     geometry: {
