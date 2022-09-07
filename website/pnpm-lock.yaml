@@ -1,7 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
-  cobe: ^0.5.0
+  cobe: ^0.6.1
   next: ^12.1.6-canary.6
   nextra: 2.0.0-alpha.56
   nextra-theme-docs: 2.0.0-alpha.59
@@ -10,7 +10,7 @@ specifiers:
   react-spring: ^9.4.4
 
 dependencies:
-  cobe: 0.5.0
+  cobe: 0.6.1
   next: 12.1.6-canary.6_zpnidt7m3osuk7shl3s4oenomq
   nextra: 2.0.0-alpha.56_react@18.0.0
   nextra-theme-docs: 2.0.0-alpha.59_gk5rtkd4pab23ol2ueguzjjiiq
@@ -594,8 +594,8 @@ packages:
       execa: 0.8.0
     dev: false
 
-  /cobe/0.5.0:
-    resolution: {integrity: sha512-iutLGC4FU0WyruiF0Rlq/iKsDtuM3GtsTd/bNi4gjT0eSOT9Mrpp/dGV46HYPaAYmebMsUFFdhQ5hqZZEChnPQ==}
+  /cobe/0.6.1:
+    resolution: {integrity: sha512-aqtj9FPpPncXDE5KCHCcL9k7ZaudCPZlj8k/1mhiMf9ubOUurYFyq/NRtofFLJEjMoTTNF6UecfuvBYdVjlyxA==}
     dependencies:
       phenomenon: 1.6.0
     dev: false
