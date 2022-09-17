@@ -13,6 +13,7 @@ export interface COBEOptions {
   theta: number
   mapSamples: number
   mapBrightness: number
+  mapBaseBrightness?: number
   baseColor: [number, number, number]
   markerColor: [number, number, number]
   glowColor: [number, number, number]
@@ -20,6 +21,7 @@ export interface COBEOptions {
   diffuse: number
   devicePixelRatio: number
   dark: number
+  opacity?: number
   offset?: [number, number]
   scale?: number
 }
