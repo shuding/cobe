@@ -24,6 +24,7 @@ export interface COBEOptions {
   opacity?: number
   offset?: [number, number]
   scale?: number
+  context?: WebGLContextAttributes
 }
 
 export default function createGlobe(
