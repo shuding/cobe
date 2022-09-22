@@ -70,6 +70,7 @@ export default (canvas, opts) => {
       antialias: true,
       depth: false,
       preserveDrawingBuffer: false,
+      ...opts.context,
     },
     settings: {
       [OPT_DPR]: opts[OPT_DPR] || 1,
@@ -158,9 +159,9 @@ export default (canvas, opts) => {
       ],
     },
     onRender: ({ uniforms }) => {
-      const state = {}
+      let state = {}
       if (opts.onRender) {
-        opts.onRender(state)
+        state = opts.onRender(state) || state
         for (let k in OPT_MAPPING) {
           if (state[k] !== undefined) {
             uniforms[OPT_MAPPING[k]].value = state[k]
