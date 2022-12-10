@@ -1,6 +1,7 @@
 {
   "auto-rotate": "Auto Rotate",
   "draggable": "Draggable",
+  "draggable-and-rotate": "Draggable & Auto Rotate",
   "rotate-to-location": "Rotate to Location",
   "scaled": "Scaled"
 }
