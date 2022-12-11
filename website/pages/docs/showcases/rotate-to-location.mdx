@@ -73,20 +73,20 @@ export function Cobe() {
         transition: 'opacity 1s ease',
       }}
     />
-    <div className="flex justify-center control-buttons" style={{ gap: '.5rem' }}>
+    <div className="flex flex-col md:flex-row justify-center items-center control-buttons" style={{ gap: '.5rem' }}>
       Rotate to:
       <button onClick={() => {
         focusRef.current = locationToAngles(37.78, -122.412)
-      }}>San Francisco</button>
+      }}>📍 San Francisco</button>
       <button onClick={() => {
         focusRef.current = locationToAngles(52.52, 13.405)
-      }}>Berlin</button>
+      }}>📍 Berlin</button>
       <button onClick={() => {
         focusRef.current = locationToAngles(35.676, 139.65)
-      }}>Tokyo</button>
+      }}>📍 Tokyo</button>
       <button onClick={() => {
         focusRef.current = locationToAngles(-34.60, -58.38)
-      }}>Buenos Aires</button>
+      }}>📍 Buenos Aires</button>
     </div>
   </div>
 }
@@ -99,8 +99,9 @@ Transforming longitude and latitude to angles, and controlling the animation dir
 
 <style jsx global>{`
 .control-buttons button {
-  text-decoration-line: underline;
-  text-underline-position: under;
-  text-decoration-thickness: from-font;
+  background: rgba(155, 155, 155, 0.2);
+  border-radius: 9px;
+  padding: 0.2rem .5rem;
+  cursor: pointer;
 }
 `}</style>
