@@ -4,7 +4,8 @@
   "description": "",
   "main": "theme.config.js",
   "dependencies": {
-    "cobe": "^0.6.1",
+    "cobe": "workspace:*",
+    "leva": "^0.9.34",
     "next": "^12.1.6-canary.6",
     "nextra": "2.0.0-alpha.56",
     "nextra-theme-docs": "2.0.0-alpha.59",

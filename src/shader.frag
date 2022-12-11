@@ -42,7 +42,6 @@ const float twoPiOnPhi = 3.8832220774509327;
 const float phiMinusOne = .618033988749895;
 const float r = .8;
 const float by2P32 = 2.3283064365386963e-10;
-const vec3 CAM = vec3(0.,0.,1.);
 
 float byDots = 1./dots;
 
@@ -139,6 +138,7 @@ void main() {
 
   float l = dot(uv, uv);
   vec4 color = vec4(0.);
+  float glowFactor = 0.;
 
   if (l <= r * r) {
     for (int side = 0; side <= 1; side++) {
@@ -189,8 +189,12 @@ void main() {
 
       color += layer * (1. + (side > 0 ? -opacity : opacity)) / 2.;
     }
+
+    glowFactor = pow(dot(normalize(vec3(-uv, sqrt(1.- l))), vec3(0.,0.,1.)), 4.) * smoothstep(0.,1.,.2/(l-r*r));
+  } else {
+    float outD = sqrt(.2/(l - r * r));
+    glowFactor = smoothstep(0.5,1., outD / (outD + 1.));
   }
 
-  float glowFactor = pow(dot(normalize(vec3(-uv, sqrt(1.- l))), CAM), 4.) * smoothstep(0.1,1.,.2/(l-r*r));
   gl_FragColor = color + vec4(glowFactor * glowColor, glowFactor);
 }

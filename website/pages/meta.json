@@ -16,7 +16,8 @@
   },
   "playground": {
     "type": "page",
-    "newWindow": true,
-    "href": "https://cobe-playground.vercel.app"
+    "theme": {
+      "layout": "raw"
+    }
   }
 }
