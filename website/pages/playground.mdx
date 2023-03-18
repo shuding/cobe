@@ -5,6 +5,7 @@ title: Playground
 import { Leva, useControls, button } from 'leva'
 import { useRef, useEffect } from 'react'
 import create from 'cobe'
+import { toRgbString } from '../toColor'
 
 export function Page() {
   const canvasRef = useRef()
@@ -26,10 +27,12 @@ export function Page() {
     offsetX: { value: 0, min: -1, max: 1 },
     offsetY: { value: 0, min: -1, max: 1 },
     opacity: { value: 0.9, min: 0, max: 1 },
+    backgroundColor: { r: 255, g: 255, b: 255, a: 1 },
     'Toggle Rotation': button(() => {
       pause.current = !pause.current
     }),
   })
+  const backgroundColor = toRgbString(paramsRef?.current?.backgroundColor)
   useEffect(() => {
     if (!canvasRef.current) return
     const canvas = canvasRef.current
@@ -104,10 +107,15 @@ export function Page() {
       </div>
       <canvas
         ref={canvasRef}
-        style={{ width: 'min(100vmin, 800px)', height: 'min(100vmin, 800px)', margin: '20px auto' }}
+        style={{
+          width: 'min(100vmin, 800px)',
+          height: 'min(100vmin, 800px)',
+          margin: '20px auto',
+          backgroundColor
+        }}
       />
     </>
   )
 }
 
-<Page/>
+<Page />
