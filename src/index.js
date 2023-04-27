@@ -2,12 +2,13 @@ import Phenomenon from 'phenomenon'
 
 const OPT_PHI = 'phi'
 const OPT_THETA = 'theta'
-const OPT_DOTS = 'mapSamples'
+// const OPT_DOTS = 'mapSamples'
 const OPT_MAP_BRIGHTNESS = 'mapBrightness'
 const OPT_BASE_COLOR = 'baseColor'
-const OPT_MARKER_COLOR = 'markerColor'
+// const OPT_MARKER_COLOR = 'markerColor'
 const OPT_GLOW_COLOR = 'glowColor'
-const OPT_MARKERS = 'markers'
+// const OPT_MARKERS = 'markers'
+const OPT_GLOBES = 'globes'
 const OPT_DIFFUSE = 'diffuse'
 const OPT_DPR = 'devicePixelRatio'
 const OPT_DARK = 'dark'
@@ -19,10 +20,10 @@ const OPT_MAP_BASE_BRIGHTNESS = 'mapBaseBrightness'
 const OPT_MAPPING = {
   [OPT_PHI]: GLSLX_NAME_PHI,
   [OPT_THETA]: GLSLX_NAME_THETA,
-  [OPT_DOTS]: GLSLX_NAME_DOTS,
+  // [OPT_DOTS]: GLSLX_NAME_DOTS,
   [OPT_MAP_BRIGHTNESS]: GLSLX_NAME_DOTS_BRIGHTNESS,
   [OPT_BASE_COLOR]: GLSLX_NAME_BASE_COLOR,
-  [OPT_MARKER_COLOR]: GLSLX_NAME_MARKER_COLOR,
+  // [OPT_MARKER_COLOR]: GLSLX_NAME_MARKER_COLOR,
   [OPT_GLOW_COLOR]: GLSLX_NAME_GLOW_COLOR,
   [OPT_DIFFUSE]: GLSLX_NAME_DIFFUSE,
   [OPT_DARK]: GLSLX_NAME_DARK,
@@ -32,19 +33,11 @@ const OPT_MAPPING = {
   [OPT_MAP_BASE_BRIGHTNESS]: GLSLX_NAME_MAP_BASE_BRIGHTNESS,
 }
 
-const { PI, sin, cos } = Math
-
-const mapMarkers = (markers) => {
+const mapGlobes = (globes) => {
   return [].concat(
-    ...markers.map((m) => {
-      let [a, b] = m.location
-      a = (a * PI) / 180
-      b = (b * PI) / 180 - PI
-      const cx = cos(a)
-      return [-cx * cos(b), sin(a), cx * sin(b), m.size]
-    }),
-    // Make sure to fill zeros
-    [0, 0, 0, 0]
+    ...globes.map((m) => {
+      return [m.x, m.y, m.textureBrightness, m.globeBrightness]
+    })
   )
 }
 
@@ -124,25 +117,33 @@ export default (canvas, opts) => {
       },
       [GLSLX_NAME_PHI]: createUniform('float', OPT_PHI),
       [GLSLX_NAME_THETA]: createUniform('float', OPT_THETA),
-      [GLSLX_NAME_DOTS]: createUniform('float', OPT_DOTS),
+      // [GLSLX_NAME_DOTS]: createUniform('float', OPT_DOTS),
       [GLSLX_NAME_DOTS_BRIGHTNESS]: createUniform('float', OPT_MAP_BRIGHTNESS),
       [GLSLX_NAME_MAP_BASE_BRIGHTNESS]: createUniform(
         'float',
         OPT_MAP_BASE_BRIGHTNESS
       ),
       [GLSLX_NAME_BASE_COLOR]: createUniform('vec3', OPT_BASE_COLOR),
-      [GLSLX_NAME_MARKER_COLOR]: createUniform('vec3', OPT_MARKER_COLOR),
+      // [GLSLX_NAME_MARKER_COLOR]: createUniform('vec3', OPT_MARKER_COLOR),
       [GLSLX_NAME_DIFFUSE]: createUniform('float', OPT_DIFFUSE),
       [GLSLX_NAME_GLOW_COLOR]: createUniform('vec3', OPT_GLOW_COLOR),
       [GLSLX_NAME_DARK]: createUniform('float', OPT_DARK),
-      [GLSLX_NAME_MARKERS]: {
-        type: 'vec4',
-        value: mapMarkers(opts[OPT_MARKERS]),
-      },
-      [GLSLX_NAME_MARKERS_NUM]: {
+      [GLSLX_NAME_GLOBES_NUM]: createUniform('float', {
         type: 'float',
-        value: opts[OPT_MARKERS].length,
+        value: opts[OPT_GLOBES].length,
+      }),
+      [GLSLX_NAME_GLOBES]: {
+        type: 'vec4',
+        value: mapGlobes(opts[OPT_GLOBES]),
       },
+      // [GLSLX_NAME_MARKERS]: {
+      //   type: 'vec4',
+      //   value: mapMarkers(opts[OPT_MARKERS]),
+      // },
+      // [GLSLX_NAME_MARKERS_NUM]: {
+      //   type: 'float',
+      //   value: opts[OPT_MARKERS].length,
+      // },
       [GLSLX_NAME_OFFSET]: createUniform('vec2', OPT_OFFSET, [0, 0]),
       [GLSLX_NAME_SCALE]: createUniform('float', OPT_SCALE, 1),
       [GLSLX_NAME_OPACITY]: createUniform('float', OPT_OPACITY, 1),
@@ -167,9 +168,9 @@ export default (canvas, opts) => {
             uniforms[OPT_MAPPING[k]].value = state[k]
           }
         }
-        if (state[OPT_MARKERS] !== undefined) {
-          uniforms[GLSLX_NAME_MARKERS].value = mapMarkers(state[OPT_MARKERS])
-          uniforms[GLSLX_NAME_MARKERS_NUM].value = state[OPT_MARKERS].length
+        if (state[OPT_GLOBES] !== undefined) {
+          uniforms[GLSLX_NAME_GLOBES].value = mapGlobes(state[OPT_GLOBES])
+          uniforms[GLSLX_NAME_GLOBES_NUM].value = state[OPT_GLOBES].length
         }
         if (state.width && state.height) {
           uniforms[GLSLX_NAME_U_RESOLUTION].value = [state.width, state.height]
