@@ -1,7 +1,7 @@
 import esbuild from 'esbuild'
 
 import __TEXTURE__ from '../src/texture.js'
-import * as __SHADER__ from '../src/shader.min.js'
+import * as __SHADER__ from '../src/base.min.js'
 
 esbuild
   .build({

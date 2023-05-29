@@ -114,7 +114,9 @@ export default (canvas, opts) => {
     },
   })
 
-  p.add('', {
+  let state = {}
+
+  p.add('base', {
     vertex: `attribute vec3 aPosition;uniform mat4 uProjectionMatrix;uniform mat4 uModelMatrix;uniform mat4 uViewMatrix;void main(){gl_Position=uProjectionMatrix*uModelMatrix*uViewMatrix*vec4(aPosition,1.);}`,
     fragment: GLSLX_SOURCE_MAIN,
     uniforms: {
@@ -159,7 +161,7 @@ export default (canvas, opts) => {
       ],
     },
     onRender: ({ uniforms }) => {
-      let state = {}
+      state = {}
       if (opts.onRender) {
         state = opts.onRender(state) || state
         for (let k in OPT_MAPPING) {
@@ -176,6 +178,128 @@ export default (canvas, opts) => {
         }
       }
     },
+  })
+
+  let markers = mapMarkers(opts[OPT_MARKERS])
+  const markerPos = {
+    name: 'markerPos',
+    data: (index) => {
+      const marker = markers.slice(index * 4, index * 4 + 4)
+      marker[3] = marker[3] ?? 0.05
+      return marker
+    },
+    size: 4,
+  }
+
+  p.add('marker', {
+    multiplier: opts[OPT_MARKERS].length,
+    attributes: [{ ...markerPos }],
+    vertex: `
+  attribute vec3 aPosition;
+  attribute vec4 markerPos;
+
+  uniform vec2 uResolution;
+  uniform mat4 uProjectionMatrix;
+  uniform mat4 uModelMatrix;
+  uniform mat4 uViewMatrix;
+  uniform float phi;
+  uniform float theta;
+  uniform vec2 offset;
+  uniform float scale;
+
+  varying vec4 vMarkerPos;
+
+  const float sqrt5 = 2.23606797749979;
+  const float PI = 3.141592653589793;
+  const float HALF_PI = 1.5707963267948966;
+  const float kTau = 6.283185307179586;
+  const float kPhi = 1.618033988749895;
+  const float byLogPhiPlusOne = 0.7202100452062783;
+  const float twoPiOnPhi = 3.8832220774509327;
+  const float phiMinusOne = .618033988749895;
+  const float r = .8;
+  const float by2P32 = 2.3283064365386963e-10;
+
+  mat3 rotate(float theta, float phi) {
+    float cx = cos(theta);
+    float cy = cos(phi);
+    float sx = sin(theta);
+    float sy = sin(phi);
+  
+    return mat3(
+      cy, sy * sx, -sy * cx,
+      0., cx, sx,
+      sy, cy * -sx, cy * cx
+    );
+  }
+
+  void main(){
+    gl_PointSize = markerPos.w * 400. * scale;
+    vec3 c = markerPos.xyz;
+
+    vec3 pos = c * rotate(0., -phi) * rotate(-theta, 0.) * 1.32 * scale;
+
+    vMarkerPos.xyz = pos;
+    vMarkerPos.w = markerPos.w;
+
+    gl_Position = uProjectionMatrix * uModelMatrix * uViewMatrix * vec4(aPosition + vec3(pos.xy, 0.), 1.);
+  }
+    `,
+    fragment: `
+  precision mediump float;
+
+  uniform vec2 uResolution;
+  uniform vec3 uMarkerColor;
+  uniform vec2 offset;
+  uniform float scale;
+
+  varying vec4 vMarkerPos;
+
+  void main(){
+    if (vMarkerPos.z < 0.) {
+      discard;
+    }
+    vec2 uv = gl_PointCoord.xy * 2. - 1.;
+    float l = length(uv);
+    if (l > 1.0) {
+        discard;
+    }
+    gl_FragColor = vec4(0.,0.,1., 1.);
+  }
+`,
+    uniforms: {
+      uMarkerColor: createUniform('vec3', OPT_MARKER_COLOR),
+      phi: createUniform('float', OPT_PHI),
+      theta: createUniform('float', OPT_THETA),
+      offset: createUniform('vec2', OPT_OFFSET, [0, 0]),
+      scale: createUniform('float', OPT_SCALE, 1),
+    },
+    onRender: (renderer) => {
+      if (opts.onRender) {
+        if (state[OPT_MARKER_COLOR] !== undefined) {
+          renderer.uniforms.uMarkerColor.value = state[OPT_MARKER_COLOR]
+        }
+        if (state[OPT_PHI] !== undefined) {
+          renderer.uniforms.phi.value = state[OPT_PHI]
+        }
+        if (state[OPT_THETA] !== undefined) {
+          renderer.uniforms.theta.value = state[OPT_THETA]
+        }
+        if (state[OPT_OFFSET] !== undefined) {
+          renderer.uniforms.offset.value = state[OPT_OFFSET]
+        }
+        if (state[OPT_SCALE] !== undefined) {
+          renderer.uniforms.scale.value = state[OPT_SCALE]
+        }
+
+        if (state[OPT_MARKERS] !== undefined) {
+          markers = mapMarkers(state[OPT_MARKERS])
+          renderer.multiplier = state[OPT_MARKERS].length
+          renderer.prepareAttribute({ ...markerPos })
+        }
+      }
+    },
+    debug: true,
   })
 
   return p
