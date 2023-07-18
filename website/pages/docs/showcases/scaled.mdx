@@ -32,7 +32,10 @@ export function Cobe() {
       }
     })
     setTimeout(() => canvasRef.current.style.opacity = '1')
-    return () => globe.destroy()
+    return () => { 
+      globe.destroy();
+      window.removeEventListener('resize', onResize);
+    }
   }, [])
   return <div style={{
     width: '100%',
