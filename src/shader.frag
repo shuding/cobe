@@ -11,7 +11,7 @@ uniform float scale;
 uniform vec3 baseColor;
 uniform vec3 markerColor;
 uniform vec3 glowColor;
-uniform vec4 markers[64];
+uniform vec4 markers[300];
 uniform float markersNum;
 uniform float dotsBrightness;
 uniform float diffuse;
@@ -172,7 +172,7 @@ void main() {
 
       int num = int(markersNum);
       float markerLight = 0.;
-      for (int m = 0; m < 64; m++) {
+      for (int m = 0; m < 300; m++) {
         if (m >= num) break;
         vec4 marker = markers[m];
         vec3 c = marker.xyz;

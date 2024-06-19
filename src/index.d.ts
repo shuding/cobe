@@ -18,6 +18,7 @@ export interface COBEOptions {
   markerColor: [number, number, number]
   glowColor: [number, number, number]
   markers: Marker[]
+  maxMarkers?: number
   diffuse: number
   devicePixelRatio: number
   dark: number
