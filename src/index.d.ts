@@ -21,6 +21,7 @@ export interface COBEOptions {
   diffuse: number
   devicePixelRatio: number
   dark: number
+  maxMarkers?: number
   opacity?: number
   offset?: [number, number]
   scale?: number

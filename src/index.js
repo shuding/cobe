@@ -15,6 +15,8 @@ const OPT_OFFSET = 'offset'
 const OPT_SCALE = 'scale'
 const OPT_OPACITY = 'opacity'
 const OPT_MAP_BASE_BRIGHTNESS = 'mapBaseBrightness'
+const OPT_MAX_MARKERS = 'maxMarkers'
+const DEFAULT_MAX_MARKERS = 64
 
 const OPT_MAPPING = {
   [OPT_PHI]: GLSLX_NAME_PHI,
@@ -34,9 +36,9 @@ const OPT_MAPPING = {
 
 const { PI, sin, cos } = Math
 
-const mapMarkers = (markers) => {
+const mapMarkers = (markers, maxMarkers) => {
   return [].concat(
-    ...markers.map((m) => {
+    ...markers.slice(0, maxMarkers).map((m) => {
       let [a, b] = m.location
       a = (a * PI) / 180
       b = (b * PI) / 180 - PI
@@ -139,7 +141,7 @@ export default (canvas, opts) => {
       [GLSLX_NAME_DARK]: createUniform('float', OPT_DARK),
       [GLSLX_NAME_MARKERS]: {
         type: 'vec4',
-        value: mapMarkers(opts[OPT_MARKERS]),
+        value: mapMarkers(opts[OPT_MARKERS], opts[OPT_MAX_MARKERS] || DEFAULT_MAX_MARKERS),
       },
       [GLSLX_NAME_MARKERS_NUM]: {
         type: 'float',
@@ -170,7 +172,7 @@ export default (canvas, opts) => {
           }
         }
         if (state[OPT_MARKERS] !== undefined) {
-          uniforms[GLSLX_NAME_MARKERS].value = mapMarkers(state[OPT_MARKERS])
+          uniforms[GLSLX_NAME_MARKERS].value = mapMarkers(state[OPT_MARKERS], opts[OPT_MAX_MARKERS] || DEFAULT_MAX_MARKERS)
           uniforms[GLSLX_NAME_MARKERS_NUM].value = state[OPT_MARKERS].length
         }
         if (state.width && state.height) {
