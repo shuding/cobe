@@ -141,7 +141,7 @@ export default (canvas, opts) => {
       [GLSLX_NAME_DARK]: createUniform('float', OPT_DARK),
       [GLSLX_NAME_MARKERS]: {
         type: 'vec4',
-        value: mapMarkers(opts[OPT_MARKERS], opts[OPT_MAX_MARKERS] || defaultMaxMarkers),
+        value: mapMarkers(opts[OPT_MARKERS], opts[OPT_MAX_MARKERS] || DEFAULT_MAX_MARKERS),
       },
       [GLSLX_NAME_MARKERS_NUM]: {
         type: 'float',
@@ -172,7 +172,7 @@ export default (canvas, opts) => {
           }
         }
         if (state[OPT_MARKERS] !== undefined) {
-          uniforms[GLSLX_NAME_MARKERS].value = mapMarkers(state[OPT_MARKERS], opts[OPT_MAX_MARKERS] || defaultMaxMarkers)
+          uniforms[GLSLX_NAME_MARKERS].value = mapMarkers(state[OPT_MARKERS], opts[OPT_MAX_MARKERS] || DEFAULT_MAX_MARKERS)
           uniforms[GLSLX_NAME_MARKERS_NUM].value = state[OPT_MARKERS].length
         }
         if (state.width && state.height) {
