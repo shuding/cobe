@@ -16,7 +16,7 @@ const OPT_SCALE = 'scale'
 const OPT_OPACITY = 'opacity'
 const OPT_MAP_BASE_BRIGHTNESS = 'mapBaseBrightness'
 const OPT_MAX_MARKERS = 'maxMarkers'
-const defaultMaxMarkers = 64
+const DEFAULT_MAX_MARKERS = 64
 
 const OPT_MAPPING = {
   [OPT_PHI]: GLSLX_NAME_PHI,
