@@ -39,7 +39,34 @@ export function Cobe() {
       baseColor: [1.1, 1.1, 1.1],
       markerColor: [251 / 255, 100 / 255, 21 / 255],
       glowColor: [1.1, 1.1, 1.1],
-      markers: [],
+      markers: [
+        // San Francisco, default color
+        { location: [37.7595, -122.4367], size: 0.05 },
+        // New York, red color
+        { location: [40.7128, -74.006], size: 0.05, color: [1, 0, 0] },
+        // Tokyo, blue color
+        { location: [35.6895, 139.6917], size: 0.05, color: [0, 0.5, 1] },
+        // Sydney, green color
+        { location: [-33.8688, 151.2093], size: 0.05, color: [0, 1, 0] },
+        // Rio de Janeiro, purple color
+        { location: [-22.9068, -43.1729], size: 0.05, color: [0.8, 0, 0.8] },
+        // Paris, yellow color
+        { location: [48.8566, 2.3522], size: 0.05, color: [1, 1, 0] },
+        // Porto, orange color
+        { location: [41.1579, -8.6291], size: 0.05, color: [1, 0.5, 0] },
+        // Athens, pink color
+        { location: [37.9838, 23.7275], size: 0.05, color: [1, 0.5, 1] },
+        // Rome, brown color
+        { location: [41.9028, 12.4964], size: 0.05, color: [0.5, 0.3, 0] },
+        // Kathmandu, blue color
+        { location: [27.7172, 85.324], size: 0.05, color: [0, 0.5, 1] },
+        // Tarbes, green color
+        { location: [43.4643, -0.5167], size: 0.05, color: [0, 1, 0] },
+        // Bamako, yellow color
+        { location: [12.6683, -8.0076], size: 0.05, color: [1, 1, 0] },
+        // Djibouti, purple color
+        { location: [11.5500, 43.1667], size: 0.05, color: [0.8, 0, 0.8] },
+      ],
       opacity: .7,
       onRender: (state) => {
         // Called on every animation frame.
@@ -65,7 +92,7 @@ export function Cobe() {
       fontWeight: 700,
       top: '50%',
       transform: 'translateY(-50%)',
-      zIndex: 1, 
+      zIndex: 1,
       textAlign: 'center',
       color: '#fff',
       pointerEvents: 'none',
@@ -73,7 +100,7 @@ export function Cobe() {
       position: 'absolute',
       mixBlendMode: 'difference'
     }}>
-      <h1 style={{ 
+      <h1 style={{
         fontSize: 'min(9vw,3.2em)',
         letterSpacing: '.3em',
         textIndent: '.3em',

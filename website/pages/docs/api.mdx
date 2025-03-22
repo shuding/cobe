@@ -1,6 +1,6 @@
 # API
 
-The library exports a default function `createGlobe`, which accepts two required parameters and returns a globe instance. Here’re the definitions:
+The library exports a default function `createGlobe`, which accepts two required parameters and returns a globe instance. Here're the definitions:
 
 ```ts
 import createGlobe from 'cobe'
@@ -18,7 +18,7 @@ An object with the following properties:
 
 | Property | Description | Required |
 |---|---|---|
-| devicePixelRatio | The “[DPR](https://developer.fastly.com/reference/io/dpr)”, defaults to 1 |  |
+| devicePixelRatio | The "[DPR](https://developer.fastly.com/reference/io/dpr)", defaults to 1 |  |
 | width | The width of the canvas | Required |
 | height | The height of the canvas | Required |
 | phi | The [φ angle](https://en.wikipedia.org/wiki/Spherical_coordinate_system), 0 ≤ phi ≤ 2π | Required |
@@ -29,7 +29,7 @@ An object with the following properties:
 | mapBrightness | Brightness of the dots, 0 ≤ mapBrightness | Required |
 | mapBaseBrightness | Brightness of samples that are not on the map, 0 ≤ mapBaseBrightness | |
 | baseColor | [r, g, b] of the base color, 0 ≤ r, g, b ≤ 1 | |
-| markerColor | [r, g, b] of the markers’ color, 0 ≤ r, g, b ≤ 1 | |
+| markerColor | [r, g, b] of the markers' color, 0 ≤ r, g, b ≤ 1 | |
 | glowColor | [r, g, b] of the glow color, 0 ≤ r, g, b ≤ 1 | |
 | scale | Scales the globe, 0 ≤ scale |  |
 | offset | [offsetX, offsetY], offset of the globe in pixel |  |
@@ -41,15 +41,19 @@ You can check how some of them actually look like in the [Playground](https://co
 
 ### `markers`
 
-A marker is an object of `location` and `size` properties. `location` is a pair of _latitude_ and _longitude_:
+A marker is an object of `location`, `size`, and optional `color` properties. `location` is a pair of _latitude_ and _longitude_:
 
 ```js
 markers: [
+  // Using the default markerColor
   { location: [37.7595, -122.4367], size: 0.03 },
-  { location: [40.7128, -74.006], size: 0.1 },
+  // Using a custom color (red)
+  { location: [40.7128, -74.006], size: 0.1, color: [1, 0, 0] },
   ...
 ]
 ```
+
+The `color` property is an RGB array with values between 0 and 1. If not specified, the marker will use the global `markerColor` setting.
 
 For example San Francisco is at [37.7595, -122.4367](https://www.latlong.net/c/?lat=37.774929&long=-122.419418).
 
