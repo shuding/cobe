@@ -52,7 +52,26 @@ export function Page() {
       baseColor: [0.3, 0.3, 0.3],
       markerColor: [1, 0.5, 1],
       glowColor: [1, 1, 1],
-      markers: [],
+      markers: [
+        // San Francisco - default color
+        { location: [37.7595, -122.4367] },
+        // New York - red
+        { location: [40.7128, -74.006], color: [1, 0, 0] },
+        // Berlin - green
+        { location: [52.520008, 13.404954], color: [0, 1, 0] },
+        // London - blue
+        { location: [51.507351, -0.127758], color: [0, 0, 1] },
+        // Tokyo - yellow
+        { location: [35.689487, 139.691711], color: [1, 1, 0] },
+        // Hong Kong - cyan
+        { location: [22.396427, 114.109497], color: [0, 1, 1] },
+        // Cairo - purple
+        { location: [30.047503, 31.233702], color: [0.8, 0, 0.8] },
+        // Sydney - orange (using default)
+        { location: [-33.86882, 151.20929] },
+        // Brazil - pink
+        { location: [-9.746956, -44.261249], color: [1, 0.4, 0.7] },
+      ].map((marker) => ({ ...marker, size: paramsRef.current.markerSize })),
       onRender: (state) => {
         state.dark = paramsRef.current.dark
         state.phi = paramsRef.current.phi + r
@@ -77,17 +96,6 @@ export function Page() {
           paramsRef.current.glowColor.g / 255,
           paramsRef.current.glowColor.b / 255,
         ]
-        state.markers = [
-          { location: [37.7595, -122.4367] },
-          { location: [40.7128, -74.006] },
-          { location: [52.520008, 13.404954] },
-          { location: [51.507351, -0.127758] },
-          { location: [35.689487, 139.691711] },
-          { location: [22.396427, 114.109497] },
-          { location: [30.047503, 31.233702] },
-          { location: [-33.86882, 151.20929] },
-          { location: [-9.746956, -44.261249] },
-        ].map((marker) => ({ ...marker, size: paramsRef.current.markerSize }))
         state.scale = paramsRef.current.scale
         state.offset = [
           paramsRef.current.offsetX * size * 4,
