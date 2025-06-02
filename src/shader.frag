@@ -11,12 +11,12 @@ uniform float scale;
 uniform vec3 baseColor;
 uniform vec3 markerColor;
 uniform vec3 glowColor;
-uniform vec4 markers[64];
+uniform vec4 markers[64 * 2]; // Now each marker takes 2 vec4 entries: [position+size, color]
 uniform float markersNum;
 uniform float dotsBrightness;
 uniform float diffuse;
 uniform float dark;
-uniform float opacity;
+uniform float opacity; 
 uniform float mapBaseBrightness;
 
 uniform sampler2D uTexture;
@@ -174,17 +174,25 @@ void main() {
       float markerLight = 0.;
       for (int m = 0; m < 64; m++) {
         if (m >= num) break;
-        vec4 marker = markers[m];
+        vec4 marker = markers[m * 2]; // Position and size
+        vec4 markerColorData = markers[m * 2 + 1]; // Color data
         vec3 c = marker.xyz;
         vec3 l = c - rP;
         float size = marker.w;
         if (dot(l,l) > size * size * 4.) continue;
         vec3 mP = nearestFibonacciLattice(c, dis);
         dis = length(mP - rP);
-        if (dis < size) { markerLight += smoothstep(size*.5,0.,dis); }
+        if (dis < size) { 
+          markerLight += smoothstep(size*.5,0.,dis); 
+          // If marker has a custom color (w component is 1), use it
+          if (markerColorData.w > 0.5) {
+            layer.xyz = mix(layer.xyz, markerColorData.xyz, smoothstep(size*.5,0.,dis) * lighting);
+          } else {
+            // Otherwise use the global marker color
+            layer.xyz = mix(layer.xyz, markerColor, smoothstep(size*.5,0.,dis) * lighting);
+          }
+        }
       }
-      markerLight = min(1., markerLight * lighting);
-      layer.xyz = mix(layer.xyz, markerColor, markerLight);
       layer.xyz += pow(1. - dotNL, 4.) * glowColor;
 
       color += layer * (1. + (side > 0 ? -opacity : opacity)) / 2.;
