@@ -1,4 +1,3 @@
-
 [![COBE](card.png)](https://cobe.vercel.app)
 
 <p align="center">A <b>lightweight (5kB)</b> WebGL globe lib. The name "COBE" stands for <a href="https://en.wikipedia.org/wiki/Cosmic_Background_Explorer" target="_blank">Cosmic Background Explorer</a>.</p>
@@ -43,9 +42,11 @@ const globe = createGlobe(canvas, {
   markerColor: [1, 0.5, 1],
   glowColor: [1, 1, 1],
   offset: [0, 0],
+  // You can specify a custom color for each marker using the color property
+  // If not specified, markers will use the global markerColor
   markers: [
-    { location: [37.7595, -122.4367], size: 0.03 },
-    { location: [40.7128, -74.006], size: 0.1 },
+    { location: [37.7595, -122.4367], size: 0.03 }, // Uses global markerColor
+    { location: [40.7128, -74.006], size: 0.1, color: [1, 0, 0] }, // Custom red color
   ],
   onRender: (state) => {
     // Called on every animation frame.
