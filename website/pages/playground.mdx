@@ -6,14 +6,77 @@ import { Leva, useControls, button } from 'leva'
 import { useRef, useEffect } from 'react'
 import create from 'cobe'
 import { toRgbString } from '../toColor'
+import { useSpring } from 'react-spring'
 
 export function Page() {
   const canvasRef = useRef()
+  const globeRef = useRef(null)
+
+  // Refs for spring-based dragging
   const pause = useRef(false)
+  const isDragging = useRef(false)
+  const lastPointerPosition = useRef({ x: 0, y: 0 })
+  const dragOffset = useRef({ x: 0, y: 0 })
+  const autoRotateOffset = useRef(0)
+
+  // Spring animations for smooth movement
+  const [{ rx, ry }, api] = useSpring(() => ({
+    rx: 0,
+    ry: 0,
+    config: {
+      mass: 1,
+      tension: 280,
+      friction: 40,
+      precision: 0.001,
+    },
+    // The onRest callback is preserved for the "coasting" effect.
+    onRest: () => {
+      // This will only fire if the user is not dragging and coasting is allowed.
+      if (!isDragging.current) {
+        dragOffset.current.x += rx.get()
+        dragOffset.current.y += ry.get()
+        api.set({ rx: 0, ry: 0 })
+      }
+    },
+  }))
+
   const paramsRef = useRef({})
   paramsRef.current = useControls({
-    phi: { value: 0, min: 0, max: Math.PI * 2 },
-    theta: { value: 0, min: -Math.PI / 2, max: Math.PI / 2 },
+    'Enable Spring Effect': {
+      value: true,
+      label: 'Enable Spring Effect',
+    },
+    // Spring config - only shown when the effect is enabled
+    mass: {
+      value: 1,
+      min: 0.1,
+      max: 10,
+      step: 0.1,
+      render: (get) => get('Enable Spring Effect'),
+    },
+    tension: {
+      value: 280,
+      min: 10,
+      max: 1000,
+      step: 10,
+      render: (get) => get('Enable Spring Effect'),
+    },
+    friction: {
+      value: 40,
+      min: 1,
+      max: 100,
+      step: 1,
+      render: (get) => get('Enable Spring Effect'),
+    },
+    precision: {
+      value: 0.001,
+      min: 0.0001,
+      max: 0.1,
+      step: 0.0001,
+      render: (get) => get('Enable Spring Effect'),
+    },
+    phi: { value: 0, min: 0, max: Math.PI * 2, label: 'Phi (Horizontal)' },
+    theta: { value: 0, min: -Math.PI / 2, max: Math.PI / 2, label: 'Theta (Vertical)' },
     mapSamples: { value: 16000, min: 500, max: 100000 },
     mapBrightness: { value: 6, min: 0, max: 12 },
     mapBaseBrightness: { value: 0, min: 0, max: 1 },
@@ -28,98 +91,208 @@ export function Page() {
     offsetY: { value: 0, min: -1, max: 1 },
     opacity: { value: 0.9, min: 0, max: 1 },
     backgroundColor: { r: 255, g: 255, b: 255, a: 1 },
+    dragX: { value: true, label: "Drag X" },
+    dragY: { value: true, label: "Drag Y" },
+    dragSensitivityX: { value: 0.005, min: 0.001, max: 0.02, step: 0.001, label: "X Sensitivity" },
+    dragSensitivityY: { value: 0.005, min: 0.001, max: 0.02, step: 0.001, label: "Y Sensitivity" },
+    returnXToDefault: { value: false, label: "Return X to Default" },
+    returnYToDefault: { value: true, label: "Return Y to Default" },
+    returnSpeed: { value: 0.05, min: 0.01, max: 1.0, step: 0.01, label: "Return Speed" },
+    autoRotateSpeed: { value: 0.003, min: 0, max: 1.0, step: 0.001, label: "Auto Rotate Speed" },
     'Toggle Rotation': button(() => {
-      pause.current = !pause.current
+      if (paramsRef.current['Enable Spring Effect']) {
+        pause.current = !pause.current
+      } else if (globeRef.current) {
+        globeRef.current.toggleRotation()
+      }
+    }),
+    'Reset Position': button(() => {
+      if (paramsRef.current['Enable Spring Effect']) {
+        dragOffset.current = { x: 0, y: 0 }
+        autoRotateOffset.current = 0
+        api.set({ rx: 0, ry: 0 })
+      } else if (globeRef.current) {
+        globeRef.current.resetPosition()
+      }
     }),
   })
-  const backgroundColor = toRgbString(paramsRef?.current?.backgroundColor)
+  const { 'Enable Spring Effect': enableSpring, ...controls } = paramsRef.current
+  const backgroundColor = toRgbString(controls.backgroundColor)
+
   useEffect(() => {
     if (!canvasRef.current) return
+    
+    if (globeRef.current) {
+        globeRef.current.destroy()
+        globeRef.current = null
+    }
+
     const canvas = canvasRef.current
     const size = Math.min(window.innerHeight, window.innerWidth, 800)
-    let r = 0
     canvas.width = size * 2
     canvas.height = size * 2
-    const p = create(canvas, {
+
+    const baseMarkers = [
+      { location: [37.7595, -122.4367] }, { location: [40.7128, -74.006], color: [1, 0, 0] },
+      { location: [52.520008, 13.404954], color: [0, 1, 0] }, { location: [51.507351, -0.127758], color: [0, 0, 1] },
+      { location: [35.689487, 139.691711], color: [1, 1, 0] }, { location: [22.396427, 114.109497], color: [0, 1, 1] },
+      { location: [30.047503, 31.233702], color: [0.8, 0, 0.8] }, { location: [-33.86882, 151.20929] },
+      { location: [-9.746956, -44.261249], color: [1, 0.4, 0.7] },
+    ];
+    
+    let globe
+
+    const commonProps = (params) => ({
       devicePixelRatio: 2,
       width: size * 2,
       height: size * 2,
-      phi: 0,
-      theta: 0,
-      diffuse: 1.2,
-      mapSamples: paramsRef.current.mapSamples,
-      mapBrightness: paramsRef.current.mapBrightness,
-      baseColor: [0.3, 0.3, 0.3],
-      markerColor: [1, 0.5, 1],
-      glowColor: [1, 1, 1],
-      markers: [
-        // San Francisco - default color
-        { location: [37.7595, -122.4367] },
-        // New York - red
-        { location: [40.7128, -74.006], color: [1, 0, 0] },
-        // Berlin - green
-        { location: [52.520008, 13.404954], color: [0, 1, 0] },
-        // London - blue
-        { location: [51.507351, -0.127758], color: [0, 0, 1] },
-        // Tokyo - yellow
-        { location: [35.689487, 139.691711], color: [1, 1, 0] },
-        // Hong Kong - cyan
-        { location: [22.396427, 114.109497], color: [0, 1, 1] },
-        // Cairo - purple
-        { location: [30.047503, 31.233702], color: [0.8, 0, 0.8] },
-        // Sydney - orange (using default)
-        { location: [-33.86882, 151.20929] },
-        // Brazil - pink
-        { location: [-9.746956, -44.261249], color: [1, 0.4, 0.7] },
-      ].map((marker) => ({ ...marker, size: paramsRef.current.markerSize })),
-      onRender: (state) => {
-        state.dark = paramsRef.current.dark
-        state.phi = paramsRef.current.phi + r
-        if (!pause.current) r += 0.003
-        state.theta = paramsRef.current.theta
-        state.mapSamples = paramsRef.current.mapSamples
-        state.mapBrightness = paramsRef.current.mapBrightness
-        state.mapBaseBrightness = paramsRef.current.mapBaseBrightness
-        state.diffuse = paramsRef.current.diffuse
-        state.baseColor = [
-          paramsRef.current.baseColor.r / 255,
-          paramsRef.current.baseColor.g / 255,
-          paramsRef.current.baseColor.b / 255,
-        ]
-        state.markerColor = [
-          paramsRef.current.markerColor.r / 255,
-          paramsRef.current.markerColor.g / 255,
-          paramsRef.current.markerColor.b / 255,
-        ]
-        state.glowColor = [
-          paramsRef.current.glowColor.r / 255,
-          paramsRef.current.glowColor.g / 255,
-          paramsRef.current.glowColor.b / 255,
-        ]
-        state.scale = paramsRef.current.scale
-        state.offset = [
-          paramsRef.current.offsetX * size * 4,
-          paramsRef.current.offsetY * size * 4,
-        ]
-        state.opacity = paramsRef.current.opacity
-      },
+      markers: baseMarkers.map((marker) => ({ ...marker, size: params.markerSize })),
+      mapSamples: params.mapSamples,
+      mapBrightness: params.mapBrightness,
+      mapBaseBrightness: params.mapBaseBrightness,
+      diffuse: params.diffuse,
+      dark: params.dark,
+      baseColor: [params.baseColor.r / 255, params.baseColor.g / 255, params.baseColor.b / 255],
+      markerColor: [params.markerColor.r / 255, params.markerColor.g / 255, params.markerColor.b / 255],
+      glowColor: [params.glowColor.r / 255, params.glowColor.g / 255, params.glowColor.b / 255],
+      scale: params.scale,
+      offset: [params.offsetX * size * 4, params.offsetY * size * 4],
+      opacity: params.opacity,
     })
-    return () => {
-      p.destroy()
+
+    if (enableSpring) {
+      globe = create(canvas, {
+        ...commonProps(paramsRef.current),
+        phi: 0,
+        theta: 0,
+        onRender: (state) => {
+          const params = paramsRef.current
+          if (!pause.current && !isDragging.current && !params.returnXToDefault) {
+            autoRotateOffset.current += params.autoRotateSpeed
+          }
+          if (!isDragging.current && params.returnXToDefault) {
+            const deltaX = 0 - dragOffset.current.x; const deltaAutoX = 0 - autoRotateOffset.current
+            dragOffset.current.x += deltaX * params.returnSpeed; autoRotateOffset.current += deltaAutoX * params.returnSpeed
+          }
+          if (!isDragging.current && params.returnYToDefault) {
+            const deltaY = 0 - dragOffset.current.y
+            dragOffset.current.y += deltaY * params.returnSpeed
+          }
+          state.phi = params.phi + autoRotateOffset.current + dragOffset.current.x + rx.get()
+          state.theta = params.theta + dragOffset.current.y + ry.get()
+          state.theta = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, state.theta))
+          
+          Object.assign(state, commonProps(params))
+        },
+      })
+    } else {
+      globe = create(canvas, {
+        ...commonProps(paramsRef.current),
+        phi: paramsRef.current.phi,
+        theta: paramsRef.current.theta,
+        dragX: paramsRef.current.dragX,
+        dragY: paramsRef.current.dragY,
+        dragSensitivityX: paramsRef.current.dragSensitivityX,
+        dragSensitivityY: paramsRef.current.dragSensitivityY,
+        returnXToDefault: paramsRef.current.returnXToDefault,
+        returnYToDefault: paramsRef.current.returnYToDefault,
+        returnSpeed: paramsRef.current.returnSpeed,
+        autoRotateSpeed: paramsRef.current.autoRotateSpeed,
+        onRender: (state) => {
+          const params = paramsRef.current
+          state.phi = params.phi; state.theta = params.theta
+          state.dragX = params.dragX; state.dragY = params.dragY
+          state.dragSensitivityX = params.dragSensitivityX; state.dragSensitivityY = params.dragSensitivityY
+          state.returnXToDefault = params.returnXToDefault; state.returnYToDefault = params.returnYToDefault
+          state.returnSpeed = params.returnSpeed; state.autoRotateSpeed = params.autoRotateSpeed
+          Object.assign(state, commonProps(params))
+        },
+      })
     }
-  }, [])
+    
+    globeRef.current = globe
+    
+    return () => {
+      globe.destroy()
+      globeRef.current = null
+    }
+  }, [enableSpring])
+
+  const isDraggable = enableSpring && (controls.dragX || controls.dragY)
+
+  // This function now contains the conditional logic.
+  const handleDragEnd = () => {
+    if (!isDragging.current) return;
+    isDragging.current = false;
+    canvasRef.current.style.cursor = 'grab';
+
+    // If "Return to Default" is on, commit the position immediately to prevent the pause.
+    if (controls.returnXToDefault || controls.returnYToDefault) {
+      dragOffset.current.x += rx.get();
+      dragOffset.current.y += ry.get();
+      api.set({ rx: 0, ry: 0 });
+    }
+    // Otherwise, do nothing and let the onRest callback handle the coasting effect.
+  };
+  
+  const springEventHandlers = {
+    onPointerDown: (e) => {
+      if (!isDraggable) return
+      // Stop any ongoing animations to ensure a crisp start.
+      api.stop();
+      isDragging.current = true
+      lastPointerPosition.current = { x: e.clientX, y: e.clientY }
+      canvasRef.current.style.cursor = 'grabbing'
+    },
+    onPointerUp: handleDragEnd,
+    onPointerOut: () => { if (isDragging.current) handleDragEnd() },
+    onMouseMove: (e) => {
+      if (!isDragging.current) return
+      const deltaX = e.clientX - lastPointerPosition.current.x
+      const deltaY = e.clientY - lastPointerPosition.current.y
+      api.start({
+        rx: controls.dragX ? deltaX * controls.dragSensitivityX : 0,
+        ry: controls.dragY ? deltaY * controls.dragSensitivityY : 0,
+        config: {
+          mass: controls.mass,
+          tension: controls.tension,
+          friction: controls.friction,
+          precision: controls.precision,
+        }
+      })
+    },
+    onTouchMove: (e) => {
+      if (!isDragging.current || !e.touches[0]) return
+      const deltaX = e.touches[0].clientX - lastPointerPosition.current.x
+      const deltaY = e.touches[0].clientY - lastPointerPosition.current.y
+      api.start({
+        rx: controls.dragX ? deltaX * controls.dragSensitivityX : 0,
+        ry: controls.dragY ? deltaY * controls.dragSensitivityY : 0,
+        config: {
+          mass: controls.mass,
+          tension: controls.tension,
+          friction: controls.friction,
+          precision: controls.precision,
+        }
+      })
+    },
+  }
+
   return (
     <>
-      <div style={{ position: 'absolute', right: 20, top: 20, zIndex: 1 }}>
+      <div style={{ position: 'absolute', right: 20, top: 20, zIndex: 1, transform: 'scale(0.8)', transformOrigin: 'top right' }}>
         <Leva fill />
       </div>
       <canvas
         ref={canvasRef}
+        {...(enableSpring ? springEventHandlers : {})}
         style={{
           width: 'min(100vmin, 800px)',
           height: 'min(100vmin, 800px)',
           margin: '20px auto',
-          backgroundColor
+          backgroundColor,
+          cursor: enableSpring ? (isDraggable ? 'grab' : 'default') : 'grab',
+          touchAction: 'none'
         }}
       />
     </>

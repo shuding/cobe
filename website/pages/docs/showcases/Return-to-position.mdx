@@ -1,4 +1,4 @@
-# Auto Rotate
+# Return to position
 
 import createGlobe from "cobe";
 import { useEffect, useRef } from "react";
@@ -14,8 +14,8 @@ export function Cobe() {
       devicePixelRatio: 2,
       width: width * 2,
       height: width * 2,
-      phi: 0,
-      theta: 0.3,
+      phi: 0.00,
+      theta: 0.39,
       dark: 1,
       diffuse: 3,
       mapSamples: 16000,
@@ -25,6 +25,10 @@ export function Cobe() {
       glowColor: [1.2, 1.2, 1.2],
       markers: [],
       autoRotateSpeed: 0.003,
+      dragX: true,
+      dragY: true,
+      returnXToDefault:true,
+      returnYToDefault:true,
       onRender: (state) => {
         // Called on every animation frame.
         // `state` will be an empty object, return updated params.
@@ -60,6 +64,7 @@ export function Cobe() {
 
 <Cobe/>
 
-Change the `autoRotateSpeed` value to control the speed of the auto-rotate and if its value is set to `0` the globe will stop rotating.
+By using `returnXToDefault` and `returnYToDefault` seperately you can return to a specific axis after drag is released. we can also set both `returnXToDefault` and `returnYtoDefault` as `true` togather which can return back to a specific position after drag is released, (The return position can be changed by modifying the values of `Phi` and `theta`).
+Return speed can be controlled by setting the `returnSpeed` property.
 
 [View source of this example on GitHub](https://github.com/shuding/cobe/blob/main/website/pages/docs/showcases/auto-rotate.mdx?plain=1)

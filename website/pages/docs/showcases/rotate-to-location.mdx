@@ -36,6 +36,12 @@ export function Cobe() {
         { location: [35.676, 139.65], size: 0.1},
         { location: [-34.60, -58.38], size: 0.1},
       ],
+      // Disable dragging and auto-rotation
+      dragX: false,
+      dragY: false,
+      autoRotateSpeed: 0,
+      returnXToDefault: false,
+      returnYToDefault: false,
       onRender: (state) => {
         state.phi = currentPhi
         state.theta = currentTheta

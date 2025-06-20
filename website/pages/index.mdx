@@ -39,6 +39,9 @@ export function Cobe() {
       baseColor: [1.1, 1.1, 1.1],
       markerColor: [251 / 255, 100 / 255, 21 / 255],
       glowColor: [1.1, 1.1, 1.1],
+      autoRotateSpeed: 0.003,
+      dragX: true,
+      dragY: true,
       markers: [
         // San Francisco, default color
         { location: [37.7595, -122.4367], size: 0.05 },
@@ -72,7 +75,7 @@ export function Cobe() {
         // Called on every animation frame.
         // `state` will be an empty object, return updated params.
         state.phi = phi + r.get()
-        phi += 0.005
+        //phi += 0.005
         state.width = width * 2
         state.height = width * 2
       }

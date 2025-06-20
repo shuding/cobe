@@ -35,6 +35,14 @@ An object with the following properties:
 | offset | [offsetX, offsetY], offset of the globe in pixel |  |
 | markers | An array of markers displayed | |
 | opacity | The transparency of the globe texture | |
+| dragX | Enable horizontal dragging, defaults to true | |
+| dragY | Enable vertical dragging, defaults to true | |
+| dragSensitivityX | Horizontal drag sensitivity, 0 < dragSensitivityX, defaults to 0.005 | |
+| dragSensitivityY | Vertical drag sensitivity, 0 < dragSensitivityY, defaults to 0.005 | |
+| returnXToDefault | Whether phi returns to default when not dragging, defaults to false | |
+| returnYToDefault | Whether theta returns to default when not dragging, defaults to true | |
+| returnSpeed | Speed of return to default position, 0 < returnSpeed ≤ 1, defaults to 0.05 | |
+| autoRotateSpeed | Speed of automatic rotation, 0 ≤ autoRotateSpeed ≤ 1, defaults to 0.003 | |
 | onRender | A callback function called when a new frame is rendered | Required |
 
 You can check how some of them actually look like in the [Playground](https://cobe-playground.vercel.app).
@@ -79,4 +87,23 @@ const globe = createGlobe(canvas, {
 
 ## `globe`
 
-A [Phenomenon](https://github.com/vaneenige/phenomenon) instance. It has methods like `globe.toggle()` to pause/resume rendering, and `globe.destroy()` to destroy itself. Please read its docs for more details.
+A [Phenomenon](https://github.com/vaneenige/phenomenon) instance with the following additional methods:
+
+| Method | Description |
+|---|---|
+| `toggle()` | Pause/resume rendering (from Phenomenon) |
+| `destroy()` | Destroy the globe instance (from Phenomenon) |
+| `toggleRotation()` | Toggle auto-rotation on/off, returns the new state (paused: true/false) |
+| `isRotating()` | Check if auto-rotation is active, returns boolean |
+| `resetPosition()` | Reset the globe to its default position, clearing any drag offsets |
+
+```js
+// Example: Toggle auto-rotation
+const rotationPaused = globe.toggleRotation();
+console.log(rotationPaused ? 'Rotation paused' : 'Rotation active');
+
+// Example: Reset position after user interaction
+globe.resetPosition();
+```
+
+Please read the [Phenomenon documentation](https://github.com/vaneenige/phenomenon) for more details about its built-in methods.
