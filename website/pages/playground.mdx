@@ -29,13 +29,23 @@ export function Page() {
       friction: 40,
       precision: 0.001,
     },
-    // The onRest callback is preserved for the "coasting" effect.
+    // onRest now only commits values for axes that are NOT returning to default.
     onRest: () => {
-      // This will only fire if the user is not dragging and coasting is allowed.
-      if (!isDragging.current) {
-        dragOffset.current.x += rx.get()
-        dragOffset.current.y += ry.get()
-        api.set({ rx: 0, ry: 0 })
+      if (isDragging.current) return;
+      const { returnXToDefault, returnYToDefault } = paramsRef.current;
+      const springResetValues = {};
+
+      if (!returnXToDefault) {
+        dragOffset.current.x += rx.get();
+        springResetValues.rx = 0;
+      }
+      if (!returnYToDefault) {
+        dragOffset.current.y += ry.get();
+        springResetValues.ry = 0;
+      }
+      
+      if (Object.keys(springResetValues).length > 0) {
+        api.set(springResetValues);
       }
     },
   }))
@@ -96,7 +106,7 @@ export function Page() {
     dragSensitivityX: { value: 0.005, min: 0.001, max: 0.02, step: 0.001, label: "X Sensitivity" },
     dragSensitivityY: { value: 0.005, min: 0.001, max: 0.02, step: 0.001, label: "Y Sensitivity" },
     returnXToDefault: { value: false, label: "Return X to Default" },
-    returnYToDefault: { value: true, label: "Return Y to Default" },
+    returnYToDefault: { value: false, label: "Return Y to Default" },
     returnSpeed: { value: 0.05, min: 0.01, max: 1.0, step: 0.01, label: "Return Speed" },
     autoRotateSpeed: { value: 0.003, min: 0, max: 1.0, step: 0.001, label: "Auto Rotate Speed" },
     'Toggle Rotation': button(() => {
@@ -220,29 +230,42 @@ export function Page() {
 
   const isDraggable = enableSpring && (controls.dragX || controls.dragY)
 
-  // This function now contains the conditional logic.
   const handleDragEnd = () => {
     if (!isDragging.current) return;
     isDragging.current = false;
     canvasRef.current.style.cursor = 'grab';
 
-    // If "Return to Default" is on, commit the position immediately to prevent the pause.
-    if (controls.returnXToDefault || controls.returnYToDefault) {
+    const springUpdate = {};
+    if (controls.returnXToDefault) {
       dragOffset.current.x += rx.get();
-      dragOffset.current.y += ry.get();
-      api.set({ rx: 0, ry: 0 });
+      springUpdate.rx = 0;
     }
-    // Otherwise, do nothing and let the onRest callback handle the coasting effect.
+    if (controls.returnYToDefault) {
+      dragOffset.current.y += ry.get();
+      springUpdate.ry = 0;
+    }
+
+    if (Object.keys(springUpdate).length > 0) {
+      api.set(springUpdate);
+    }
   };
   
   const springEventHandlers = {
     onPointerDown: (e) => {
-      if (!isDraggable) return
-      // Stop any ongoing animations to ensure a crisp start.
+      if (!isDraggable) return;
+
+      // Commit the current spring value to the permanent offset.
+      // This is the key to fixing the instant re-drag issue.
+      dragOffset.current.x += rx.get();
+      dragOffset.current.y += ry.get();
+      // Reset the spring to 0, so the new drag starts from a clean state.
+      api.set({ rx: 0, ry: 0 });
+
+      // Stop any ongoing animations.
       api.stop();
-      isDragging.current = true
-      lastPointerPosition.current = { x: e.clientX, y: e.clientY }
-      canvasRef.current.style.cursor = 'grabbing'
+      isDragging.current = true;
+      lastPointerPosition.current = { x: e.clientX, y: e.clientY };
+      canvasRef.current.style.cursor = 'grabbing';
     },
     onPointerUp: handleDragEnd,
     onPointerOut: () => { if (isDragging.current) handleDragEnd() },
