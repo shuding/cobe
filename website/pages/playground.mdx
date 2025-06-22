@@ -95,7 +95,7 @@ export function Page() {
     dark: { value: 1, min: 0, max: 1 },
     baseColor: { r: 60, g: 60, b: 60 },
     markerColor: { r: 255, g: 255, b: 255 },
-    markerSize: { value: 0.05, min: 0, max: 0.1,pad: 4 },
+    markerSize: { value: 0.05, min: 0, max: 0.1, pad: 4 },
     glowColor: { r: 255, g: 255, b: 255 },
     scale: { value: 1, min: 0, max: 4 },
     offsetX: { value: 0, min: -1, max: 1 },
@@ -104,8 +104,8 @@ export function Page() {
     backgroundColor: { r: 255, g: 255, b: 255, a: 1 },
     dragX: { value: true, label: "Drag X" },
     dragY: { value: true, label: "Drag Y" },
-    dragSensitivityX: { value: 0.005, min: 0.001, max: 0.02, step: 0.001,pad: 4, label: "X Sensitivity" },
-    dragSensitivityY: { value: 0.005, min: 0.001, max: 0.02, step: 0.001,pad: 4, label: "Y Sensitivity" },
+    dragSensitivityX: { value: 0.005, min: 0.001, max: 0.02, step: 0.001, pad: 4, label: "X Sensitivity" },
+    dragSensitivityY: { value: 0.005, min: 0.001, max: 0.02, step: 0.001, pad: 4, label: "Y Sensitivity" },
     returnXToDefault: { value: false, label: "Return X to Default" },
     returnYToDefault: { value: true, label: "Return Y to Default" },
     returnSpeed: { value: 0.05, min: 0.01, max: 1.0, step: 0.01, label: "Return Speed" },
@@ -152,7 +152,6 @@ export function Page() {
     ];
     
     let globe
-
     const commonProps = (params) => ({
       devicePixelRatio: 2,
       width: size * 2,
@@ -242,7 +241,12 @@ export function Page() {
       springUpdate.rx = 0;
     }
     if (controls.returnYToDefault) {
-      dragOffset.current.y += ry.get();
+      // THE FIX: Calculate the final visual rotation and clamp it.
+      const currentTheta = controls.theta + dragOffset.current.y + ry.get();
+      const clampedTheta = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, currentTheta));
+      // Set the permanent offset to this correct, clamped value.
+      dragOffset.current.y = clampedTheta - controls.theta;
+      // Reset the spring.
       springUpdate.ry = 0;
     }
 
@@ -254,14 +258,11 @@ export function Page() {
   const springEventHandlers = {
     onPointerDown: (e) => {
       if (!isDraggable) return;
-
       // Commit the current spring value to the permanent offset.
-      // This is the key to fixing the instant re-drag issue.
       dragOffset.current.x += rx.get();
       dragOffset.current.y += ry.get();
       // Reset the spring to 0, so the new drag starts from a clean state.
       api.set({ rx: 0, ry: 0 });
-
       // Stop any ongoing animations.
       api.stop();
       isDragging.current = true;

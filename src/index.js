@@ -138,6 +138,14 @@ export default (canvas, opts) => {
         
         if (opts.dragY) {
             interaction.dragOffset.y += deltaY * opts.dragSensitivityY;
+
+            // Clamp drag offset to prevent over-dragging and delay
+            const y_limit = Math.PI / 2 - 0.01;
+            const theta = opts.theta || 0;
+            interaction.dragOffset.y = Math.max(
+                -y_limit - theta, 
+                Math.min(y_limit - theta, interaction.dragOffset.y)
+            );
         }
     };
 
