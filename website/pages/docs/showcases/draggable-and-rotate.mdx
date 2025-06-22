@@ -7,9 +7,10 @@ import { useSpring } from 'react-spring';
 export function Cobe() {
   const canvasRef = useRef();
   const pointerInteracting = useRef(null);
-  const pointerInteractionMovement = useRef(0);
-  const [{ r }, api] = useSpring(() => ({
+  const pointerInteractionMovement = useRef({ x: 0, y: 0 });
+  const [{ r, theta: springTheta }, api] = useSpring(() => ({
     r: 0,
+    theta: 0,
     config: {
       mass: 1,
       tension: 280,
@@ -19,6 +20,7 @@ export function Cobe() {
   }));
   useEffect(() => {
     let phi = 0;
+    let theta = 0.3;
     let width = 0;
     const onResize = () => canvasRef.current && (width = canvasRef.current.offsetWidth)
     window.addEventListener('resize', onResize)
@@ -37,20 +39,28 @@ export function Cobe() {
       markerColor: [251 / 255, 100 / 255, 21 / 255],
       glowColor: [1.2, 1.2, 1.2],
       markers: [],
+      dragX: true,
+      dragY: true,
+      dragSensitivityX: 0.007,
+      dragSensitivityY: 0.007,
+      returnYToDefault: false,
+      returnXToDefault: false,
+      autoRotateSpeed: 0.003,
       onRender: (state) => {
         // This prevents rotation while dragging
         if (!pointerInteracting.current) {
           // Called on every animation frame.
           // `state` will be an empty object, return updated params.
-          phi += 0.005
-        } 
-        state.phi = phi + r.get()
+         // phi += 0.003;
+        }
+        state.phi = phi + r.get();
+        state.theta = theta + springTheta.get();
         state.width = width * 2
         state.height = width * 2
       }
     })
     setTimeout(() => canvasRef.current.style.opacity = '1')
-    return () => { 
+    return () => {
       globe.destroy();
       window.removeEventListener('resize', onResize);
     }
@@ -65,8 +75,10 @@ export function Cobe() {
     <canvas
       ref={canvasRef}
       onPointerDown={(e) => {
-        pointerInteracting.current =
-          e.clientX - pointerInteractionMovement.current;
+        pointerInteracting.current = {
+          x: e.clientX - pointerInteractionMovement.current.x,
+          y: e.clientY - pointerInteractionMovement.current.y,
+        };
         canvasRef.current.style.cursor = 'grabbing';
       }}
       onPointerUp={() => {
@@ -79,19 +91,23 @@ export function Cobe() {
       }}
       onMouseMove={(e) => {
         if (pointerInteracting.current !== null) {
-          const delta = e.clientX - pointerInteracting.current;
-          pointerInteractionMovement.current = delta;
+          const deltaX = e.clientX - pointerInteracting.current.x;
+          const deltaY = e.clientY - pointerInteracting.current.y;
+          pointerInteractionMovement.current = { x: deltaX, y: deltaY };
           api.start({
-            r: delta / 200,
+            r: deltaX / 200,
+            theta: deltaY / 200,
           });
         }
       }}
       onTouchMove={(e) => {
         if (pointerInteracting.current !== null && e.touches[0]) {
-          const delta = e.touches[0].clientX - pointerInteracting.current;
-          pointerInteractionMovement.current = delta;
+          const deltaX = e.touches[0].clientX - pointerInteracting.current.x;
+          const deltaY = e.touches[0].clientY - pointerInteracting.current.y;
+          pointerInteractionMovement.current = { x: deltaX, y: deltaY };
           api.start({
-            r: delta / 100,
+            r: deltaX / 100,
+            theta: deltaY / 100,
           });
         }
       }}
@@ -107,8 +123,10 @@ export function Cobe() {
   </div>
 }
 
-<Cobe/>
+<Cobe />
 
-Change the `phi` value over time or when moving on the canvas, with [React Spring](https://react-spring.dev) to smoothen it.
+
+this example demonstrates the use of `dragX` and `dragY` properties to enable omnidirectional dragging and `autoRotateSpeed` to enable auto-rotation. The drag animation is smoothened with [React Spring](https://react-spring.dev).
+You can also test different configurations of React spring in the [playground](https://cobe.vercel.app/playground).
 
 [View source of this example on GitHub](https://github.com/shuding/cobe/blob/main/website/pages/docs/showcases/draggable-and-rotate.mdx?plain=1)

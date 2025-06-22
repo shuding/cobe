@@ -26,6 +26,14 @@ export interface COBEOptions {
   offset?: [number, number];
   scale?: number;
   context?: WebGLContextAttributes;
+  dragX?: boolean;
+  dragY?: boolean;
+  dragSensitivityX?: number;
+  dragSensitivityY?: number;
+  returnXToDefault?: boolean;
+  returnYToDefault?: boolean;
+  returnSpeed?: number;
+  autoRotateSpeed?: number;
 }
 
 export default function createGlobe(

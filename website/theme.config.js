@@ -50,7 +50,7 @@ export default {
         <meta name='twitter:card' content='summary_large_image' />
         <meta name='twitter:site' content='@shuding_' />
         <meta name='twitter:image' content={ogImage} />
-        <meta name='og:title' content={title ? title + ' – COBE' : 'COBE'} />
+        <meta name='og:title' content={title ? `${title} – COBE` : 'COBE'} />
         <meta name='og:image' content={ogImage} />
         <meta name='apple-mobile-web-app-title' content='COBE' />
       </>

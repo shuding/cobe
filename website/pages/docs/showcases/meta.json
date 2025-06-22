@@ -1,7 +1,8 @@
 {
   "auto-rotate": "Auto Rotate",
-  "draggable": "Draggable",
+  "draggable": "Draggable Globe",
   "draggable-and-rotate": "Draggable & Auto Rotate",
+  "Return-to-position":"Return to position",
   "rotate-to-location": "Rotate to Location",
-  "scaled": "Scaled"
+  "scaled": "Scaled Globe"
 }
