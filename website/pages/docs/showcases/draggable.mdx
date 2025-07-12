@@ -8,6 +8,7 @@ export function Cobe() {
   const canvasRef = useRef();
   const pointerInteracting = useRef(null);
   const pointerInteractionMovement = useRef(0);
+  
   const [{ r }, api] = useSpring(() => ({
     r: 0,
     config: {
@@ -17,6 +18,7 @@ export function Cobe() {
       precision: 0.001,
     },
   }));
+
   useEffect(() => {
     let width = 0;
     const onResize = () => canvasRef.current && (width = canvasRef.current.offsetWidth)

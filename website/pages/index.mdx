@@ -66,6 +66,8 @@ export function Cobe() {
         { location: [12.6683, -8.0076], size: 0.05, color: [1, 1, 0] },
         // Djibouti, purple color
         { location: [11.5500, 43.1667], size: 0.05, color: [0.8, 0, 0.8] },
+        // Hyderabad, red color
+        { location: [78.4867, 17.3850], size: 0.05, color: [1, 0, 0] }
       ],
       opacity: .7,
       onRender: (state) => {
@@ -79,15 +81,16 @@ export function Cobe() {
     })
     setTimeout(() => canvasRef.current.style.opacity = '1')
     return () => globe.destroy()
-  }, [])
-  return <div style={{
+
+}, [])
+return <div style={{
     width: '100%',
     maxWidth: 600,
     aspectRatio: 1,
     margin: 'auto',
     position: 'relative',
   }}>
-    <div style={{
+<div style={{
       width: '100%',
       fontWeight: 700,
       top: '50%',
@@ -100,48 +103,48 @@ export function Cobe() {
       position: 'absolute',
       mixBlendMode: 'difference'
     }}>
-      <h1 style={{
+<h1 style={{
         fontSize: 'min(9vw,3.2em)',
         letterSpacing: '.3em',
         textIndent: '.3em',
         margin: 'auto',
       }}>COBE</h1>
-      <span style={{ fontSize: '1.2em' }}>5kB WebGL Globe</span>
-    </div>
-    <canvas
-      ref={canvasRef}
-      onPointerDown={(e) => {
-        pointerInteracting.current =
-          e.clientX - pointerInteractionMovement.current;
-        canvasRef.current.style.cursor = 'grabbing';
-      }}
-      onPointerUp={() => {
-        pointerInteracting.current = null;
-        canvasRef.current.style.cursor = 'grab';
-      }}
-      onPointerOut={() => {
-        pointerInteracting.current = null;
-        canvasRef.current.style.cursor = 'grab';
-      }}
-      onMouseMove={(e) => {
-        if (pointerInteracting.current !== null) {
-          const delta = e.clientX - pointerInteracting.current;
-          pointerInteractionMovement.current = delta;
-          api.start({
-            r: delta / 200,
-          });
-        }
-      }}
-      onTouchMove={(e) => {
-        if (pointerInteracting.current !== null && e.touches[0]) {
-          const delta = e.touches[0].clientX - pointerInteracting.current;
-          pointerInteractionMovement.current = delta;
-          api.start({
-            r: delta / 100,
-          });
-        }
-      }}
-      style={{
+<span style={{ fontSize: '1.2em' }}>5kB WebGL Globe</span>
+</div>
+<canvas
+ref={canvasRef}
+onPointerDown={(e) => {
+pointerInteracting.current =
+e.clientX - pointerInteractionMovement.current;
+canvasRef.current.style.cursor = 'grabbing';
+}}
+onPointerUp={() => {
+pointerInteracting.current = null;
+canvasRef.current.style.cursor = 'grab';
+}}
+onPointerOut={() => {
+pointerInteracting.current = null;
+canvasRef.current.style.cursor = 'grab';
+}}
+onMouseMove={(e) => {
+if (pointerInteracting.current !== null) {
+const delta = e.clientX - pointerInteracting.current;
+pointerInteractionMovement.current = delta;
+api.start({
+r: delta / 200,
+});
+}
+}}
+onTouchMove={(e) => {
+if (pointerInteracting.current !== null && e.touches[0]) {
+const delta = e.touches[0].clientX - pointerInteracting.current;
+pointerInteractionMovement.current = delta;
+api.start({
+r: delta / 100,
+});
+}
+}}
+style={{
         width: '100%',
         height: '100%',
         cursor: 'grab',
@@ -150,54 +153,61 @@ export function Cobe() {
         transition: 'opacity 1s ease',
         borderRadius: '50%',
       }}
-    />
+/>
+
   </div>
 }
 
-<Cobe/>
+<Cobe />
 
-import Link from 'next/link'
+import Link from "next/link";
 
-<div style={{ textAlign: 'center' }}>
+<div style={{ textAlign: "center" }}>
   <div className="inline-flex justify-center cta-container">
     <Link href="/docs">
-      <a className="cta" draggable="false">Get Started</a>
+      <a className="cta" draggable="false">
+        Get Started
+      </a>
     </Link>
-    <a href="https://cobe-playground.vercel.app" className="cta" draggable="false">Playground</a>
+    <a
+      href="https://cobe-playground.vercel.app"
+      className="cta"
+      draggable="false"
+    >
+      Playground
+    </a>
   </div>
-  <div style={{ marginTop: '2rem' }}/>
-  <a href="https://twitter.com/shuding_/status/1475916082875666441" target="_blank" style={{
-    color: 'inherit',
-    opacity: .5,
-    fontSize: 14
-  }}>How the library was created →</a>
+  <div style={{ marginTop: "2rem" }} />
+  <a
+    href="https://twitter.com/shuding_/status/1475916082875666441"
+    target="_blank"
+    style={{
+      color: "inherit",
+      opacity: 0.5,
+      fontSize: 14,
+    }}
+  >
+    How the library was created →
+  </a>
 </div>
 
 <style jsx global>{`
-body {
-  background: linear-gradient(
-      180deg,
-      hsla(0, 0%, 100%, 0) 0,
-      #fff min(110vw, 800px)
-    ),
-    fixed
-      repeating-radial-gradient(
-        circle at 50% min(calc(50vw + 3.5rem), calc(300px + 5rem)),
-        #f5f5f5 0,
-        #fff 40px
-      );
-}
-.dark body {
-  background: linear-gradient(
-    0deg,
-    hsla(0, 0%, 100%, 0.2) 0,
-    #000 min(110vw, 800px)
-  ),
-  fixed
-    repeating-radial-gradient(
-      circle at 50% min(calc(50vw + 3.5rem), calc(300px + 5rem)),
-      #050505 0,
-      #000 40px
-    );
-}
+  body {
+    background: linear-gradient(
+        180deg,
+        hsla(0, 0%, 100%, 0) 0,
+        #fff min(110vw, 800px)
+      ),
+      fixed repeating-radial-gradient(circle at 50% min(calc(50vw + 3.5rem), calc(300px +
+                  5rem)), #f5f5f5 0, #fff 40px);
+  }
+  .dark body {
+    background: linear-gradient(
+        0deg,
+        hsla(0, 0%, 100%, 0.2) 0,
+        #000 min(110vw, 800px)
+      ),
+      fixed repeating-radial-gradient(circle at 50% min(calc(50vw + 3.5rem), calc(300px +
+                  5rem)), #050505 0, #000 40px);
+  }
 `}</style>
