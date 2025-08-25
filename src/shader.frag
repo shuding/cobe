@@ -34,7 +34,6 @@ uniform sampler2D uTexture;
 
 const float sqrt5 = 2.23606797749979;
 const float PI = 3.141592653589793;
-const float HALF_PI = 1.5707963267948966;
 const float kTau = 6.283185307179586;
 const float kPhi = 1.618033988749895;
 const float byLogPhiPlusOne = 0.7202100452062783;
@@ -63,7 +62,7 @@ vec3 nearestFibonacciLattice(vec3 p, out float m) {
 
   float k = max(2., floor(log2(sqrt5 * dots * PI * (1. - p.z * p.z)) * byLogPhiPlusOne));
 
-  vec2 f = floor(pow(kPhi,k)/sqrt5*vec2(1.,kPhi)+.5);
+  vec2 f = floor(pow(kPhi,k)/sqrt5*vec2(1,kPhi)+.5);
   vec2 br1 = fract((f+1.) * phiMinusOne)*kTau - twoPiOnPhi;
   vec2 br2 = -2.*f;
   vec2 sp = vec2(atan(p.y, p.x), p.z-1.);
@@ -133,74 +132,72 @@ vec3 nearestFibonacciLattice(vec3 p, out float m) {
 }
 
 void main() {
-  vec2 uv = ((gl_FragCoord.xy / uResolution) * 2. - 1.) / scale - offset * vec2(1., -1.) / uResolution;
-  uv.x *= uResolution.x / uResolution.y;
+  // Pre-calculate common values
+  float rSquared = r * r;
+  vec2 invResolution = 1.0 / uResolution;
+  
+  vec2 uv = ((gl_FragCoord.xy * invResolution) * 2. - 1.) / scale - offset * vec2(1, -1) * invResolution;
+  uv.x *= uResolution.x * invResolution.y;
 
   float l = dot(uv, uv);
-  vec4 color = vec4(0.);
+  vec4 color = vec4(0);
   float glowFactor = 0.;
+  int num = int(markersNum);
 
-  if (l <= r * r) {
-    for (int side = 0; side <= 1; side++) {
-      vec4 layer = vec4(0.);
-      float dis;
+  if (l <= rSquared) {
+    float dis;
+    vec4 layer = vec4(0);
+    vec3 light = vec3(0,0,1);
+    vec3 p = normalize(vec3(uv, sqrt(rSquared - l)));
+    mat3 rot = rotate(theta, phi);
+    float dotNL = dot(p, light);
 
-      vec3 light = vec3(0.,0.,1.);
-      vec3 p = normalize(vec3(uv, sqrt(r*r - l)));
+    vec3 rP = p * rot;
+    vec3 gP = nearestFibonacciLattice(rP, dis);
 
-      p.z *= side > 0 ? -1. : 1.;
-      light.z *= side > 0 ? -1. : 1.;
+    float gPhi = asin(gP.y);
+    float gTheta = acos(-gP.x / cos(gPhi));
+    if (gP.z < 0.) gTheta = -gTheta;
 
-      vec3 rP = p * rotate(theta, phi);
+    float mapColor = max(texture2D(uTexture, vec2(((gTheta * .5) / PI), -(gPhi / PI + .5))).x, mapBaseBrightness);
+    float v = smoothstep(.008, .0, dis);
 
-      float diff = -kTau * dots / kPhi;
+    float lighting = pow(dotNL,diffuse)*dotsBrightness;
+    float sample = mapColor*v * lighting;
+    float colorFactor = mix((1. - sample) * pow(dotNL,.4), sample, dark) + .1;
+    layer += vec4(baseColor * colorFactor, 1.);
 
-      vec3 gP = nearestFibonacciLattice(rP, dis);
+    float markerLight = 0.;
+    for (int m = 0; m < 128; m += 2) {
+      if (m >= num) break;
+      vec4 marker = markers[m]; // Position and size
+      vec4 markerColorData = markers[m + 1]; // Color data
+      vec3 c = marker.xyz; // Pre-computed lattice position
+      float size = marker.w;
+      vec3 l = c - rP;
+      dis = length(l);
 
-      float gPhi = asin(gP.y);
-      float gTheta = acos(-gP.x / cos(gPhi));
-      if (gP.z < 0.) gTheta = -gTheta;
-
-      float mapColor = max(texture2D(uTexture, vec2(((gTheta * .5) / PI), -(gPhi / PI + .5))).x, mapBaseBrightness);
-      float v = smoothstep(.008, .0, dis);
-      
-      float dotNL = dot(p, light);
-      float lighting = pow(dotNL,diffuse)*dotsBrightness;
-      float sample = mapColor*v * lighting;
-      float colorFactor = mix((1. - sample) * pow(dotNL,.4), sample, dark) + .1;
-      layer += vec4(baseColor * colorFactor, 1.);
-
-      int num = int(markersNum);
-      float markerLight = 0.;
-      for (int m = 0; m < 64; m++) {
-        if (m >= num) break;
-        vec4 marker = markers[m * 2]; // Position and size
-        vec4 markerColorData = markers[m * 2 + 1]; // Color data
-        vec3 c = marker.xyz;
-        vec3 l = c - rP;
-        float size = marker.w;
-        if (dot(l,l) > size * size * 4.) continue;
-        vec3 mP = nearestFibonacciLattice(c, dis);
-        dis = length(mP - rP);
-        if (dis < size) { 
-          markerLight += smoothstep(size*.5,0.,dis); 
-          // If marker has a custom color (w component is 1), use it
-          if (markerColorData.w > 0.5) {
-            layer.xyz = mix(layer.xyz, markerColorData.xyz, smoothstep(size*.5,0.,dis) * lighting);
-          } else {
-            // Otherwise use the global marker color
-            layer.xyz = mix(layer.xyz, markerColor, smoothstep(size*.5,0.,dis) * lighting);
-          }
+      // c is already the nearest Fibonacci lattice point, so use it directly
+      if (dis < size) { 
+        float halfSize = size * .5;
+        float hr = smoothstep(halfSize, 0., dis);
+        markerLight += hr;
+        // If marker has a custom color (w component is 1), use it
+        if (markerColorData.w > 0.5) {
+          layer.xyz = mix(layer.xyz, markerColorData.xyz, hr * lighting);
+        } else {
+          // Otherwise use the global marker color
+          layer.xyz = mix(layer.xyz, markerColor, hr * lighting);
         }
       }
-      layer.xyz += pow(1. - dotNL, 4.) * glowColor;
-
-      color += layer * (1. + (side > 0 ? -opacity : opacity)) / 2.;
     }
+    layer.xyz += pow(1. - dotNL, 4.) * glowColor;
 
-    glowFactor = pow(dot(normalize(vec3(-uv, sqrt(1.- l))), vec3(0.,0.,1.)), 4.) * smoothstep(0.,1.,.2/(l-r*r));
+    color += layer * (1. + opacity) * .5;
+
+    glowFactor = pow(dot(normalize(vec3(-uv, sqrt(1.- l))), vec3(0,0,1)), 4.) * smoothstep(0.,1.,.2/(l-rSquared));
   } else {
-    float outD = sqrt(.2/(l - r * r));
+    float outD = sqrt(.2/(l - rSquared));
     glowFactor = smoothstep(0.5,1., outD / (outD + 1.));
   }
 

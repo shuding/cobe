@@ -32,28 +32,47 @@ const OPT_MAPPING = {
     [OPT_MAP_BASE_BRIGHTNESS]: GLSLX_NAME_MAP_BASE_BRIGHTNESS,
 };
 
-const { PI, sin, cos } = Math;
+const { PI, sin, cos, sqrt, atan2, floor, max, pow, log2 } = Math;
 
-const mapMarkers = (markers) => {
-    return [].concat(
-        ...markers.map((m) => {
-            let [a, b] = m.location;
-            a = (a * PI) / 180;
-            b = (b * PI) / 180 - PI;
-            const cx = cos(a);
+// Constants matching shader
+const sqrt5 = 2.23606797749979;
+const kPhi = 1.618033988749895;
+const byLogPhiPlusOne = 0.7202100452062783;
+const kTau = 6.283185307179586;
+const twoPiOnPhi = 3.8832220774509327;
+const phiMinusOne = 0.618033988749895;
 
-            // Position and size data
-            const posData = [-cx * cos(b), sin(a), cx * sin(b), m.size];
-
-            // Color data (use marker color if provided, otherwise [0,0,0] to indicate default)
-            const colorData = m.color ? [...m.color, 1] : [0, 0, 0, 0];
-
-            return [...posData, ...colorData];
-        }),
-        // Make sure to fill zeros for both position and color data
-        [0, 0, 0, 0, 0, 0, 0, 0],
-    );
+// Optimized nearestFibonacciLattice implementation
+const nearestFibonacciLattice = (p, d) => {
+    const q = [p[0], p[2], p[1]], b = 1 / d;
+    const k = max(2, floor(log2(sqrt5 * d * PI * (1 - q[2] * q[2])) * byLogPhiPlusOne));
+    const pk = pow(kPhi, k) / sqrt5;
+    const f = [floor(pk + .5), floor(pk * kPhi + .5)];
+    const r1 = [((f[0] + 1) * phiMinusOne) % 1 * kTau - twoPiOnPhi, ((f[1] + 1) * phiMinusOne) % 1 * kTau - twoPiOnPhi];
+    const r2 = [-2 * f[0], -2 * f[1]];
+    const sp = [atan2(q[1], q[0]), q[2] - 1];
+    const dt = r1[0] * r2[1] - r2[0] * r1[1];
+    const c = [floor((r2[1] * sp[0] - r1[1] * (sp[1] * d + 1)) / dt), floor((-r2[0] * sp[0] + r1[0] * (sp[1] * d + 1)) / dt)];
+    
+    let md = PI, mp = [0, 0, 0];
+    for (let s = 0; s < 4; s++) {
+        const i = f[0] * (c[0] + s % 2) + f[1] * (c[1] + floor(s * .5));
+        if (i > d) continue;
+        const t = ((i * phiMinusOne) % 1) * kTau, cp = 1 - 2 * i * b, sp = sqrt(1 - cp * cp);
+        const sm = [cos(t) * sp, sin(t) * sp, cp];
+        const ds = sqrt((q[0] - sm[0]) ** 2 + (q[1] - sm[1]) ** 2 + (q[2] - sm[2]) ** 2);
+        if (ds < md) md = ds, mp = sm;
+    }
+    return [mp[0], mp[2], mp[1]];
 };
+
+const mapMarkers = (ms, d) => [].concat(...ms.map(m => {
+    let [a, b] = m.location;
+    a = a * PI / 180; b = b * PI / 180 - PI;
+    const c = cos(a), p = [-c * cos(b), sin(a), c * sin(b)];
+    const l = nearestFibonacciLattice(p, d);
+    return [...l, m.size, ...(m.color ? [...m.color, 1] : [0, 0, 0, 0])];
+}), [0, 0, 0, 0, 0, 0, 0, 0]);
 
 export default (canvas, opts) => {
     const createUniform = (type, name, fallback) => {
@@ -164,11 +183,11 @@ export default (canvas, opts) => {
             [GLSLX_NAME_DARK]: createUniform("float", OPT_DARK),
             [GLSLX_NAME_MARKERS]: {
                 type: "vec4",
-                value: mapMarkers(opts[OPT_MARKERS]),
+                value: mapMarkers(opts[OPT_MARKERS], opts[OPT_DOTS]),
             },
             [GLSLX_NAME_MARKERS_NUM]: {
                 type: "float",
-                value: opts[OPT_MARKERS].length,
+                value: opts[OPT_MARKERS].length * 2,
             },
             [GLSLX_NAME_OFFSET]: createUniform("vec2", OPT_OFFSET, [0, 0]),
             [GLSLX_NAME_SCALE]: createUniform("float", OPT_SCALE, 1),
@@ -195,8 +214,11 @@ export default (canvas, opts) => {
                     }
                 }
                 if (state[OPT_MARKERS] !== undefined) {
+                    // Get current dots value from state or existing uniform
+                    const currentDots = state[OPT_DOTS] !== undefined ? state[OPT_DOTS] : uniforms[GLSLX_NAME_DOTS].value;
                     uniforms[GLSLX_NAME_MARKERS].value = mapMarkers(
                         state[OPT_MARKERS],
+                        currentDots
                     );
                     uniforms[GLSLX_NAME_MARKERS_NUM].value =
                         state[OPT_MARKERS].length;
@@ -206,6 +228,13 @@ export default (canvas, opts) => {
                         state.width,
                         state.height,
                     ];
+                }
+                if (state[OPT_DOTS] !== undefined) {
+                    // Remap markers when dots change
+                    uniforms[GLSLX_NAME_MARKERS].value = mapMarkers(
+                        state[OPT_MARKERS] || opts[OPT_MARKERS],
+                        state[OPT_DOTS]
+                    );
                 }
             }
         },
