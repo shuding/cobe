@@ -16,8 +16,9 @@ uniform float markersNum;
 uniform float dotsBrightness;
 uniform float diffuse;
 uniform float dark;
-uniform float opacity; 
+uniform float opacity;
 uniform float mapBaseBrightness;
+uniform float ambient;
 
 uniform sampler2D uTexture;
 
@@ -164,7 +165,7 @@ void main() {
 
     float lighting = pow(dotNL,diffuse)*dotsBrightness;
     float sample = mapColor*v * lighting;
-    float colorFactor = mix((1. - sample) * pow(dotNL,.4), sample, dark) + .1;
+    float colorFactor = mix((1. - sample) * pow(dotNL,.4), sample, dark) + ambient;
     layer += vec4(baseColor * colorFactor, 1.);
 
     float markerLight = 0.;

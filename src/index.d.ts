@@ -25,6 +25,7 @@ export interface COBEOptions {
   opacity?: number;
   offset?: [number, number];
   scale?: number;
+  ambient?: number;
   context?: WebGLContextAttributes;
 }
 
