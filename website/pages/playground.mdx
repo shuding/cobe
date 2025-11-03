@@ -18,6 +18,7 @@ export function Page() {
     mapBrightness: { value: 6, min: 0, max: 12 },
     mapBaseBrightness: { value: 0, min: 0, max: 1 },
     diffuse: { value: 1.2, min: 0, max: 5 },
+    ambient: { value: 0.5, min: 0, max: 1 },
     dark: { value: 1, min: 0, max: 1 },
     baseColor: { r: 60, g: 60, b: 60 },
     markerColor: { r: 255, g: 255, b: 255 },
@@ -81,6 +82,7 @@ export function Page() {
         state.mapBrightness = paramsRef.current.mapBrightness
         state.mapBaseBrightness = paramsRef.current.mapBaseBrightness
         state.diffuse = paramsRef.current.diffuse
+        state.ambient = paramsRef.current.ambient
         state.baseColor = [
           paramsRef.current.baseColor.r / 255,
           paramsRef.current.baseColor.g / 255,
