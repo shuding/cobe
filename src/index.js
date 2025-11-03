@@ -15,6 +15,7 @@ const OPT_OFFSET = "offset";
 const OPT_SCALE = "scale";
 const OPT_OPACITY = "opacity";
 const OPT_MAP_BASE_BRIGHTNESS = "mapBaseBrightness";
+const OPT_AMBIENT = "ambient";
 
 const OPT_MAPPING = {
     [OPT_PHI]: GLSLX_NAME_PHI,
@@ -30,6 +31,7 @@ const OPT_MAPPING = {
     [OPT_SCALE]: GLSLX_NAME_SCALE,
     [OPT_OPACITY]: GLSLX_NAME_OPACITY,
     [OPT_MAP_BASE_BRIGHTNESS]: GLSLX_NAME_MAP_BASE_BRIGHTNESS,
+    [OPT_AMBIENT]: GLSLX_NAME_AMBIENT,
 };
 
 const { PI, sin, cos, sqrt, atan2, floor, max, pow, log2 } = Math;
@@ -192,6 +194,7 @@ export default (canvas, opts) => {
             [GLSLX_NAME_OFFSET]: createUniform("vec2", OPT_OFFSET, [0, 0]),
             [GLSLX_NAME_SCALE]: createUniform("float", OPT_SCALE, 1),
             [GLSLX_NAME_OPACITY]: createUniform("float", OPT_OPACITY, 1),
+            [GLSLX_NAME_AMBIENT]: createUniform("float", OPT_AMBIENT, 0.1),
         },
         mode: 4,
         geometry: {
