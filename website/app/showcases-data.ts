@@ -1,0 +1,346 @@
+// Shared showcase data for COBE demos
+
+export type ShowcaseConfig = {
+  theta: number
+  dark: number
+  mapBrightness: number
+  markerColor: [number, number, number]
+  baseColor: [number, number, number]
+  arcColor: [number, number, number]
+  markerSize: number
+  markerElevation: number
+}
+
+// Showcase: Default
+export const showcaseDefaultMarkers = [
+  { id: 'default-sf', location: [37.76, -122.44] as [number, number], label: 'San Francisco' },
+  { id: 'default-nyc', location: [40.71, -74.01] as [number, number], label: 'New York' },
+  { id: 'default-tokyo', location: [35.68, 139.65] as [number, number], label: 'Tokyo' },
+  { id: 'default-london', location: [51.51, -0.13] as [number, number], label: 'London' },
+  { id: 'default-sydney', location: [-33.87, 151.21] as [number, number], label: 'Sydney' },
+  { id: 'default-paris', location: [48.86, 2.35] as [number, number], label: 'Paris' },
+]
+
+export const showcaseDefaultArcs = [
+  { id: 'default-sf-tokyo', from: [37.76, -122.44] as [number, number], to: [35.68, 139.65] as [number, number], label: 'SF → Tokyo' },
+  { id: 'default-nyc-london', from: [40.71, -74.01] as [number, number], to: [51.51, -0.13] as [number, number], label: 'NYC → London' },
+]
+
+// Showcase: Stickers
+export const stickerMarkers = [
+  { id: 'sticker-paris', location: [48.86, 2.35] as [number, number], sticker: '🥐' },
+  { id: 'sticker-tokyo', location: [35.68, 139.65] as [number, number], sticker: '🗼' },
+  { id: 'sticker-nyc', location: [40.71, -74.01] as [number, number], sticker: '🍎' },
+  { id: 'sticker-rio', location: [-22.91, -43.17] as [number, number], sticker: '🎭' },
+  { id: 'sticker-sydney', location: [-33.87, 151.21] as [number, number], sticker: '🐨' },
+  { id: 'sticker-cairo', location: [30.04, 31.24] as [number, number], sticker: '🐪' },
+  { id: 'sticker-rome', location: [41.9, 12.5] as [number, number], sticker: '🍕' },
+  { id: 'sticker-mexico', location: [19.43, -99.13] as [number, number], sticker: '🌮' },
+  { id: 'sticker-india', location: [28.61, 77.21] as [number, number], sticker: '🐘' },
+  { id: 'sticker-iceland', location: [64.15, -21.94] as [number, number], sticker: '🧊' },
+]
+
+// Showcase: Live badge
+export const liveMarkers = [
+  { id: 'live-sf', location: [37.78, -122.44] as [number, number] },
+  { id: 'live-london', location: [51.51, -0.13] as [number, number] },
+  { id: 'live-tokyo', location: [35.68, 139.65] as [number, number] },
+  { id: 'live-paris', location: [48.86, 2.35] as [number, number] },
+  { id: 'live-sydney', location: [-33.87, 151.21] as [number, number] },
+  { id: 'live-nyc', location: [40.71, -74.01] as [number, number] },
+]
+
+// Showcase: Interactive markers
+export const interactiveMarkers = [
+  { id: 'hq', location: [37.78, -122.44] as [number, number], name: 'HQ', users: 1420 },
+  { id: 'eu', location: [52.52, 13.41] as [number, number], name: 'EU', users: 892 },
+  { id: 'asia', location: [35.68, 139.65] as [number, number], name: 'Asia', users: 2103 },
+  { id: 'latam', location: [-23.55, -46.63] as [number, number], name: 'LATAM', users: 567 },
+  { id: 'mena', location: [25.2, 55.27] as [number, number], name: 'MENA', users: 734 },
+  { id: 'oceania', location: [-33.87, 151.21] as [number, number], name: 'APAC', users: 445 },
+]
+
+// Showcase: Polaroid photos
+export const polaroidMarkers = [
+  { id: 'polaroid-sf', location: [37.78, -122.44] as [number, number], image: '/sf.jpg', caption: 'San Francisco', rotate: -5 },
+  { id: 'polaroid-nyc', location: [40.71, -74.01] as [number, number], image: '/nyc.jpg', caption: 'New York', rotate: 4 },
+  { id: 'polaroid-tokyo', location: [35.68, 139.65] as [number, number], image: '/tokyo.jpg', caption: 'Tokyo', rotate: -3 },
+  { id: 'polaroid-sydney', location: [-33.87, 151.21] as [number, number], image: '/sydney.jpg', caption: 'Sydney', rotate: 6 },
+  { id: 'polaroid-beijing', location: [39.9, 116.4] as [number, number], image: '/beijing.jpg', caption: 'Beijing', rotate: -4 },
+  { id: 'polaroid-egypt', location: [29.98, 31.13] as [number, number], image: '/egypt.jpg', caption: 'Egypt', rotate: 3 },
+  { id: 'polaroid-pisa', location: [43.72, 10.4] as [number, number], image: '/pisa.jpg', caption: 'Pisa', rotate: -6 },
+  { id: 'polaroid-singapore', location: [1.35, 103.82] as [number, number], image: '/singapore.jpg', caption: 'Singapore', rotate: 5 },
+]
+
+// Showcase: Pulse animations
+export const pulseMarkers = [
+  { id: 'pulse-1', location: [51.51, -0.13] as [number, number], delay: 0 },
+  { id: 'pulse-2', location: [40.71, -74.01] as [number, number], delay: 0.5 },
+  { id: 'pulse-3', location: [35.68, 139.65] as [number, number], delay: 1 },
+  { id: 'pulse-4', location: [-33.87, 151.21] as [number, number], delay: 1.5 },
+]
+
+// Showcase: Highlight bars
+export const barMarkers = [
+  { id: 'bar-1', location: [40.71, -74.01] as [number, number], value: 85, label: 'NYC' },
+  { id: 'bar-2', location: [51.51, -0.13] as [number, number], value: 62, label: 'London' },
+  { id: 'bar-3', location: [35.68, 139.65] as [number, number], value: 94, label: 'Tokyo' },
+  { id: 'bar-4', location: [1.35, 103.82] as [number, number], value: 78, label: 'Singapore' },
+]
+
+// Showcase: Analytics (visitor tracking)
+export const analyticsMarkers = [
+  { id: 'vis-1', location: [40.71, -74.01] as [number, number], visitors: 847, trend: 12 },
+  { id: 'vis-2', location: [51.51, -0.13] as [number, number], visitors: 623, trend: -3 },
+  { id: 'vis-3', location: [35.68, 139.65] as [number, number], visitors: 412, trend: 8 },
+  { id: 'vis-4', location: [48.86, 2.35] as [number, number], visitors: 385, trend: 5 },
+  { id: 'vis-5', location: [-33.87, 151.21] as [number, number], visitors: 201, trend: 15 },
+  { id: 'vis-6', location: [52.52, 13.41] as [number, number], visitors: 178, trend: -1 },
+]
+
+// Showcase: Flights
+export const flightArcs = [
+  { id: 'flight-1', from: [40.64, -73.78] as [number, number], to: [51.47, -0.46] as [number, number] },
+  { id: 'flight-2', from: [51.47, -0.46] as [number, number], to: [25.25, 55.36] as [number, number] },
+  { id: 'flight-3', from: [35.55, 139.78] as [number, number], to: [37.62, -122.38] as [number, number] },
+  { id: 'flight-4', from: [1.36, 103.99] as [number, number], to: [-33.95, 151.18] as [number, number] },
+  { id: 'flight-5', from: [48.86, 2.35] as [number, number], to: [40.64, -73.78] as [number, number] },
+]
+
+export const flightMarkers = [
+  { id: 'apt-jfk', location: [40.64, -73.78] as [number, number] },
+  { id: 'apt-lhr', location: [51.47, -0.46] as [number, number] },
+  { id: 'apt-dxb', location: [25.25, 55.36] as [number, number] },
+  { id: 'apt-nrt', location: [35.55, 139.78] as [number, number] },
+  { id: 'apt-sfo', location: [37.62, -122.38] as [number, number] },
+  { id: 'apt-sin', location: [1.36, 103.99] as [number, number] },
+  { id: 'apt-syd', location: [-33.95, 151.18] as [number, number] },
+  { id: 'apt-cdg', location: [48.86, 2.35] as [number, number] },
+]
+
+// Showcase: Labels (text stickers)
+export const labelMarkers = [
+  { id: 'label-1', location: [48.86, 2.35] as [number, number], text: 'visit soon!', color: '#e84855', rotate: -8 },
+  { id: 'label-2', location: [35.68, 139.65] as [number, number], text: 'amazing food', color: '#2a9d8f', rotate: 5 },
+  { id: 'label-3', location: [40.71, -74.01] as [number, number], text: 'home ♥', color: '#e76f51', rotate: -3 },
+  { id: 'label-4', location: [-33.87, 151.21] as [number, number], text: 'bucket list', color: '#264653', rotate: 7 },
+  { id: 'label-5', location: [51.51, -0.13] as [number, number], text: 'rainy but fun', color: '#7b2cbf', rotate: -5 },
+  { id: 'label-6', location: [-22.91, -43.17] as [number, number], text: 'samba time!', color: '#f4a261', rotate: 4 },
+  { id: 'label-7', location: [55.75, 37.62] as [number, number], text: 'cold but cozy', color: '#457b9d', rotate: -6 },
+  { id: 'label-8', location: [25.2, 55.27] as [number, number], text: 'so luxurious', color: '#d4a373', rotate: 3 },
+  { id: 'label-9', location: [1.35, 103.82] as [number, number], text: 'foodie heaven', color: '#e63946', rotate: -4 },
+  { id: 'label-10', location: [-34.6, -58.38] as [number, number], text: 'tango nights', color: '#9d4edd', rotate: 6 },
+]
+
+// Showcase: Satellites
+export const satelliteMarkers = [
+  { id: 'sat-1', location: [45.0, -120.0] as [number, number] },
+  { id: 'sat-2', location: [30.0, 45.0] as [number, number] },
+  { id: 'sat-3', location: [-15.0, 100.0] as [number, number] },
+  { id: 'sat-4', location: [60.0, -30.0] as [number, number] },
+  { id: 'sat-5', location: [-40.0, -60.0] as [number, number] },
+  { id: 'sat-6', location: [10.0, 150.0] as [number, number] },
+  { id: 'sat-7', location: [55.0, 80.0] as [number, number] },
+  { id: 'sat-8', location: [-25.0, 20.0] as [number, number] },
+  { id: 'sat-9', location: [70.0, 25.0] as [number, number] },
+  { id: 'sat-10', location: [-5.0, -75.0] as [number, number] },
+  { id: 'sat-11', location: [35.0, -95.0] as [number, number] },
+  { id: 'sat-12', location: [-50.0, 140.0] as [number, number] },
+  { id: 'sat-13', location: [20.0, -20.0] as [number, number] },
+  { id: 'sat-14', location: [50.0, 120.0] as [number, number] },
+  { id: 'sat-15', location: [-30.0, 70.0] as [number, number] },
+  { id: 'sat-16', location: [5.0, -150.0] as [number, number] },
+]
+
+// Showcase: Weather emojis
+export const weatherMarkers = [
+  { id: 'weather-1', location: [50.0, -100.0] as [number, number], emoji: '☀️' },
+  { id: 'weather-2', location: [55.0, 10.0] as [number, number], emoji: '🌧️' },
+  { id: 'weather-3', location: [25.0, 80.0] as [number, number], emoji: '⛈️' },
+  { id: 'weather-4', location: [-10.0, -60.0] as [number, number], emoji: '🌤️' },
+  { id: 'weather-5', location: [65.0, 100.0] as [number, number], emoji: '❄️' },
+  { id: 'weather-6', location: [35.0, 140.0] as [number, number], emoji: '🌸' },
+  { id: 'weather-7', location: [-30.0, 25.0] as [number, number], emoji: '🌈' },
+  { id: 'weather-8', location: [40.0, -5.0] as [number, number], emoji: '☁️' },
+  { id: 'weather-9', location: [-45.0, 170.0] as [number, number], emoji: '🌊' },
+  { id: 'weather-10', location: [15.0, -130.0] as [number, number], emoji: '🌴' },
+  { id: 'weather-11', location: [70.0, -40.0] as [number, number], emoji: '🌨️' },
+  { id: 'weather-12', location: [-20.0, 130.0] as [number, number], emoji: '🔥' },
+  { id: 'weather-13', location: [5.0, 40.0] as [number, number], emoji: '🌪️' },
+  { id: 'weather-14', location: [45.0, 60.0] as [number, number], emoji: '🌙' },
+  { id: 'weather-15', location: [-35.0, -70.0] as [number, number], emoji: '⭐' },
+  { id: 'weather-16', location: [20.0, -20.0] as [number, number], emoji: '🌞' },
+]
+
+// Showcase configs
+export const showcaseConfigs: Record<string, ShowcaseConfig> = {
+  default: {
+    theta: 0.2,
+    dark: 0,
+    mapBrightness: 10,
+    markerColor: [0.3, 0.45, 0.85],
+    baseColor: [1, 1, 1],
+    arcColor: [0.3, 0.45, 0.85],
+    markerSize: 0.02,
+    markerElevation: 0,
+  },
+  stickers: {
+    theta: 0.15,
+    dark: 0,
+    mapBrightness: 8,
+    markerColor: [0.85, 0.35, 0.6],
+    baseColor: [1, 1, 1],
+    arcColor: [0.9, 0.4, 0.7],
+    markerSize: 0.03,
+    markerElevation: 0,
+  },
+  live: {
+    theta: 0.1,
+    dark: 0,
+    mapBrightness: 10,
+    markerColor: [0.9, 0.2, 0.2],
+    baseColor: [0.95, 0.95, 0.95],
+    arcColor: [0.9, 0.3, 0.3],
+    markerSize: 0.02,
+    markerElevation: 0.01,
+  },
+  pulse: {
+    theta: 0.15,
+    dark: 1,
+    mapBrightness: 10,
+    markerColor: [0.2, 0.8, 0.9],
+    baseColor: [0.5, 0.5, 0.5],
+    arcColor: [0.3, 0.85, 0.95],
+    markerSize: 0.025,
+    markerElevation: 0,
+  },
+  interactive: {
+    theta: 0.2,
+    dark: 0,
+    mapBrightness: 10,
+    markerColor: [0.1, 0.2, 0.45],
+    baseColor: [1, 1, 1],
+    arcColor: [0.15, 0.3, 0.55],
+    markerSize: 0.035,
+    markerElevation: 0,
+  },
+  polaroids: {
+    theta: 0.15,
+    dark: 0,
+    mapBrightness: 9,
+    markerColor: [0.4, 0.6, 0.9],
+    baseColor: [1, 1, 1],
+    arcColor: [0.5, 0.7, 1],
+    markerSize: 0.02,
+    markerElevation: 0,
+  },
+  bars: {
+    theta: 0.2,
+    dark: 0,
+    mapBrightness: 9,
+    markerColor: [0.15, 0.55, 0.55],
+    baseColor: [1, 1, 1],
+    arcColor: [0.2, 0.6, 0.6],
+    markerSize: 0.02,
+    markerElevation: 0,
+  },
+  analytics: {
+    theta: 0.2,
+    dark: 0,
+    mapBrightness: 10,
+    markerColor: [0.3, 0.85, 0.45],
+    baseColor: [1, 1, 1],
+    arcColor: [0.25, 0.9, 0.5],
+    markerSize: 0.04,
+    markerElevation: 0,
+  },
+  flights: {
+    theta: 0.15,
+    dark: 0.05,
+    mapBrightness: 8,
+    markerColor: [0.3, 0.55, 0.95],
+    baseColor: [0.98, 0.98, 1],
+    arcColor: [0.35, 0.6, 1],
+    markerSize: 0.02,
+    markerElevation: 0,
+  },
+  labels: {
+    theta: 0.15,
+    dark: 0,
+    mapBrightness: 9,
+    markerColor: [0.55, 0.35, 0.75],
+    baseColor: [1, 1, 1],
+    arcColor: [0.6, 0.4, 0.8],
+    markerSize: 0.025,
+    markerElevation: 0,
+  },
+  satellites: {
+    theta: 0.1,
+    dark: 0.01,
+    mapBrightness: 9,
+    markerColor: [0.9, 0.9, 0.9],
+    baseColor: [0.95, 0.95, 0.95],
+    arcColor: [0.5, 0.8, 1],
+    markerSize: 0.03,
+    markerElevation: 0.15,
+  },
+  weather: {
+    theta: 0.15,
+    dark: 0,
+    mapBrightness: 10,
+    markerColor: [0.4, 0.7, 0.95],
+    baseColor: [0.98, 0.98, 1],
+    arcColor: [0.5, 0.8, 1],
+    markerSize: 0.025,
+    markerElevation: 0.12,
+  },
+}
+
+export const showcases = [
+  { name: 'COBE v2', key: 'default' },
+  { name: 'Stickers', key: 'stickers' },
+  { name: 'Labels', key: 'labels' },
+  { name: 'Satellites', key: 'satellites' },
+  { name: 'Polaroids', key: 'polaroids' },
+  { name: 'Live Badge', key: 'live' },
+  { name: 'Flights', key: 'flights' },
+  { name: 'Interactive', key: 'interactive' },
+  { name: 'Analytics', key: 'analytics' },
+  { name: 'Pulse', key: 'pulse' },
+  { name: 'Weather', key: 'weather' },
+  { name: 'Bars', key: 'bars' },
+] as const
+
+export type ShowcaseKey = (typeof showcases)[number]['key']
+
+// Helper to get markers for a showcase
+export function getShowcaseMarkers(key: ShowcaseKey, size: number) {
+  const markerArrays: Record<ShowcaseKey, { id: string; location: [number, number] }[]> = {
+    default: showcaseDefaultMarkers,
+    stickers: stickerMarkers,
+    live: liveMarkers,
+    interactive: interactiveMarkers,
+    polaroids: polaroidMarkers,
+    pulse: pulseMarkers,
+    bars: barMarkers,
+    analytics: analyticsMarkers,
+    flights: flightMarkers,
+    labels: labelMarkers,
+    satellites: satelliteMarkers,
+    weather: weatherMarkers,
+  }
+  const arr = markerArrays[key]
+  if (!arr) return []
+  return arr.map((m) => ({ location: m.location, size, id: m.id }))
+}
+
+// Helper to get arcs for a showcase
+export function getShowcaseArcs(key: ShowcaseKey) {
+  if (key === 'default') {
+    return showcaseDefaultArcs.map((a) => ({ from: a.from, to: a.to, id: a.id }))
+  }
+  if (key === 'flights') {
+    return flightArcs.map((a) => ({ ...a }))
+  }
+  return []
+}

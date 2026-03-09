@@ -1,0 +1,7 @@
+export void vertex();
+
+attribute vec2 aPosition;
+
+void vertex() {
+  gl_Position = vec4(aPosition, 0.0, 1.0);
+}

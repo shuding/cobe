@@ -2,16 +2,20 @@
   "name": "cobe-site",
   "version": "1.0.0",
   "description": "",
-  "main": "theme.config.js",
   "dependencies": {
     "cobe": "workspace:*",
+    "geist": "^1.4.1",
     "leva": "^0.9.34",
-    "next": "^12.1.6-canary.6",
-    "nextra": "2.0.0-alpha.56",
-    "nextra-theme-docs": "2.0.0-alpha.59",
+    "next": "^16.1.6",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "react-spring": "^9.4.4"
+    "react-spring": "^9.4.4",
+    "sugar-high": "^0.9.5"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "typescript": "^5.0.0"
   },
   "scripts": {
     "build": "next build",
