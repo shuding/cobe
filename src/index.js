@@ -1,244 +1,609 @@
-import Phenomenon from "phenomenon";
+import {
+  createProgram,
+  getUniformLocations,
+  getAttribLocations,
+} from './webgl.js'
+import { createAnchorManager } from './anchor.js'
 
-const OPT_PHI = "phi";
-const OPT_THETA = "theta";
-const OPT_DOTS = "mapSamples";
-const OPT_MAP_BRIGHTNESS = "mapBrightness";
-const OPT_BASE_COLOR = "baseColor";
-const OPT_MARKER_COLOR = "markerColor";
-const OPT_GLOW_COLOR = "glowColor";
-const OPT_MARKERS = "markers";
-const OPT_DIFFUSE = "diffuse";
-const OPT_DPR = "devicePixelRatio";
-const OPT_DARK = "dark";
-const OPT_OFFSET = "offset";
-const OPT_SCALE = "scale";
-const OPT_OPACITY = "opacity";
-const OPT_MAP_BASE_BRIGHTNESS = "mapBaseBrightness";
+const { PI, sin, cos } = Math
 
-const OPT_MAPPING = {
-    [OPT_PHI]: GLSLX_NAME_PHI,
-    [OPT_THETA]: GLSLX_NAME_THETA,
-    [OPT_DOTS]: GLSLX_NAME_DOTS,
-    [OPT_MAP_BRIGHTNESS]: GLSLX_NAME_DOTS_BRIGHTNESS,
-    [OPT_BASE_COLOR]: GLSLX_NAME_BASE_COLOR,
-    [OPT_MARKER_COLOR]: GLSLX_NAME_MARKER_COLOR,
-    [OPT_GLOW_COLOR]: GLSLX_NAME_GLOW_COLOR,
-    [OPT_DIFFUSE]: GLSLX_NAME_DIFFUSE,
-    [OPT_DARK]: GLSLX_NAME_DARK,
-    [OPT_OFFSET]: GLSLX_NAME_OFFSET,
-    [OPT_SCALE]: GLSLX_NAME_SCALE,
-    [OPT_OPACITY]: GLSLX_NAME_OPACITY,
-    [OPT_MAP_BASE_BRIGHTNESS]: GLSLX_NAME_MAP_BASE_BRIGHTNESS,
-};
+// Shader sources will be injected by build
+const GLOBE_VERT = __GLOBE_VERT__
+const GLOBE_FRAG = __GLOBE_FRAG__
+const MARKER_VERT = __MARKER_VERT__
+const MARKER_FRAG = __MARKER_FRAG__
+const ARC_VERT = __ARC_VERT__
+const ARC_FRAG = __ARC_FRAG__
 
-const { PI, sin, cos, sqrt, atan2, floor, max, pow, log2 } = Math;
+const GLOBE_R = 0.8
 
-// Constants matching shader
-const sqrt5 = 2.23606797749979;
-const kPhi = 1.618033988749895;
-const byLogPhiPlusOne = 0.7202100452062783;
-const kTau = 6.283185307179586;
-const twoPiOnPhi = 3.8832220774509327;
-const phiMinusOne = 0.618033988749895;
+/**
+ * Convert lat/lon to 3D position on unit sphere
+ * @param {[number, number]} location - [latitude, longitude] in degrees
+ * @returns {[number, number, number]} - [x, y, z]
+ */
+function latLonTo3D([lat, lon]) {
+  const latRad = (lat * PI) / 180
+  const lonRad = (lon * PI) / 180 - PI
+  const cosLat = cos(latRad)
+  return [-cosLat * cos(lonRad), sin(latRad), cosLat * sin(lonRad)]
+}
 
-// Optimized nearestFibonacciLattice implementation
-const nearestFibonacciLattice = (p, d) => {
-    const q = [p[0], p[2], p[1]], b = 1 / d;
-    const k = max(2, floor(log2(sqrt5 * d * PI * (1 - q[2] * q[2])) * byLogPhiPlusOne));
-    const pk = pow(kPhi, k) / sqrt5;
-    const f = [floor(pk + .5), floor(pk * kPhi + .5)];
-    const r1 = [((f[0] + 1) * phiMinusOne) % 1 * kTau - twoPiOnPhi, ((f[1] + 1) * phiMinusOne) % 1 * kTau - twoPiOnPhi];
-    const r2 = [-2 * f[0], -2 * f[1]];
-    const sp = [atan2(q[1], q[0]), q[2] - 1];
-    const dt = r1[0] * r2[1] - r2[0] * r1[1];
-    const c = [floor((r2[1] * sp[0] - r1[1] * (sp[1] * d + 1)) / dt), floor((-r2[0] * sp[0] + r1[0] * (sp[1] * d + 1)) / dt)];
-    
-    let md = PI, mp = [0, 0, 0];
-    for (let s = 0; s < 4; s++) {
-        const i = f[0] * (c[0] + s % 2) + f[1] * (c[1] + floor(s * .5));
-        if (i > d) continue;
-        const t = ((i * phiMinusOne) % 1) * kTau, cp = 1 - 2 * i * b, sp = sqrt(1 - cp * cp);
-        const sm = [cos(t) * sp, sin(t) * sp, cp];
-        const ds = sqrt((q[0] - sm[0]) ** 2 + (q[1] - sm[1]) ** 2 + (q[2] - sm[2]) ** 2);
-        if (ds < md) md = ds, mp = sm;
-    }
-    return [mp[0], mp[2], mp[1]];
-};
+const emptyGlobe = { destroy: () => {}, update: () => {} }
 
-const mapMarkers = (ms, d) => [].concat(...ms.map(m => {
-    let [a, b] = m.location;
-    a = a * PI / 180; b = b * PI / 180 - PI;
-    const c = cos(a), p = [-c * cos(b), sin(a), c * sin(b)];
-    const l = nearestFibonacciLattice(p, d);
-    return [...l, m.size, ...(m.color ? [...m.color, 1] : [0, 0, 0, 0])];
-}), [0, 0, 0, 0, 0, 0, 0, 0]);
-
+/**
+ * Create COBE globe
+ * @param {HTMLCanvasElement} canvas
+ * @param {Object} opts
+ * @returns {{ destroy: () => void, update: (state: Partial<COBEOptions>) => void }}
+ */
 export default (canvas, opts) => {
-    const createUniform = (type, name, fallback) => {
-        return {
-            type,
-            value: typeof opts[name] === "undefined" ? fallback : opts[name],
-        };
-    };
+  const contextOpts = {
+    alpha: true,
+    stencil: false,
+    antialias: true,
+    depth: false,
+    preserveDrawingBuffer: false,
+    ...opts.context,
+  }
 
-    // See https://github.com/shuding/cobe/pull/34.
-    const contextType = canvas.getContext("webgl2")
-        ? "webgl2"
-        : canvas.getContext("webgl")
-          ? "webgl"
-          : "experimental-webgl";
+  let gl = canvas.getContext('webgl2', contextOpts)
+  const webgl2 = !!gl
+  if (!gl) gl = canvas.getContext('webgl', contextOpts)
 
-    const p = new Phenomenon({
-        canvas,
-        contextType,
-        context: {
-            alpha: true,
-            stencil: false,
-            antialias: true,
-            depth: false,
-            preserveDrawingBuffer: false,
-            ...opts.context,
-        },
-        settings: {
-            [OPT_DPR]: opts[OPT_DPR] || 1,
-            onSetup: (gl) => {
-                const RGBFormat = gl.RGB;
-                const srcType = gl.UNSIGNED_BYTE;
-                const TEXTURE_2D = gl.TEXTURE_2D;
+  if (!gl) return emptyGlobe
 
-                const texture = gl.createTexture();
-                gl.bindTexture(TEXTURE_2D, texture);
-                gl.texImage2D(
-                    TEXTURE_2D,
-                    0,
-                    RGBFormat,
-                    1,
-                    1,
-                    0,
-                    RGBFormat,
-                    srcType,
-                    new Uint8Array([0, 0, 0, 0]),
-                );
+  const instExt = webgl2 ? null : gl.getExtension('ANGLE_instanced_arrays')
 
-                const image = new Image();
-                image.onload = () => {
-                    gl.bindTexture(TEXTURE_2D, texture);
-                    gl.texImage2D(
-                        TEXTURE_2D,
-                        0,
-                        RGBFormat,
-                        RGBFormat,
-                        srcType,
-                        image,
-                    );
+  // Device pixel ratio
+  const dpr = opts.devicePixelRatio || 1
+  canvas.width = opts.width * dpr
+  canvas.height = opts.height * dpr
 
-                    gl.generateMipmap(TEXTURE_2D);
+  // State
+  let phi = opts.phi || 0
+  let theta = opts.theta || 0
+  let markers = opts.markers || []
+  let arcs = opts.arcs || []
 
-                    const program = gl.getParameter(gl.CURRENT_PROGRAM);
-                    const textureLocation = gl.getUniformLocation(
-                        program,
-                        GLSLX_NAME_U_TEXTURE,
-                    );
-                    gl.texParameteri(
-                        TEXTURE_2D,
-                        gl.TEXTURE_MIN_FILTER,
-                        gl.NEAREST,
-                    );
-                    gl.texParameteri(
-                        TEXTURE_2D,
-                        gl.TEXTURE_MAG_FILTER,
-                        gl.NEAREST,
-                    );
-                    gl.uniform1i(textureLocation, 0);
-                };
-                image.src = __TEXTURE__;
-            },
-        },
-    });
+  // Options with defaults (mutable for dynamic updates)
+  let mapSamples = opts.mapSamples || 10000
+  let mapBrightness = opts.mapBrightness || 1
+  let mapBaseBrightness = opts.mapBaseBrightness || 0
+  let baseColor = opts.baseColor || [1, 1, 1]
+  let markerColor = opts.markerColor || [1, 0.5, 0]
+  let glowColor = opts.glowColor || [1, 1, 1]
+  let arcColor = opts.arcColor || [0.3, 0.6, 1]
+  let arcWidth = opts.arcWidth ?? 1
+  let arcHeight = opts.arcHeight ?? 0.2
+  let diffuse = opts.diffuse || 1
+  let dark = opts.dark || 0
+  let opacity = opts.opacity ?? 1
+  let offsetOpt = opts.offset || [0, 0]
+  let scaleOpt = opts.scale || 1
+  let markerElevation = opts.markerElevation ?? 0.05
 
-    p.add("", {
-        vertex: `attribute vec3 aPosition;uniform mat4 uProjectionMatrix;uniform mat4 uModelMatrix;uniform mat4 uViewMatrix;void main(){gl_Position=uProjectionMatrix*uModelMatrix*uViewMatrix*vec4(aPosition,1.);}`,
-        fragment: GLSLX_SOURCE_MAIN,
-        uniforms: {
-            [GLSLX_NAME_U_RESOLUTION]: {
-                type: "vec2",
-                value: [opts.width, opts.height],
-            },
-            [GLSLX_NAME_PHI]: createUniform("float", OPT_PHI),
-            [GLSLX_NAME_THETA]: createUniform("float", OPT_THETA),
-            [GLSLX_NAME_DOTS]: createUniform("float", OPT_DOTS),
-            [GLSLX_NAME_DOTS_BRIGHTNESS]: createUniform(
-                "float",
-                OPT_MAP_BRIGHTNESS,
-            ),
-            [GLSLX_NAME_MAP_BASE_BRIGHTNESS]: createUniform(
-                "float",
-                OPT_MAP_BASE_BRIGHTNESS,
-            ),
-            [GLSLX_NAME_BASE_COLOR]: createUniform("vec3", OPT_BASE_COLOR),
-            [GLSLX_NAME_MARKER_COLOR]: createUniform("vec3", OPT_MARKER_COLOR),
-            [GLSLX_NAME_DIFFUSE]: createUniform("float", OPT_DIFFUSE),
-            [GLSLX_NAME_GLOW_COLOR]: createUniform("vec3", OPT_GLOW_COLOR),
-            [GLSLX_NAME_DARK]: createUniform("float", OPT_DARK),
-            [GLSLX_NAME_MARKERS]: {
-                type: "vec4",
-                value: mapMarkers(opts[OPT_MARKERS], opts[OPT_DOTS]),
-            },
-            [GLSLX_NAME_MARKERS_NUM]: {
-                type: "float",
-                value: opts[OPT_MARKERS].length * 2,
-            },
-            [GLSLX_NAME_OFFSET]: createUniform("vec2", OPT_OFFSET, [0, 0]),
-            [GLSLX_NAME_SCALE]: createUniform("float", OPT_SCALE, 1),
-            [GLSLX_NAME_OPACITY]: createUniform("float", OPT_OPACITY, 1),
-        },
-        mode: 4,
-        geometry: {
-            vertices: [
-                { x: -100, y: 100, z: 0 },
-                { x: -100, y: -100, z: 0 },
-                { x: 100, y: 100, z: 0 },
-                { x: 100, y: -100, z: 0 },
-                { x: -100, y: -100, z: 0 },
-                { x: 100, y: 100, z: 0 },
-            ],
-        },
-        onRender: ({ uniforms }) => {
-            let state = {};
-            if (opts.onRender) {
-                state = opts.onRender(state) || state;
-                for (const k in OPT_MAPPING) {
-                    if (state[k] !== undefined) {
-                        uniforms[OPT_MAPPING[k]].value = state[k];
-                    }
-                }
-                if (state[OPT_MARKERS] !== undefined) {
-                    // Get current dots value from state or existing uniform
-                    const currentDots = state[OPT_DOTS] !== undefined ? state[OPT_DOTS] : uniforms[GLSLX_NAME_DOTS].value;
-                    uniforms[GLSLX_NAME_MARKERS].value = mapMarkers(
-                        state[OPT_MARKERS],
-                        currentDots
-                    );
-                    uniforms[GLSLX_NAME_MARKERS_NUM].value =
-                        state[OPT_MARKERS].length;
-                }
-                if (state.width && state.height) {
-                    uniforms[GLSLX_NAME_U_RESOLUTION].value = [
-                        state.width,
-                        state.height,
-                    ];
-                }
-                if (state[OPT_DOTS] !== undefined) {
-                    // Remap markers when dots change
-                    uniforms[GLSLX_NAME_MARKERS].value = mapMarkers(
-                        state[OPT_MARKERS] || opts[OPT_MARKERS],
-                        state[OPT_DOTS]
-                    );
-                }
-            }
-        },
-    });
+  // Create shader programs
+  const globeProgram = createProgram(gl, GLOBE_VERT, GLOBE_FRAG)
+  const markerProgram = createProgram(gl, MARKER_VERT, MARKER_FRAG)
+  const arcProgram = createProgram(gl, ARC_VERT, ARC_FRAG)
 
-    return p;
-};
+  if (!globeProgram) return emptyGlobe
+
+  // Buffers
+  const quadBuffer = gl.createBuffer()
+  gl.bindBuffer(gl.ARRAY_BUFFER, quadBuffer)
+  gl.bufferData(
+    gl.ARRAY_BUFFER,
+    new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]),
+    gl.STATIC_DRAW,
+  )
+
+  const arcSegmentBuffer = gl.createBuffer()
+  const arcSegmentCount = 66 // (32 + 1) * 2
+  gl.bindBuffer(gl.ARRAY_BUFFER, arcSegmentBuffer)
+  const vertices = []
+  for (let i = 0; i <= 32; i++) {
+    const t = i / 32
+    vertices.push(t, -1, t, 1)
+  }
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
+
+  // Instance buffers
+  const markerInstanceBuffer = gl.createBuffer()
+  const arcInstanceBuffer = gl.createBuffer()
+
+  // Globe uniforms
+  const globeUniforms = getUniformLocations(gl, globeProgram, [
+    GLOBE_F_uResolution,
+    GLOBE_F_rotation,
+    GLOBE_F_dots,
+    GLOBE_F_scale,
+    GLOBE_F_offset,
+    GLOBE_F_baseColor,
+    GLOBE_F_glowColor,
+    GLOBE_F_renderParams,
+    GLOBE_F_mapBaseBrightness,
+    GLOBE_F_uTexture,
+  ])
+
+  // Marker uniforms
+  const markerUniforms = getUniformLocations(gl, markerProgram, [
+    MARKER_phi,
+    MARKER_theta,
+    MARKER_uResolution,
+    MARKER_scale,
+    MARKER_offset,
+    MARKER_markerColor,
+    MARKER_markerElevation,
+  ])
+
+  // Marker attributes
+  const markerAttribs = getAttribLocations(gl, markerProgram, [
+    MARKER_aPosition,
+    MARKER_aMarkerPos,
+    MARKER_aMarkerSize,
+    MARKER_aMarkerColor,
+    MARKER_aHasColor,
+  ])
+
+  // Arc uniforms
+  const arcUniforms = getUniformLocations(gl, arcProgram, [
+    ARC_phi,
+    ARC_theta,
+    ARC_uResolution,
+    ARC_scale,
+    ARC_offset,
+    ARC_arcColor,
+    ARC_markerElevation,
+  ])
+
+  // Arc attributes
+  const arcAttribs = getAttribLocations(gl, arcProgram, [
+    ARC_aPosition,
+    ARC_aArcFrom,
+    ARC_aArcTo,
+    ARC_aArcHeight,
+    ARC_aArcWidth,
+    ARC_aArcColor,
+    ARC_aHasColor,
+  ])
+
+  // Globe attribute
+  const globePositionAttrib = gl.getAttribLocation(
+    globeProgram,
+    GLOBE_V_aPosition,
+  )
+
+  // Load texture
+  const texture = gl.createTexture()
+  gl.bindTexture(gl.TEXTURE_2D, texture)
+  gl.texImage2D(
+    gl.TEXTURE_2D,
+    0,
+    gl.RGB,
+    1,
+    1,
+    0,
+    gl.RGB,
+    gl.UNSIGNED_BYTE,
+    new Uint8Array([0, 0, 0]),
+  )
+
+  const image = new Image()
+  image.onload = () => {
+    gl.bindTexture(gl.TEXTURE_2D, texture)
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image)
+    gl.generateMipmap(gl.TEXTURE_2D)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
+    gl.activeTexture(gl.TEXTURE0)
+    gl.bindTexture(gl.TEXTURE_2D, texture)
+  }
+  image.src = __TEXTURE__
+
+  /**
+   * Update marker instance data
+   */
+  function updateMarkers(newMarkers) {
+    markers = newMarkers
+
+    // 8 floats per marker: x, y, z, size, r, g, b, hasColor
+    const markerData = new Float32Array(markers.length * 8)
+
+    markers.forEach((m, i) => {
+      markerData.set(
+        [
+          ...latLonTo3D(m.location),
+          m.size,
+          ...(m.color || [0, 0, 0]),
+          m.color ? 1 : 0,
+        ],
+        i * 8,
+      )
+    })
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, markerInstanceBuffer)
+    gl.bufferData(gl.ARRAY_BUFFER, markerData, gl.DYNAMIC_DRAW)
+  }
+
+  /**
+   * Update arc instance data
+   */
+  // Track valid arc count (arcs with resolved endpoints)
+  let validArcCount = 0
+
+  function updateArcs(newArcs) {
+    arcs = newArcs
+    validArcCount = arcs.length
+
+    // 12 floats per arc: from(3), to(3), height, width, color(3), hasColor
+    const arcData = new Float32Array(arcs.length * 12)
+
+    arcs.forEach((arc, i) => {
+      arcData.set(
+        [
+          ...latLonTo3D(arc.from),
+          ...latLonTo3D(arc.to),
+          arcHeight,
+          arcWidth * 0.005,
+          ...(arc.color || [0, 0, 0]),
+          arc.color ? 1 : 0,
+        ],
+        i * 12,
+      )
+    })
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, arcInstanceBuffer)
+    gl.bufferData(gl.ARRAY_BUFFER, arcData, gl.DYNAMIC_DRAW)
+  }
+
+  /**
+   * Apply rotation to a 3D point (same rotation as marker/arc shaders)
+   * Uses rot * p (matrix times column vector) for world-to-view transformation
+   * @param {[number, number, number]} p
+   * @param {number} theta
+   * @param {number} phi
+   * @returns {[number, number, number]}
+   */
+  function applyRotation(p) {
+    const cx = Math.cos(theta)
+    const cy = Math.cos(phi)
+    const sx = Math.sin(theta)
+    const sy = Math.sin(phi)
+
+    const aspect = canvas.width / canvas.height
+
+    // Rotated coordinates
+    const rx = cy * p[0] + sy * p[2]
+    const ry = sy * sx * p[0] + cx * p[1] - cy * sx * p[2]
+    const rz = -sy * cx * p[0] + sx * p[1] + cy * cx * p[2]
+
+    return [
+      ((rx / aspect) * scaleOpt + offsetOpt[0] / canvas.width + 1) / 2,
+      (-ry * scaleOpt - offsetOpt[1] / canvas.height + 1) / 2,
+      rz >= 0 || rx * rx + ry * ry >= 0.64, // visible if in front OR outside globe silhouette
+    ]
+  }
+
+  /**
+   * Project a location to screen coordinates
+   */
+  function project(location) {
+    const pos3D = latLonTo3D(location)
+    const r = GLOBE_R + markerElevation
+    const elevatedPos = [pos3D[0] * r, pos3D[1] * r, pos3D[2] * r]
+
+    const rotated = applyRotation(elevatedPos)
+    return { x: rotated[0], y: rotated[1], visible: rotated[2] }
+  }
+
+  /**
+   * Project arc midpoint to screen coordinates
+   */
+  function projectArcMidpoint(arc) {
+    const fromDir = latLonTo3D(arc.from)
+    const toDir = latLonTo3D(arc.to)
+
+    const midSum = [
+      fromDir[0] + toDir[0],
+      fromDir[1] + toDir[1],
+      fromDir[2] + toDir[2],
+    ]
+    const len = (midSum[0] ** 2 + midSum[1] ** 2 + midSum[2] ** 2) ** 0.5
+    if (len < 0.001) return null
+
+    // Bezier at t=0.5: 0.25*(from+to) + 0.5*mid, simplified
+    const s = 0.25 * (GLOBE_R + markerElevation) + 0.5 * (GLOBE_R + arcHeight) / len
+    const rotated = applyRotation([midSum[0] * s, midSum[1] * s, midSum[2] * s])
+    return { x: rotated[0], y: rotated[1], visible: rotated[2] }
+  }
+
+  /**
+   * Set up instanced attribute
+   */
+  function setupInstancedAttribute(attrib, size, stride, offset, divisor) {
+    if (attrib < 0) return
+    gl.enableVertexAttribArray(attrib)
+    gl.vertexAttribPointer(attrib, size, gl.FLOAT, false, stride, offset)
+
+    if (webgl2) {
+      gl.vertexAttribDivisor(attrib, divisor)
+    } else if (instExt) {
+      instExt.vertexAttribDivisorANGLE(attrib, divisor)
+    }
+  }
+
+  /**
+   * Draw instanced
+   */
+  function drawInstanced(count) {
+    if (webgl2) {
+      gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, count)
+    } else if (instExt) {
+      instExt.drawArraysInstancedANGLE(gl.TRIANGLES, 0, 6, count)
+    } else {
+      // Fallback: draw one at a time (slow)
+      for (let i = 0; i < count; i++) {
+        gl.drawArrays(gl.TRIANGLES, 0, 6)
+      }
+    }
+  }
+
+  const UNDEFINED = undefined
+
+  // Anchor elements
+  const wrapper = document.createElement('div')
+  wrapper.style.cssText = 'position:relative;width:100%;height:100%'
+  canvas.parentElement?.insertBefore(wrapper, canvas)
+  wrapper.append(canvas)
+  const anchorManager = createAnchorManager(wrapper)
+
+  /**
+   * Update state and trigger a re-render
+   * @param {Object} state - State updates to apply
+   */
+  function update(state) {
+    // Update state from provided values
+    if (state.phi != UNDEFINED) phi = state.phi
+    if (state.theta != UNDEFINED) theta = state.theta
+    if (state.markers) updateMarkers(state.markers)
+    if (state.arcs) updateArcs(state.arcs)
+
+    if (state.width && state.height) {
+      canvas.width = state.width * dpr
+      canvas.height = state.height * dpr
+    }
+
+    // Update appearance options
+    if (state.mapSamples != UNDEFINED) mapSamples = state.mapSamples
+    if (state.mapBrightness != UNDEFINED) mapBrightness = state.mapBrightness
+    if (state.mapBaseBrightness != UNDEFINED)
+      mapBaseBrightness = state.mapBaseBrightness
+    if (state.baseColor != UNDEFINED) baseColor = state.baseColor
+    if (state.markerColor != UNDEFINED) markerColor = state.markerColor
+    if (state.glowColor != UNDEFINED) glowColor = state.glowColor
+    if (state.arcColor != UNDEFINED) arcColor = state.arcColor
+    if (state.arcWidth != UNDEFINED) arcWidth = state.arcWidth
+    if (state.arcHeight != UNDEFINED) arcHeight = state.arcHeight
+    if (state.diffuse != UNDEFINED) diffuse = state.diffuse
+    if (state.dark != UNDEFINED) dark = state.dark
+    if (state.opacity != UNDEFINED) opacity = state.opacity
+    if (state.offset != UNDEFINED) offsetOpt = state.offset
+    if (state.scale != UNDEFINED) scaleOpt = state.scale
+    if (state.markerElevation != UNDEFINED)
+      markerElevation = state.markerElevation
+
+    // Update anchor positions
+    anchorManager.m(markers, project)
+    anchorManager.a(arcs, projectArcMidpoint)
+
+    // Set viewport
+    gl.viewport(0, 0, canvas.width, canvas.height)
+    gl.clearColor(0, 0, 0, 0)
+    gl.clear(gl.COLOR_BUFFER_BIT)
+
+    // Enable blending for transparency
+    gl.enable(gl.BLEND)
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+
+    // === Pass 1: Globe ===
+    gl.useProgram(globeProgram)
+
+    // Bind quad buffer
+    gl.bindBuffer(gl.ARRAY_BUFFER, quadBuffer)
+    gl.enableVertexAttribArray(globePositionAttrib)
+    gl.vertexAttribPointer(globePositionAttrib, 2, gl.FLOAT, false, 0, 0)
+
+    // Set uniforms
+    gl.uniform2f(
+      globeUniforms[GLOBE_F_uResolution],
+      canvas.width,
+      canvas.height,
+    )
+    gl.uniform2f(globeUniforms[GLOBE_F_rotation], phi, theta)
+    gl.uniform1f(globeUniforms[GLOBE_F_dots], mapSamples)
+    gl.uniform1f(globeUniforms[GLOBE_F_scale], scaleOpt)
+    gl.uniform2f(
+      globeUniforms[GLOBE_F_offset],
+      offsetOpt[0] * dpr,
+      offsetOpt[1] * dpr,
+    )
+    gl.uniform3fv(globeUniforms[GLOBE_F_baseColor], baseColor)
+    gl.uniform3fv(globeUniforms[GLOBE_F_glowColor], glowColor)
+    gl.uniform4f(
+      globeUniforms[GLOBE_F_renderParams],
+      mapBrightness,
+      diffuse,
+      dark,
+      opacity,
+    )
+    gl.uniform1f(globeUniforms[GLOBE_F_mapBaseBrightness], mapBaseBrightness)
+    gl.uniform1i(globeUniforms[GLOBE_F_uTexture], 0)
+
+    gl.drawArrays(gl.TRIANGLES, 0, 6)
+
+    // === Pass 2: Arcs ===
+    if (arcProgram && validArcCount > 0) {
+      gl.useProgram(arcProgram)
+
+      // Bind arc segment buffer for position (t, offset pairs along curve)
+      gl.bindBuffer(gl.ARRAY_BUFFER, arcSegmentBuffer)
+      if (arcAttribs[ARC_aPosition] >= 0) {
+        gl.enableVertexAttribArray(arcAttribs[ARC_aPosition])
+        gl.vertexAttribPointer(
+          arcAttribs[ARC_aPosition],
+          2,
+          gl.FLOAT,
+          false,
+          0,
+          0,
+        )
+        if (webgl2) gl.vertexAttribDivisor(arcAttribs[ARC_aPosition], 0)
+        else if (instExt)
+          instExt.vertexAttribDivisorANGLE(arcAttribs[ARC_aPosition], 0)
+      }
+
+      // Bind instance buffer
+      gl.bindBuffer(gl.ARRAY_BUFFER, arcInstanceBuffer)
+      const arcStride = 12 * 4 // 12 floats * 4 bytes
+
+      setupInstancedAttribute(arcAttribs[ARC_aArcFrom], 3, arcStride, 0, 1)
+      setupInstancedAttribute(arcAttribs[ARC_aArcTo], 3, arcStride, 12, 1)
+      setupInstancedAttribute(arcAttribs[ARC_aArcHeight], 1, arcStride, 24, 1)
+      setupInstancedAttribute(arcAttribs[ARC_aArcWidth], 1, arcStride, 28, 1)
+      setupInstancedAttribute(arcAttribs[ARC_aArcColor], 3, arcStride, 32, 1)
+      setupInstancedAttribute(arcAttribs[ARC_aHasColor], 1, arcStride, 44, 1)
+
+      // Set uniforms
+      gl.uniform1f(arcUniforms[ARC_phi], phi)
+      gl.uniform1f(arcUniforms[ARC_theta], theta)
+      gl.uniform2f(arcUniforms[ARC_uResolution], canvas.width, canvas.height)
+      gl.uniform1f(arcUniforms[ARC_scale], scaleOpt)
+      gl.uniform2f(
+        arcUniforms[ARC_offset],
+        offsetOpt[0] * dpr,
+        offsetOpt[1] * dpr,
+      )
+      gl.uniform3fv(arcUniforms[ARC_arcColor], arcColor)
+      gl.uniform1f(arcUniforms[ARC_markerElevation], markerElevation)
+
+      // Draw arcs using TRIANGLE_STRIP
+      if (webgl2) {
+        gl.drawArraysInstanced(
+          gl.TRIANGLE_STRIP,
+          0,
+          arcSegmentCount,
+          validArcCount,
+        )
+      } else if (instExt) {
+        instExt.drawArraysInstancedANGLE(
+          gl.TRIANGLE_STRIP,
+          0,
+          arcSegmentCount,
+          validArcCount,
+        )
+      } else {
+        // Fallback: draw one arc at a time
+        for (let i = 0; i < validArcCount; i++) {
+          gl.drawArrays(gl.TRIANGLE_STRIP, 0, arcSegmentCount)
+        }
+      }
+    }
+
+    // === Pass 3: Markers ===
+    if (markerProgram && markers.length > 0) {
+      gl.useProgram(markerProgram)
+
+      // Bind quad buffer for position
+      gl.bindBuffer(gl.ARRAY_BUFFER, quadBuffer)
+      if (markerAttribs[MARKER_aPosition] >= 0) {
+        gl.enableVertexAttribArray(markerAttribs[MARKER_aPosition])
+        gl.vertexAttribPointer(
+          markerAttribs[MARKER_aPosition],
+          2,
+          gl.FLOAT,
+          false,
+          0,
+          0,
+        )
+        if (webgl2) gl.vertexAttribDivisor(markerAttribs[MARKER_aPosition], 0)
+        else if (instExt)
+          instExt.vertexAttribDivisorANGLE(markerAttribs[MARKER_aPosition], 0)
+      }
+
+      // Bind instance buffer
+      gl.bindBuffer(gl.ARRAY_BUFFER, markerInstanceBuffer)
+      const markerStride = 8 * 4 // 8 floats * 4 bytes
+
+      setupInstancedAttribute(
+        markerAttribs[MARKER_aMarkerPos],
+        3,
+        markerStride,
+        0,
+        1,
+      )
+      setupInstancedAttribute(
+        markerAttribs[MARKER_aMarkerSize],
+        1,
+        markerStride,
+        12,
+        1,
+      )
+      setupInstancedAttribute(
+        markerAttribs[MARKER_aMarkerColor],
+        3,
+        markerStride,
+        16,
+        1,
+      )
+      setupInstancedAttribute(
+        markerAttribs[MARKER_aHasColor],
+        1,
+        markerStride,
+        28,
+        1,
+      )
+
+      // Set uniforms
+      gl.uniform1f(markerUniforms[MARKER_phi], phi)
+      gl.uniform1f(markerUniforms[MARKER_theta], theta)
+      gl.uniform2f(
+        markerUniforms[MARKER_uResolution],
+        canvas.width,
+        canvas.height,
+      )
+      gl.uniform1f(markerUniforms[MARKER_scale], scaleOpt)
+      gl.uniform2f(
+        markerUniforms[MARKER_offset],
+        offsetOpt[0] * dpr,
+        offsetOpt[1] * dpr,
+      )
+      gl.uniform3fv(markerUniforms[MARKER_markerColor], markerColor)
+      gl.uniform1f(markerUniforms[MARKER_markerElevation], markerElevation)
+
+      drawInstanced(markers.length)
+    }
+  }
+
+  // Initialize
+  update({ markers, arcs })
+
+  // Return public API
+  return {
+    update,
+    destroy: () => {
+      // Clean up WebGL resources
+      gl.deleteBuffer(quadBuffer)
+      gl.deleteBuffer(arcSegmentBuffer)
+      gl.deleteBuffer(markerInstanceBuffer)
+      gl.deleteBuffer(arcInstanceBuffer)
+      gl.deleteProgram(globeProgram)
+      if (markerProgram) gl.deleteProgram(markerProgram)
+      if (arcProgram) gl.deleteProgram(arcProgram)
+
+      // Clean up anchor elements
+      anchorManager.r()
+    },
+  }
+}
