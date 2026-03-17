@@ -245,7 +245,7 @@ export default (canvas, opts) => {
         [
           ...latLonTo3D(arc.from),
           ...latLonTo3D(arc.to),
-          arcHeight,
+          arcHeight + markerElevation,
           arcWidth * 0.005,
           ...(arc.color || [0, 0, 0]),
           arc.color ? 1 : 0,
@@ -314,7 +314,9 @@ export default (canvas, opts) => {
     if (len < 0.001) return null
 
     // Bezier at t=0.5: 0.25*(from+to) + 0.5*mid, simplified
-    const s = 0.25 * (GLOBE_R + markerElevation) + 0.5 * (GLOBE_R + arcHeight) / len
+    const s =
+      0.25 * (GLOBE_R + markerElevation) +
+      (0.5 * (GLOBE_R + arcHeight + markerElevation)) / len
     const rotated = applyRotation([midSum[0] * s, midSum[1] * s, midSum[2] * s])
     return { x: rotated[0], y: rotated[1], visible: rotated[2] }
   }

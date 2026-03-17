@@ -26,72 +26,8 @@ import {
   weatherMarkers,
 } from './showcases-data'
 
-const markers = [
-  {
-    id: 'sf',
-    location: [37.7595, -122.4367] as [number, number],
-    label: 'San Francisco',
-  },
-  {
-    id: 'nyc',
-    location: [40.7128, -74.006] as [number, number],
-    label: 'New York',
-  },
-  {
-    id: 'tokyo',
-    location: [35.6762, 139.6503] as [number, number],
-    label: 'Tokyo',
-  },
-  {
-    id: 'london',
-    location: [51.5074, -0.1278] as [number, number],
-    label: 'London',
-  },
-  {
-    id: 'sydney',
-    location: [-33.8688, 151.2093] as [number, number],
-    label: 'Sydney',
-  },
-  {
-    id: 'capetown',
-    location: [-33.9249, 18.4241] as [number, number],
-    label: 'Cape Town',
-  },
-  {
-    id: 'dubai',
-    location: [25.2048, 55.2708] as [number, number],
-    label: 'Dubai',
-  },
-  {
-    id: 'paris',
-    location: [48.8566, 2.3522] as [number, number],
-    label: 'Paris',
-  },
-  {
-    id: 'saopaulo',
-    location: [-23.5505, -46.6333] as [number, number],
-    label: 'São Paulo',
-  },
-]
-
-const arcs = [
-  {
-    id: 'sf-tokyo',
-    from: [37.7595, -122.4367] as [number, number],
-    to: [35.6762, 139.6503] as [number, number],
-    label: 'SF → Tokyo',
-  },
-  {
-    id: 'nyc-london',
-    from: [40.7128, -74.006] as [number, number],
-    to: [51.5074, -0.1278] as [number, number],
-    label: 'NYC → London',
-  },
-]
-
 const installCommands = {
-  'Copy Prompt':
-    'Add the cobe@latest (check cobe.vercel.app for docs), make no mistakes.',
+  'Copy Prompt': 'Add cobe@latest (https://cobe.vercel.app) to my app.',
   npm: 'npm i cobe',
   pnpm: 'pnpm i cobe',
   yarn: 'yarn add cobe',
@@ -255,9 +191,14 @@ function Showcases() {
   const [expanded, setExpanded] = useState<string | null>(null)
   const [progress, setProgress] = useState(0)
   const pointerInteracting = useRef<{ x: number; y: number } | null>(null)
-  const pointerMovement = useRef({ x: 0, y: 0 })
+  const lastPointer = useRef<{ x: number; y: number; t: number } | null>(null)
+  const dragOffset = useRef({ phi: 0, theta: 0 })
+  const velocity = useRef({ phi: 0, theta: 0 })
+  const phiOffsetRef = useRef(0)
+  const thetaOffsetRef = useRef(0)
   const [liveViewers, setLiveViewers] = useState(2847)
   const isPausedRef = useRef(false)
+  const speedRef = useRef(1)
   const accumulatedRef = useRef(0)
   const [analyticsData, setAnalyticsData] = useState(() =>
     analyticsMarkers.map((m) => ({ ...m })),
@@ -278,8 +219,6 @@ function Showcases() {
     ab: showcaseConfigs.default.arcColor[2],
     markerSize: showcaseConfigs.default.markerSize,
     markerElevation: showcaseConfigs.default.markerElevation,
-    dragPhi: 0,
-    dragTheta: 0,
     config: { mass: 1, tension: 120, friction: 20 },
   }))
 
@@ -289,19 +228,33 @@ function Showcases() {
     isPausedRef.current = true
   }, [])
 
-  const handlePointerMove = useCallback(
-    (e: PointerEvent) => {
-      if (pointerInteracting.current !== null) {
-        const deltaX = e.clientX - pointerInteracting.current.x
-        const deltaY = e.clientY - pointerInteracting.current.y
-        pointerMovement.current = { x: deltaX, y: deltaY }
-        api.start({ dragPhi: deltaX / 150, dragTheta: deltaY / 300 })
+  const handlePointerMove = useCallback((e: PointerEvent) => {
+    if (pointerInteracting.current !== null) {
+      const deltaX = e.clientX - pointerInteracting.current.x
+      const deltaY = e.clientY - pointerInteracting.current.y
+      dragOffset.current = { phi: deltaX / 300, theta: deltaY / 600 }
+
+      // Track velocity (clamped)
+      const now = Date.now()
+      if (lastPointer.current) {
+        const dt = Math.max(now - lastPointer.current.t, 1)
+        const maxVelocity = 0.15
+        velocity.current = {
+          phi: Math.max(-maxVelocity, Math.min(maxVelocity, (e.clientX - lastPointer.current.x) / dt * 0.3)),
+          theta: Math.max(-maxVelocity, Math.min(maxVelocity, (e.clientY - lastPointer.current.y) / dt * 0.15)),
+        }
       }
-    },
-    [api],
-  )
+      lastPointer.current = { x: e.clientX, y: e.clientY, t: now }
+    }
+  }, [])
 
   const handlePointerUp = useCallback(() => {
+    if (pointerInteracting.current !== null) {
+      phiOffsetRef.current += dragOffset.current.phi
+      thetaOffsetRef.current += dragOffset.current.theta
+      dragOffset.current = { phi: 0, theta: 0 }
+      lastPointer.current = null
+    }
     pointerInteracting.current = null
     if (canvasRef.current) canvasRef.current.style.cursor = 'grab'
     isPausedRef.current = false
@@ -441,31 +394,46 @@ function Showcases() {
       width: width * 2,
       height: width * 2,
       phi: 0,
-      theta: 0.15,
+      theta: 0.2,
       dark: 0,
-      diffuse: 1.2,
+      diffuse: 1.5,
       mapSamples: 16000,
-      mapBrightness: 8,
+      mapBrightness: 10,
       baseColor: [1, 1, 1],
-      // #243ab0
-      markerColor: [36 / 255, 58 / 255, 176 / 255],
-      glowColor: [0.95, 0.95, 0.95],
-      markerElevation: 0,
+      markerColor: [0.3, 0.45, 0.85],
+      glowColor: [0.94, 0.93, 0.91],
+      markerElevation: 0.01,
       markers: getMarkers(),
       arcs: getArcs(),
-      arcColor: [0.2, 0.5, 0.9],
-      arcWidth: 0.4,
+      arcColor: [0.3, 0.45, 0.85],
+      arcWidth: 0.5,
       arcHeight: 0.25,
-      opacity: 0.8,
+      opacity: 0.7,
     })
 
     let animationId: number
     function animate() {
       const s = springRef.current
-      phi += 0.003
+      if (!isPausedRef.current) {
+        phi += 0.003 * speedRef.current
+        // Apply momentum with decay
+        if (Math.abs(velocity.current.phi) > 0.0001 || Math.abs(velocity.current.theta) > 0.0001) {
+          phiOffsetRef.current += velocity.current.phi
+          thetaOffsetRef.current += velocity.current.theta
+          velocity.current.phi *= 0.95
+          velocity.current.theta *= 0.95
+        }
+        // Soft spring back for theta limits
+        const thetaMin = -0.4, thetaMax = 0.4
+        if (thetaOffsetRef.current < thetaMin) {
+          thetaOffsetRef.current += (thetaMin - thetaOffsetRef.current) * 0.1
+        } else if (thetaOffsetRef.current > thetaMax) {
+          thetaOffsetRef.current += (thetaMax - thetaOffsetRef.current) * 0.1
+        }
+      }
       globe.update({
-        phi: phi + s.dragPhi.get(),
-        theta: s.theta.get() + s.dragTheta.get(),
+        phi: phi + phiOffsetRef.current + dragOffset.current.phi,
+        theta: s.theta.get() + thetaOffsetRef.current + dragOffset.current.theta,
         dark: s.dark.get(),
         mapBrightness: s.mapBrightness.get(),
         markerColor: [s.mr.get(), s.mg.get(), s.mb.get()],
@@ -489,8 +457,7 @@ function Showcases() {
   }, [])
 
   return (
-    <section className='section showcases-section'>
-      <h2>Showcases</h2>
+    <section className='hero'>
       <div className='showcases-demo'>
         <div className='showcases-globe'>
           <svg width='0' height='0' style={{ position: 'absolute' }}>
@@ -520,11 +487,31 @@ function Showcases() {
             ref={canvasRef}
             className='showcases-canvas'
             onPointerDown={handlePointerDown}
+            onPointerEnter={() => (speedRef.current = 0.8)}
+            onPointerLeave={() => (speedRef.current = 1)}
           />
 
           {/* Default */}
           {activeShowcase === 'default' && (
             <>
+              <div className='globe-overlay'>
+                <h1>COBE</h1>
+              </div>
+              <div className='orbit-ring' aria-hidden='true'>
+                <svg className='orbit-svg' viewBox='0 0 300 300'>
+                  <defs>
+                    <path
+                      id='showcaseOrbitPath'
+                      d='M 150,150 m -130,0 a 130,130 0 1,0 260,0 a 130,130 0 1,0 -260,0'
+                    />
+                  </defs>
+                  <text className='orbit-text'>
+                    <textPath href='#showcaseOrbitPath'>
+                      {'The 5KB Globe Lib · '.repeat(10)}
+                    </textPath>
+                  </text>
+                </svg>
+              </div>
               {showcaseDefaultMarkers.map((m) => (
                 <div
                   key={m.id}
@@ -850,6 +837,28 @@ function Showcases() {
           </div>
         </div>
       </div>
+      <p className='hero-tagline'>COBE: The 5KB WebGL globe</p>
+      <div className='hero-links'>
+        <a
+          href='https://github.com/shuding/cobe'
+          target='_blank'
+          rel='noopener'
+        >
+          GitHub
+        </a>
+        <span className='hero-links-sep'>/</span>
+        <a href='https://x.com/shuding' target='_blank' rel='noopener'>
+          @shuding
+        </a>
+        <span className='hero-links-sep'>/</span>
+        <a
+          href='https://x.com/shuding/status/1475916082875666441'
+          target='_blank'
+          rel='noopener'
+        >
+          Tech Details →
+        </a>
+      </div>
     </section>
   )
 }
@@ -893,14 +902,259 @@ const playgroundPresets = {
   },
 }
 
+const markerPresets = {
+  'World Cities': {
+    markers: [
+      {
+        id: 'pg-sf',
+        location: [37.78, -122.44] as [number, number],
+        label: 'San Francisco',
+      },
+      {
+        id: 'pg-nyc',
+        location: [40.71, -74.01] as [number, number],
+        label: 'New York',
+      },
+      {
+        id: 'pg-london',
+        location: [51.51, -0.13] as [number, number],
+        label: 'London',
+      },
+      {
+        id: 'pg-tokyo',
+        location: [35.68, 139.65] as [number, number],
+        label: 'Tokyo',
+      },
+      {
+        id: 'pg-sydney',
+        location: [-33.87, 151.21] as [number, number],
+        label: 'Sydney',
+      },
+      {
+        id: 'pg-singapore',
+        location: [1.35, 103.82] as [number, number],
+        label: 'Singapore',
+      },
+      {
+        id: 'pg-dubai',
+        location: [25.2, 55.27] as [number, number],
+        label: 'Dubai',
+      },
+      {
+        id: 'pg-saopaulo',
+        location: [-23.55, -46.63] as [number, number],
+        label: 'São Paulo',
+      },
+      {
+        id: 'pg-capetown',
+        location: [-33.92, 18.42] as [number, number],
+        label: 'Cape Town',
+      },
+    ],
+    arcs: [
+      {
+        id: 'pg-sf-tokyo',
+        from: [37.78, -122.44] as [number, number],
+        to: [35.68, 139.65] as [number, number],
+      },
+      {
+        id: 'pg-nyc-london',
+        from: [40.71, -74.01] as [number, number],
+        to: [51.51, -0.13] as [number, number],
+      },
+      {
+        id: 'pg-london-dubai',
+        from: [51.51, -0.13] as [number, number],
+        to: [25.2, 55.27] as [number, number],
+      },
+    ],
+  },
+  'US Offices': {
+    markers: [
+      {
+        id: 'pg-sf',
+        location: [37.78, -122.44] as [number, number],
+        label: 'San Francisco',
+      },
+      {
+        id: 'pg-nyc',
+        location: [40.71, -74.01] as [number, number],
+        label: 'New York',
+      },
+      {
+        id: 'pg-seattle',
+        location: [47.61, -122.33] as [number, number],
+        label: 'Seattle',
+      },
+      {
+        id: 'pg-la',
+        location: [34.05, -118.24] as [number, number],
+        label: 'Los Angeles',
+      },
+      {
+        id: 'pg-chicago',
+        location: [41.88, -87.63] as [number, number],
+        label: 'Chicago',
+      },
+      {
+        id: 'pg-austin',
+        location: [30.27, -97.74] as [number, number],
+        label: 'Austin',
+      },
+    ],
+    arcs: [
+      {
+        id: 'pg-sf-nyc',
+        from: [37.78, -122.44] as [number, number],
+        to: [40.71, -74.01] as [number, number],
+      },
+      {
+        id: 'pg-seattle-chicago',
+        from: [47.61, -122.33] as [number, number],
+        to: [41.88, -87.63] as [number, number],
+      },
+      {
+        id: 'pg-la-austin',
+        from: [34.05, -118.24] as [number, number],
+        to: [30.27, -97.74] as [number, number],
+      },
+    ],
+  },
+  'Flight Routes': {
+    markers: [
+      {
+        id: 'pg-lhr',
+        location: [51.47, -0.46] as [number, number],
+        label: 'LHR',
+      },
+      {
+        id: 'pg-jfk',
+        location: [40.64, -73.78] as [number, number],
+        label: 'JFK',
+      },
+      {
+        id: 'pg-dxb',
+        location: [25.25, 55.36] as [number, number],
+        label: 'DXB',
+      },
+      {
+        id: 'pg-sin',
+        location: [1.36, 103.99] as [number, number],
+        label: 'SIN',
+      },
+      {
+        id: 'pg-hnd',
+        location: [35.55, 139.78] as [number, number],
+        label: 'HND',
+      },
+      {
+        id: 'pg-syd',
+        location: [-33.95, 151.18] as [number, number],
+        label: 'SYD',
+      },
+      {
+        id: 'pg-cdg',
+        location: [49.01, 2.55] as [number, number],
+        label: 'CDG',
+      },
+    ],
+    arcs: [
+      {
+        id: 'pg-lhr-jfk',
+        from: [51.47, -0.46] as [number, number],
+        to: [40.64, -73.78] as [number, number],
+      },
+      {
+        id: 'pg-dxb-sin',
+        from: [25.25, 55.36] as [number, number],
+        to: [1.36, 103.99] as [number, number],
+      },
+      {
+        id: 'pg-hnd-syd',
+        from: [35.55, 139.78] as [number, number],
+        to: [-33.95, 151.18] as [number, number],
+      },
+      {
+        id: 'pg-cdg-dxb',
+        from: [49.01, 2.55] as [number, number],
+        to: [25.25, 55.36] as [number, number],
+      },
+    ],
+  },
+  'Data Centers': {
+    markers: [
+      {
+        id: 'pg-sanjose',
+        location: [37.37, -121.92] as [number, number],
+        label: 'us-west-1',
+      },
+      {
+        id: 'pg-ashburn',
+        location: [39.04, -77.49] as [number, number],
+        label: 'us-east-1',
+      },
+      {
+        id: 'pg-dublin',
+        location: [53.35, -6.26] as [number, number],
+        label: 'eu-west-1',
+      },
+      {
+        id: 'pg-frankfurt',
+        location: [50.11, 8.68] as [number, number],
+        label: 'eu-central-1',
+      },
+      {
+        id: 'pg-singapore',
+        location: [1.35, 103.82] as [number, number],
+        label: 'ap-southeast-1',
+      },
+      {
+        id: 'pg-tokyo',
+        location: [35.68, 139.65] as [number, number],
+        label: 'ap-northeast-1',
+      },
+      {
+        id: 'pg-sydney',
+        location: [-33.87, 151.21] as [number, number],
+        label: 'ap-southeast-2',
+      },
+      {
+        id: 'pg-saopaulo',
+        location: [-23.55, -46.63] as [number, number],
+        label: 'sa-east-1',
+      },
+    ],
+    arcs: [
+      {
+        id: 'pg-west-east',
+        from: [37.37, -121.92] as [number, number],
+        to: [39.04, -77.49] as [number, number],
+      },
+      {
+        id: 'pg-dublin-frankfurt',
+        from: [53.35, -6.26] as [number, number],
+        to: [50.11, 8.68] as [number, number],
+      },
+      {
+        id: 'pg-singapore-tokyo',
+        from: [1.35, 103.82] as [number, number],
+        to: [35.68, 139.65] as [number, number],
+      },
+    ],
+  },
+}
+
 function InlinePlayground() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const globeRef = useRef<ReturnType<typeof createGlobe> | null>(null)
-  const pointerInteracting = useRef<number | null>(null)
-  const pointerInteractionMovement = useRef(0)
+  const pointerInteracting = useRef<{ x: number; y: number } | null>(null)
+  const dragOffset = useRef({ phi: 0, theta: 0 })
   const phiRef = useRef(0)
+  const thetaOffsetRef = useRef(0)
   const [preset, setPreset] =
     useState<keyof typeof playgroundPresets>('default')
+  const [markerPreset, setMarkerPreset] =
+    useState<keyof typeof markerPresets>('World Cities')
   const [dark, setDark] = useState(0)
   const [diffuse, setDiffuse] = useState(1.2)
   const [mapBrightness, setMapBrightness] = useState(6)
@@ -927,6 +1181,8 @@ function InlinePlayground() {
     autoRotate,
     baseColor: playgroundPresets.default.baseColor,
     markerColor: playgroundPresets.default.markerColor,
+    markers: markerPresets['World Cities'].markers,
+    arcs: markerPresets['World Cities'].arcs,
     glowColor: playgroundPresets.default.glowColor,
   })
 
@@ -946,6 +1202,8 @@ function InlinePlayground() {
       baseColor: playgroundPresets[preset].baseColor,
       markerColor: playgroundPresets[preset].markerColor,
       glowColor: playgroundPresets[preset].glowColor,
+      markers: markerPresets[markerPreset].markers,
+      arcs: markerPresets[markerPreset].arcs,
     }
   }, [
     dark,
@@ -960,6 +1218,7 @@ function InlinePlayground() {
     arcWidth,
     autoRotate,
     preset,
+    markerPreset,
   ])
 
   useEffect(() => {
@@ -969,34 +1228,39 @@ function InlinePlayground() {
     setMapBrightness(p.mapBrightness)
   }, [preset])
 
+  const handlePointerMove = useCallback((e: PointerEvent) => {
+    if (pointerInteracting.current !== null) {
+      const deltaX = e.clientX - pointerInteracting.current.x
+      const deltaY = e.clientY - pointerInteracting.current.y
+      dragOffset.current = {
+        phi: deltaX / 150,
+        theta: deltaY / 300,
+      }
+    }
+  }, [])
+
+  const handlePointerUp = useCallback(() => {
+    if (pointerInteracting.current !== null) {
+      phiRef.current += dragOffset.current.phi
+      thetaOffsetRef.current += dragOffset.current.theta
+      dragOffset.current = { phi: 0, theta: 0 }
+    }
+    pointerInteracting.current = null
+    if (canvasRef.current) canvasRef.current.style.cursor = 'grab'
+  }, [])
+
+  useEffect(() => {
+    window.addEventListener('pointermove', handlePointerMove)
+    window.addEventListener('pointerup', handlePointerUp)
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove)
+      window.removeEventListener('pointerup', handlePointerUp)
+    }
+  }, [handlePointerMove, handlePointerUp])
+
   useEffect(() => {
     if (!canvasRef.current) return
-    let phi = 0
     const width = canvasRef.current.offsetWidth
-
-    const markers = [
-      { location: [37.78, -122.44] as [number, number] },
-      { location: [40.71, -74.01] as [number, number] },
-      { location: [51.51, -0.13] as [number, number] },
-      { location: [35.68, 139.65] as [number, number] },
-      { location: [-33.87, 151.21] as [number, number] },
-      { location: [48.86, 2.35] as [number, number] },
-    ]
-
-    const arcs = [
-      {
-        from: [37.78, -122.44] as [number, number],
-        to: [35.68, 139.65] as [number, number],
-      },
-      {
-        from: [40.71, -74.01] as [number, number],
-        to: [51.51, -0.13] as [number, number],
-      },
-      {
-        from: [51.51, -0.13] as [number, number],
-        to: [48.86, 2.35] as [number, number],
-      },
-    ]
 
     const globe = createGlobe(canvasRef.current, {
       devicePixelRatio: 2,
@@ -1011,8 +1275,8 @@ function InlinePlayground() {
       baseColor: [1, 1, 1],
       markerColor: [0.3, 0.5, 1],
       glowColor: [1, 1, 1],
-      markers: markers.map((m) => ({ ...m, size: 0.04 })),
-      arcs,
+      markers: stateRef.current.markers.map((m) => ({ ...m, size: 0.04 })),
+      arcs: stateRef.current.arcs,
       arcColor: [0.3, 0.5, 1],
       arcWidth: 0.4,
       arcHeight: 0.25,
@@ -1025,8 +1289,8 @@ function InlinePlayground() {
         phiRef.current += 0.003
       }
       globe.update({
-        phi: phiRef.current + pointerInteractionMovement.current,
-        theta: s.theta,
+        phi: phiRef.current + dragOffset.current.phi,
+        theta: s.theta + thetaOffsetRef.current + dragOffset.current.theta,
         scale: s.scale,
         dark: s.dark,
         diffuse: s.diffuse,
@@ -1035,8 +1299,8 @@ function InlinePlayground() {
         markerColor: s.markerColor,
         glowColor: s.glowColor,
         markerElevation: s.markerElevation,
-        markers: markers.map((m) => ({ ...m, size: s.markerSize })),
-        arcs: s.showArcs ? arcs : [],
+        markers: s.markers.map((m) => ({ ...m, size: s.markerSize })),
+        arcs: s.showArcs ? s.arcs : [],
         arcHeight: s.arcHeight,
         arcWidth: s.arcWidth,
       })
@@ -1067,31 +1331,29 @@ function InlinePlayground() {
             ref={canvasRef}
             className='playground-canvas'
             onPointerDown={(e) => {
-              pointerInteracting.current =
-                e.clientX - pointerInteractionMovement.current
+              pointerInteracting.current = { x: e.clientX, y: e.clientY }
               if (canvasRef.current) canvasRef.current.style.cursor = 'grabbing'
             }}
-            onPointerMove={(e) => {
-              if (pointerInteracting.current !== null) {
-                const delta = e.clientX - pointerInteracting.current
-                pointerInteractionMovement.current = delta / 100
-              }
-            }}
-            onPointerUp={() => {
-              pointerInteracting.current = null
-              if (canvasRef.current) canvasRef.current.style.cursor = 'grab'
-            }}
-            onPointerOut={() => {
-              if (pointerInteracting.current !== null) {
-                pointerInteracting.current = null
-                if (canvasRef.current) canvasRef.current.style.cursor = 'grab'
-              }
-            }}
           />
+          {markerPresets[markerPreset].markers.map((m) => (
+            <div
+              key={m.id}
+              className='playground-marker-label'
+              style={
+                {
+                  positionAnchor: `--cobe-${m.id}`,
+                  opacity: `var(--cobe-visible-${m.id}, 0)`,
+                  filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
+                } as React.CSSProperties
+              }
+            >
+              {m.label}
+            </div>
+          ))}
         </div>
         <div className='playground-controls'>
           <div className='playground-control'>
-            <label>Preset</label>
+            <label>Theme</label>
             <select
               value={preset}
               onChange={(e) =>
@@ -1102,6 +1364,21 @@ function InlinePlayground() {
               <option value='dark'>Dark Mode</option>
               <option value='minimal'>Minimal</option>
               <option value='neon'>Neon</option>
+            </select>
+          </div>
+          <div className='playground-control'>
+            <label>Markers</label>
+            <select
+              value={markerPreset}
+              onChange={(e) =>
+                setMarkerPreset(e.target.value as keyof typeof markerPresets)
+              }
+            >
+              {Object.keys(markerPresets).map((key) => (
+                <option key={key} value={key}>
+                  {key}
+                </option>
+              ))}
             </select>
           </div>
           <div className='playground-control'>
@@ -1231,6 +1508,16 @@ function InlinePlayground() {
               Show Arcs
             </label>
           </div>
+          <div className='playground-control'>
+            <label>
+              <input
+                type='checkbox'
+                checked={autoRotate}
+                onChange={(e) => setAutoRotate(e.target.checked)}
+              />
+              Auto Rotate
+            </label>
+          </div>
         </div>
       </div>
     </section>
@@ -1238,101 +1525,9 @@ function InlinePlayground() {
 }
 
 export default function Home() {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const pointerInteracting = useRef<number | null>(null)
-  const pointerInteractionMovement = useRef(0)
   const [pkgManager, setPkgManager] =
     useState<keyof typeof installCommands>('Copy Prompt')
   const [copied, setCopied] = useState(false)
-
-  const [{ r, speed }, api] = useSpring(() => ({
-    r: 0,
-    speed: 1,
-    config: { mass: 1, tension: 280, friction: 40, precision: 0.001 },
-  }))
-
-  const handlePointerMove = useCallback(
-    (e: PointerEvent) => {
-      if (pointerInteracting.current !== null) {
-        const delta = e.clientX - pointerInteracting.current
-        pointerInteractionMovement.current = delta
-        api.start({ r: delta / 200 })
-      }
-    },
-    [api],
-  )
-
-  const handlePointerUp = useCallback(() => {
-    pointerInteracting.current = null
-    if (canvasRef.current) canvasRef.current.style.cursor = 'grab'
-  }, [])
-
-  useEffect(() => {
-    window.addEventListener('pointermove', handlePointerMove)
-    window.addEventListener('pointerup', handlePointerUp)
-    return () => {
-      window.removeEventListener('pointermove', handlePointerMove)
-      window.removeEventListener('pointerup', handlePointerUp)
-    }
-  }, [handlePointerMove, handlePointerUp])
-
-  useEffect(() => {
-    let phi = 0
-    let width = 0
-    const onResize = () =>
-      canvasRef.current && (width = canvasRef.current.offsetWidth)
-    window.addEventListener('resize', onResize)
-    onResize()
-
-    const globe = createGlobe(canvasRef.current!, {
-      devicePixelRatio: 2,
-      width: width * 2,
-      height: width * 2,
-      phi: 0,
-      theta: 0.2,
-      dark: 0,
-      diffuse: 1.5,
-      mapSamples: 16000,
-      mapBrightness: 10,
-      mapBaseBrightness: 0,
-      baseColor: [1, 1, 1],
-      markerColor: [0.3, 0.45, 0.85],
-      glowColor: [0.94, 0.93, 0.91],
-      markerElevation: 0.01,
-      markers: markers.map((m) => ({
-        location: m.location,
-        size: 0.025,
-        id: m.id,
-      })),
-      arcs: arcs.map((a) => ({
-        ...a,
-        color: [0.3, 0.45, 0.85] as [number, number, number],
-      })),
-      arcColor: [0.3, 0.45, 0.85],
-      arcWidth: 0.5,
-      arcHeight: 0.25,
-      opacity: 0.7,
-    })
-
-    let animationId: number
-    function animate() {
-      phi += 0.005 * speed.get()
-      globe.update({
-        phi: phi + r.get(),
-        width: width * 2,
-        height: width * 2,
-      })
-      animationId = requestAnimationFrame(animate)
-    }
-    animate()
-
-    setTimeout(() => (canvasRef.current!.style.opacity = '1'))
-    return () => {
-      cancelAnimationFrame(animationId)
-      globe.destroy()
-      window.removeEventListener('resize', onResize)
-    }
-  }, [])
 
   const copyInstall = () => {
     navigator.clipboard.writeText(installCommands[pkgManager])
@@ -1342,92 +1537,8 @@ export default function Home() {
 
   return (
     <div className='page'>
-      {/* Hero Section */}
-      <section className='hero'>
-        <div className='hero-globe'>
-          <div className='globe-overlay'>
-            <h1>COBE</h1>
-          </div>
-          <div className='orbit-ring' aria-hidden='true'>
-            <svg className='orbit-svg' viewBox='0 0 300 300'>
-              <defs>
-                <path
-                  id='orbitPath'
-                  d='M 150,150 m -130,0 a 130,130 0 1,0 260,0 a 130,130 0 1,0 -260,0'
-                />
-              </defs>
-              <text className='orbit-text'>
-                <textPath href='#orbitPath'>
-                  {'The 5KB Globe Lib · '.repeat(10)}
-                </textPath>
-              </text>
-            </svg>
-          </div>
-          <canvas
-            ref={canvasRef}
-            className='globe-canvas'
-            onPointerDown={(e) => {
-              pointerInteracting.current =
-                e.clientX - pointerInteractionMovement.current
-              canvasRef.current!.style.cursor = 'grabbing'
-            }}
-            onPointerEnter={() => api.start({ speed: 0 })}
-            onPointerLeave={() => api.start({ speed: 1 })}
-          />
-          {markers.map((m) => (
-            <div
-              key={m.id}
-              className='marker-tooltip'
-              style={
-                {
-                  positionAnchor: `--cobe-${m.id}`,
-                  opacity: `var(--cobe-visible-${m.id}, 0)`,
-                  filter: `blur(var(--cobe-visible-${m.id}, 10px))`,
-                } as React.CSSProperties
-              }
-            >
-              {m.label}
-            </div>
-          ))}
-          {arcs.map((a) => (
-            <div
-              key={a.id}
-              className='arc-label'
-              style={
-                {
-                  positionAnchor: `--cobe-arc-${a.id}`,
-                  opacity: `var(--cobe-visible-arc-${a.id}, 0)`,
-                  filter: `blur(var(--cobe-visible-arc-${a.id}, 10px))`,
-                } as React.CSSProperties
-              }
-            >
-              {a.label}
-            </div>
-          ))}
-        </div>
-        <p className='hero-tagline'>The 5KB WebGL globe</p>
-        <div className='hero-links'>
-          <a
-            href='https://github.com/shuding/cobe'
-            target='_blank'
-            rel='noopener'
-          >
-            GitHub
-          </a>
-          <span className='hero-links-sep'>/</span>
-          <a href='https://x.com/shuding' target='_blank' rel='noopener'>
-            @shuding
-          </a>
-          <span className='hero-links-sep'>/</span>
-          <a
-            href='https://x.com/shuding/status/1475916082875666441'
-            target='_blank'
-            rel='noopener'
-          >
-            Tech Details →
-          </a>
-        </div>
-      </section>
+      {/* Hero - Showcases */}
+      <Showcases />
 
       {/* Install Section */}
       <section className='section'>
@@ -1487,9 +1598,6 @@ export default function Home() {
         </p>
       </section>
 
-      {/* Showcases */}
-      <Showcases />
-
       {/* API Reference */}
       <section className='section'>
         <h2>API</h2>
@@ -1535,6 +1643,31 @@ export default function Home() {
 
       {/* Playground */}
       <InlinePlayground />
+
+      {/* Footer */}
+      <footer className='footer'>
+        <div className='footer-links'>
+          <a
+            href='https://github.com/shuding/cobe'
+            target='_blank'
+            rel='noopener'
+          >
+            GitHub
+          </a>
+          <span className='footer-links-sep'>/</span>
+          <a href='https://x.com/shuding' target='_blank' rel='noopener'>
+            @shuding
+          </a>
+          <span className='footer-links-sep'>/</span>
+          <a
+            href='https://x.com/shuding/status/1475916082875666441'
+            target='_blank'
+            rel='noopener'
+          >
+            Tech Details →
+          </a>
+        </div>
+      </footer>
     </div>
   )
 }

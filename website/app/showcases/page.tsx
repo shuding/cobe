@@ -40,19 +40,19 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
       phi: 0,
       theta: config.theta,
       dark: config.dark,
-      diffuse: 1.2,
+      diffuse: 1.5,
       mapSamples: 16000,
       mapBrightness: config.mapBrightness,
       baseColor: config.baseColor,
       markerColor: config.markerColor,
-      glowColor: [0.95, 0.95, 0.95],
+      glowColor: [0.94, 0.93, 0.91],
       markerElevation: config.markerElevation,
       markers: getShowcaseMarkers(showcaseKey, config.markerSize),
       arcs: getShowcaseArcs(showcaseKey),
       arcColor: config.arcColor,
-      arcWidth: 0.4,
+      arcWidth: 0.5,
       arcHeight: 0.25,
-      opacity: 0.85,
+      opacity: 0.7,
     })
 
     let animationId: number
@@ -94,6 +94,24 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
         {/* Default */}
         {showcaseKey === 'default' && (
           <>
+            <div className='globe-overlay'>
+              <h1>COBE</h1>
+            </div>
+            <div className='orbit-ring' aria-hidden='true'>
+              <svg className='orbit-svg' viewBox='0 0 300 300'>
+                <defs>
+                  <path
+                    id={`orbitPath-${showcaseKey}`}
+                    d='M 150,150 m -130,0 a 130,130 0 1,0 260,0 a 130,130 0 1,0 -260,0'
+                  />
+                </defs>
+                <text className='orbit-text'>
+                  <textPath href={`#orbitPath-${showcaseKey}`}>
+                    {'The 5KB Globe Lib · '.repeat(10)}
+                  </textPath>
+                </text>
+              </svg>
+            </div>
             {showcaseDefaultMarkers.map((m) => (
               <div
                 key={m.id}
@@ -101,6 +119,7 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
                 style={{
                   positionAnchor: `--cobe-${m.id}`,
                   opacity: `var(--cobe-visible-${m.id}, 0)`,
+                  filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
                 } as React.CSSProperties}
               >
                 {m.label}
@@ -113,6 +132,7 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
                 style={{
                   positionAnchor: `--cobe-arc-${a.id}`,
                   opacity: `var(--cobe-visible-arc-${a.id}, 0)`,
+                  filter: `blur(calc((1 - var(--cobe-visible-arc-${a.id}, 0)) * 8px))`,
                 } as React.CSSProperties}
               >
                 {a.label}
@@ -145,6 +165,7 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
               style={{
                 positionAnchor: `--cobe-${m.id}`,
                 opacity: `var(--cobe-visible-${m.id}, 0)`,
+                filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
               } as React.CSSProperties}
             >
               <span className='showcase-live-dot' />
@@ -161,6 +182,7 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
               style={{
                 positionAnchor: `--cobe-${m.id}`,
                 opacity: `var(--cobe-visible-${m.id}, 0)`,
+                filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
               } as React.CSSProperties}
             >
               <span className='showcase-interactive-name'>{m.name}</span>
@@ -176,6 +198,7 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
               style={{
                 positionAnchor: `--cobe-${m.id}`,
                 opacity: `var(--cobe-visible-${m.id}, 0)`,
+                filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
                 '--polaroid-rotate': `${m.rotate}deg`,
               } as React.CSSProperties}
             >
@@ -193,6 +216,7 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
               style={{
                 positionAnchor: `--cobe-${m.id}`,
                 opacity: `var(--cobe-visible-${m.id}, 0)`,
+                filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
                 '--delay': `${m.delay}s`,
               } as React.CSSProperties}
             >
@@ -211,6 +235,7 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
               style={{
                 positionAnchor: `--cobe-${m.id}`,
                 opacity: `var(--cobe-visible-${m.id}, 0)`,
+                filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
               } as React.CSSProperties}
             >
               <span className='showcase-bar-label'>{m.label}</span>
@@ -230,6 +255,7 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
               style={{
                 positionAnchor: `--cobe-${m.id}`,
                 opacity: `var(--cobe-visible-${m.id}, 0)`,
+                filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
               } as React.CSSProperties}
             >
               <span className='showcase-analytics-count'>{m.visitors}</span>
@@ -263,6 +289,7 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
               style={{
                 positionAnchor: `--cobe-${m.id}`,
                 opacity: `var(--cobe-visible-${m.id}, 0)`,
+                filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
                 '--label-color': m.color,
                 '--label-rotate': `${m.rotate}deg`,
               } as React.CSSProperties}
@@ -280,6 +307,7 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
               style={{
                 positionAnchor: `--cobe-${m.id}`,
                 opacity: `var(--cobe-visible-${m.id}, 0)`,
+                filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
               } as React.CSSProperties}
             >
               🛰️
@@ -295,6 +323,7 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
               style={{
                 positionAnchor: `--cobe-${m.id}`,
                 opacity: `var(--cobe-visible-${m.id}, 0)`,
+                filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
               } as React.CSSProperties}
             >
               {m.emoji}

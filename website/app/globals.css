@@ -66,7 +66,7 @@ code {
 
 .hero {
   width: 100%;
-  max-width: 420px;
+  max-width: 640px;
   padding: 3rem 0 1rem;
   display: flex;
   flex-direction: column;
@@ -91,7 +91,7 @@ code {
   pointer-events: none;
   user-select: none;
   position: absolute;
-  animation: fade-in 2s ease 0.4s both;
+  animation: fade-in 1.5s ease 0.2s both;
 }
 
 .globe-overlay h1 {
@@ -108,7 +108,7 @@ code {
 
 .orbit-ring {
   position: absolute;
-  inset: 1%;
+  inset: -2%;
   pointer-events: none;
   transform-style: preserve-3d;
 }
@@ -116,8 +116,8 @@ code {
 .orbit-svg {
   width: 100%;
   height: 100%;
-  transform: rotateX(64deg);
-  animation: orbit-spin 30s linear infinite, fade-in 2s ease 1s both;
+  transform: rotateX(62deg);
+  animation: orbit-spin 30s linear infinite, fade-in 1.7s ease .5s both;
 }
 
 .orbit-text {
@@ -130,10 +130,10 @@ code {
 
 @keyframes orbit-spin {
   from {
-    transform: rotateX(64deg) rotateZ(0deg);
+    transform: rotateX(62deg) rotateZ(0deg);
   }
   to {
-    transform: rotateX(64deg) rotateZ(-360deg);
+    transform: rotateX(62deg) rotateZ(-360deg);
   }
 }
 
@@ -203,7 +203,7 @@ code {
   font-size: 1rem;
   color: var(--text-dim);
   text-align: center;
-  margin-top: 0.5rem;
+  margin-top: 2.5rem;
 }
 
 .hero-links {
@@ -477,6 +477,7 @@ code {
 
 .showcases-demo {
   display: flex;
+  width: 100%;
   flex-direction: column;
   align-items: center;
   gap: 1.25rem;
@@ -487,15 +488,18 @@ code {
   max-width: 520px;
   aspect-ratio: 1;
   position: relative;
+  transform-style: preserve-3d;
 }
 
 .showcases-canvas {
   width: 100%;
   height: 100%;
+  aspect-ratio: 1;
   opacity: 0;
   transition: opacity 0.8s ease;
   border-radius: 50%;
   cursor: grab;
+  transform: translateZ(1px);
 }
 
 .showcases-canvas:active {
@@ -1177,6 +1181,34 @@ code {
   cursor: grab;
 }
 
+.playground-marker-label {
+  position: absolute;
+  bottom: anchor(top);
+  left: anchor(center);
+  translate: -50% 0;
+  margin-bottom: 8px;
+  padding: 0.15rem 0.35rem;
+  background: var(--ink);
+  color: var(--bg);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: opacity 0.3s, filter 0.3s;
+  pointer-events: none;
+}
+
+.playground-marker-label::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translate3d(-50%, -1px, 0);
+  border: 5px solid transparent;
+  border-top-color: var(--ink);
+}
+
 .playground-controls {
   display: flex;
   flex-direction: column;
@@ -1335,6 +1367,31 @@ code {
   color: var(--ink);
   margin-top: 0.75rem;
   text-align: center;
+}
+
+/* ── Footer ──────────────────────────────── */
+
+.footer {
+  width: 100%;
+  max-width: var(--max-width);
+  padding: 3rem 0;
+  margin-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.footer-links {
+  font-family: var(--font-sans), sans-serif;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  text-align: center;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.footer-links-sep {
+  opacity: 0.4;
 }
 
 @media (prefers-reduced-motion: reduce) {
