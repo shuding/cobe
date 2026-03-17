@@ -110,10 +110,10 @@ createGlobe(canvas, {
     className="marker-label"
     style={{
       positionAnchor: \`--cobe-\${m.id}\`,
-      // Set the opacity to 0 and filter to blur(8px),
-      // when the marker becomes invisible
+      // Fade out when marker rotates to back of globe
       opacity: \`var(--cobe-visible-\${m.id}, 0)\`,
-      filter: \`var(--cobe-visible-\${m.id}, blur(8px))\`
+      // Blur when marker is hidden (fallback used when var is undefined)
+      filter: \`blur(var(--cobe-visible-\${m.id}, 8px))\`
     }}
   >
     {m.label}
@@ -123,14 +123,12 @@ createGlobe(canvas, {
 .marker-label {
   /* ...rest of the styles... */
 
-  /* Default values */
-  opacity: 1;
-  filter: blur(0);
-  transition: opacity 0.4s, filter 0.4s;
+  /* Smooth transitions */
+  transition: opacity 0.3s, filter 0.3s;
 }
 `,
     description:
-      'Both style and opacity changes smoothly as markers rotate. Use it to create fade, blur, scale, or any CSS-driven animation.',
+      'The visibility variable is undefined when hidden, triggering the CSS fallback. When visible, it contains an invalid value that browsers ignore.',
   },
   {
     key: 'rich',

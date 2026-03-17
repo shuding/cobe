@@ -12,13 +12,6 @@ export interface Arc {
   id?: string
 }
 
-export interface ProjectedPoint {
-  x: number
-  y: number
-  z: number
-  visible: boolean
-}
-
 export interface COBEOptions {
   width: number
   height: number
@@ -50,7 +43,6 @@ export interface COBEOptions {
 export interface Globe {
   update: (state: Partial<COBEOptions>) => void
   destroy: () => void
-  project: (location: [number, number]) => ProjectedPoint | null
 }
 
 export default function createGlobe(

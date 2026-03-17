@@ -169,6 +169,11 @@ const apiOptions = [
     type: 'number',
     desc: 'Pixel density (use 2 for retina displays)',
   },
+  {
+    name: 'context',
+    type: 'WebGLContextAttributes',
+    desc: 'WebGL context options (antialias, alpha, etc.)',
+  },
 ]
 
 const returnedMethods = [
