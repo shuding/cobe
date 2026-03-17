@@ -50,18 +50,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       lang='en'
       className={`${GeistPixel.variable} ${GeistPixelLine.variable} ${DepartureMono.variable}`}
     >
-      <body
-        style={
-          {
-            '--font-pixel': "'Geist Pixel Square', monospace",
-            '--font-pixel-line': "'Geist Pixel Line', monospace",
-            '--font-sans': "'Geist Pixel Square', monospace",
-            '--font-mono': "'Departure Mono', monospace",
-          } as React.CSSProperties
-        }
-      >
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
   )
 }

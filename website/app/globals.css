@@ -19,6 +19,7 @@
 
 html {
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 body {
@@ -155,6 +156,7 @@ code {
   transition: opacity 1.2s ease;
   border-radius: 50%;
   transform: translateZ(1px);
+  touch-action: none;
 }
 
 .globe-canvas:active {
@@ -500,6 +502,7 @@ code {
   border-radius: 50%;
   cursor: grab;
   transform: translateZ(1px);
+  touch-action: none;
 }
 
 .showcases-canvas:active {
@@ -1179,6 +1182,7 @@ code {
   opacity: 0;
   transition: opacity 0.5s;
   cursor: grab;
+  touch-action: none;
 }
 
 .playground-marker-label {
@@ -1357,6 +1361,7 @@ code {
   opacity: 0;
   transition: opacity 0.5s ease;
   cursor: grab;
+  touch-action: none;
 }
 
 .showcase-grid-title {
