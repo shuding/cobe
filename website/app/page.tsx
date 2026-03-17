@@ -245,8 +245,20 @@ function Showcases() {
         const dt = Math.max(now - lastPointer.current.t, 1)
         const maxVelocity = 0.15
         velocity.current = {
-          phi: Math.max(-maxVelocity, Math.min(maxVelocity, (e.clientX - lastPointer.current.x) / dt * 0.3)),
-          theta: Math.max(-maxVelocity, Math.min(maxVelocity, (e.clientY - lastPointer.current.y) / dt * 0.15)),
+          phi: Math.max(
+            -maxVelocity,
+            Math.min(
+              maxVelocity,
+              ((e.clientX - lastPointer.current.x) / dt) * 0.3,
+            ),
+          ),
+          theta: Math.max(
+            -maxVelocity,
+            Math.min(
+              maxVelocity,
+              ((e.clientY - lastPointer.current.y) / dt) * 0.15,
+            ),
+          ),
         }
       }
       lastPointer.current = { x: e.clientX, y: e.clientY, t: now }
@@ -422,14 +434,18 @@ function Showcases() {
       if (!isPausedRef.current) {
         phi += 0.003 * speedRef.current
         // Apply momentum with decay
-        if (Math.abs(velocity.current.phi) > 0.0001 || Math.abs(velocity.current.theta) > 0.0001) {
+        if (
+          Math.abs(velocity.current.phi) > 0.0001 ||
+          Math.abs(velocity.current.theta) > 0.0001
+        ) {
           phiOffsetRef.current += velocity.current.phi
           thetaOffsetRef.current += velocity.current.theta
           velocity.current.phi *= 0.95
           velocity.current.theta *= 0.95
         }
         // Soft spring back for theta limits
-        const thetaMin = -0.4, thetaMax = 0.4
+        const thetaMin = -0.4,
+          thetaMax = 0.4
         if (thetaOffsetRef.current < thetaMin) {
           thetaOffsetRef.current += (thetaMin - thetaOffsetRef.current) * 0.1
         } else if (thetaOffsetRef.current > thetaMax) {
@@ -438,7 +454,8 @@ function Showcases() {
       }
       globe.update({
         phi: phi + phiOffsetRef.current + dragOffset.current.phi,
-        theta: s.theta.get() + thetaOffsetRef.current + dragOffset.current.theta,
+        theta:
+          s.theta.get() + thetaOffsetRef.current + dragOffset.current.theta,
         dark: s.dark.get(),
         mapBrightness: s.mapBrightness.get(),
         markerColor: [s.mr.get(), s.mg.get(), s.mb.get()],
