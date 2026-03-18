@@ -1,10 +1,14 @@
 [![COBE](card.png)](https://cobe.vercel.app)
 
-<p align="center">A <b>lightweight (5kB)</b> WebGL globe lib. The name "COBE" stands for <a href="https://en.wikipedia.org/wiki/Cosmic_Background_Explorer" target="_blank">Cosmic Background Explorer</a>.</p>
+<h3 align="center">Use any DOM element as bindings.<br/>CSS transitions, animations, filters, interactivity — all just work.</h3>
+
+<p align="center">High perf, zero deps, ~5KB.</p>
 
 <p align="center">
   <img src="demo.gif" alt="COBE demo" width="600" />
 </p>
+
+<p align="center">A WebGL globe lib. The name "COBE" stands for <a href="https://en.wikipedia.org/wiki/Cosmic_Background_Explorer" target="_blank">Cosmic Background Explorer</a>.</p>
 
 ---
 
@@ -69,13 +73,30 @@ const globe = createGlobe(canvas, {
 // `globe.destroy()`
 ```
 
-## Bindable Markers
+## Arcs
 
-Markers can have an `id` property for CSS Anchor Positioning:
+Arcs connect two locations on the globe:
+
+```js
+arcs: [
+  {
+    from: [37.7595, -122.4367],
+    to: [35.6762, 139.6503],
+    color: [1, 0.5, 0.5], // optional, uses arcColor if not set
+  },
+]
+```
+
+## Bindable Markers & Arcs
+
+Markers and arcs can have an `id` property for [CSS Anchor Positioning](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_anchor_positioning):
 
 ```js
 markers: [
   { location: [37.7595, -122.4367], size: 0.03, id: 'sf' },
+],
+arcs: [
+  { from: [37.7595, -122.4367], to: [35.6762, 139.6503], id: 'sf-tokyo' },
 ]
 ```
 
@@ -87,9 +108,17 @@ markers: [
   left: anchor(center);
   opacity: var(--cobe-visible-sf, 0);
 }
+
+.arc-label {
+  position: absolute;
+  position-anchor: --cobe-arc-sf-tokyo;
+  bottom: anchor(top);
+  left: anchor(center);
+  opacity: var(--cobe-visible-arc-sf-tokyo, 0);
+}
 ```
 
-The globe exposes `--cobe-{id}` anchor names and `--cobe-visible-{id}` CSS variables (0 when behind globe, 1 when visible).
+The globe exposes `--cobe-{id}` and `--cobe-arc-{id}` anchor names, plus `--cobe-visible-{id}` and `--cobe-visible-arc-{id}` CSS variables (0 when behind globe, 1 when visible).
 
 ## Acknowledgment
 
