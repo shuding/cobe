@@ -1849,3 +1849,87 @@ code {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ── /ip page ─────────────────────────────── */
+
+.ip-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.ip-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.ip-city {
+  font-family: var(--font-pixel-line), sans-serif;
+  font-size: min(10vw, 2.8em);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+}
+
+.ip-globe-wrap {
+  width: 100%;
+  aspect-ratio: 1;
+  position: relative;
+}
+
+.ip-globe {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  contain: layout style;
+}
+
+.ip-marker-label {
+  position: absolute;
+  bottom: anchor(top);
+  left: anchor(center);
+  translate: -50% 0;
+  margin-bottom: 8px;
+  padding: 0.2rem 0.5rem;
+  background: var(--ink);
+  color: var(--bg);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+  transition: opacity 0.8s;
+}
+
+.ip-marker-label::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translate3d(-50%, -1px, 0);
+  border: 5px solid transparent;
+  border-top-color: var(--ink);
+}
+
+@supports not (anchor-name: --test) {
+  .ip-marker-label {
+    display: none;
+  }
+}
+
+.ip-coords {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+  margin-top: 1rem;
+  text-align: center;
+}
