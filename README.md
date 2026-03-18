@@ -1,14 +1,12 @@
 [![COBE](card.png)](https://cobe.vercel.app)
 
-<h3 align="center">Use any DOM element as bindings.<br/>CSS transitions, animations, filters, interactivity — all just work.</h3>
+<p align="center">Use any DOM element as bindable markers.<br/>CSS transitions, animations, filters, interactivity, all just work.</p>
 
 <p align="center">High perf, zero deps, ~5KB.</p>
 
 <p align="center">
   <video src="ideas-1_4x.mp4" poster="card.png" autoplay loop muted playsinline width="600"></video>
 </p>
-
-<p align="center">A WebGL globe lib. The name "COBE" stands for <a href="https://en.wikipedia.org/wiki/Cosmic_Background_Explorer" target="_blank">Cosmic Background Explorer</a>.</p>
 
 ---
 
