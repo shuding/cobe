@@ -28,6 +28,7 @@ export function IpGlobe({ lat, lon }: IpGlobeProps) {
       baseColor: [1, 1, 1],
       markerColor: [0.2, 0.4, 1],
       glowColor: [1, 1, 1],
+      markers: [{ location: [lat, lon], size: 0.03 }],
     })
 
     setTimeout(() => {
