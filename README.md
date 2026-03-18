@@ -105,6 +105,8 @@ arcs: [
   bottom: anchor(top);
   left: anchor(center);
   opacity: var(--cobe-visible-sf, 0);
+  filter: blur(calc((1 - var(--cobe-visible-sf, 0)) * 8px));
+  transition: opacity 0.3s, filter 0.3s;
 }
 
 .arc-label {
@@ -116,7 +118,11 @@ arcs: [
 }
 ```
 
-The globe exposes `--cobe-{id}` and `--cobe-arc-{id}` anchor names, plus `--cobe-visible-{id}` and `--cobe-visible-arc-{id}` CSS variables (0 when behind globe, 1 when visible).
+The globe exposes:
+- `--cobe-{id}` / `--cobe-arc-{id}` — CSS anchor names for positioning
+- `--cobe-visible-{id}` / `--cobe-visible-arc-{id}` — visibility variable (0 when behind globe, 1 when visible)
+
+Use the visibility variable to drive opacity, blur, scale, or any CSS property for smooth transitions.
 
 ## Acknowledgment
 
