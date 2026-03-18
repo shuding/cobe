@@ -278,8 +278,8 @@ function Showcases() {
   }, [])
 
   useEffect(() => {
-    window.addEventListener('pointermove', handlePointerMove)
-    window.addEventListener('pointerup', handlePointerUp)
+    window.addEventListener('pointermove', handlePointerMove, { passive: true })
+    window.addEventListener('pointerup', handlePointerUp, { passive: true })
     return () => {
       window.removeEventListener('pointermove', handlePointerMove)
       window.removeEventListener('pointerup', handlePointerUp)
@@ -362,54 +362,73 @@ function Showcases() {
     let phi = 0
     const width = canvasRef.current.offsetWidth
 
+    const markerArrays: Record<
+      ShowcaseKey,
+      { id: string; location: [number, number] }[]
+    > = {
+      default: showcaseDefaultMarkers,
+      stickers: stickerMarkers,
+      live: liveMarkers,
+      interactive: interactiveMarkers,
+      polaroids: polaroidMarkers,
+      pulse: pulseMarkers,
+      bars: barMarkers,
+      analytics: analyticsMarkers,
+      flights: flightMarkers,
+      labels: labelMarkers,
+      satellites: satelliteMarkers,
+      weather: weatherMarkers,
+    }
+
+    // Pre-build arc arrays (static)
+    const defaultArcs = showcaseDefaultArcs.map((a) => ({
+      from: a.from,
+      to: a.to,
+      id: a.id,
+    }))
+    const flightArcsData = flightArcs.map((a) => ({
+      from: a.from,
+      to: a.to,
+      id: a.id,
+    }))
+    const emptyArcs: typeof defaultArcs = []
+
+    // Cache for markers with size
+    let cachedShowcase: ShowcaseKey | null = null
+    let cachedSize = 0
+    let cachedMarkers: { location: [number, number]; size: number; id: string }[] = []
+
     const getMarkers = () => {
       const s = showcaseRef.current
       const size = springRef.current.markerSize.get()
-      const markerArrays: Record<
-        ShowcaseKey,
-        { id: string; location: [number, number] }[]
-      > = {
-        default: showcaseDefaultMarkers,
-        stickers: stickerMarkers,
-        live: liveMarkers,
-        interactive: interactiveMarkers,
-        polaroids: polaroidMarkers,
-        pulse: pulseMarkers,
-        bars: barMarkers,
-        analytics: analyticsMarkers,
-        flights: flightMarkers,
-        labels: labelMarkers,
-        satellites: satelliteMarkers,
-        weather: weatherMarkers,
+      // Return cached if same showcase and size hasn't changed much
+      if (s === cachedShowcase && Math.abs(size - cachedSize) < 0.001) {
+        return cachedMarkers
       }
       const arr = markerArrays[s]
       if (!arr) return []
-      return arr.map((m) => ({
+      cachedShowcase = s
+      cachedSize = size
+      cachedMarkers = arr.map((m) => ({
         location: m.location,
         size,
         id: m.id,
       }))
+      return cachedMarkers
     }
 
     const getArcs = () => {
       const s = showcaseRef.current
-      if (s === 'default') {
-        return showcaseDefaultArcs.map((a) => ({
-          from: a.from,
-          to: a.to,
-          id: a.id,
-        }))
-      }
-      if (s === 'flights') {
-        return flightArcs.map((a) => ({ ...a }))
-      }
-      return []
+      if (s === 'default') return defaultArcs
+      if (s === 'flights') return flightArcsData
+      return emptyArcs
     }
 
+    const dpr = Math.min(window.devicePixelRatio || 1, 2)
     const globe = createGlobe(canvasRef.current, {
-      devicePixelRatio: 2,
-      width: width * 2,
-      height: width * 2,
+      devicePixelRatio: dpr,
+      width: width * dpr,
+      height: width * dpr,
       phi: 0,
       theta: 0.2,
       dark: 0,
@@ -1272,8 +1291,8 @@ function InlinePlayground() {
   }, [])
 
   useEffect(() => {
-    window.addEventListener('pointermove', handlePointerMove)
-    window.addEventListener('pointerup', handlePointerUp)
+    window.addEventListener('pointermove', handlePointerMove, { passive: true })
+    window.addEventListener('pointerup', handlePointerUp, { passive: true })
     return () => {
       window.removeEventListener('pointermove', handlePointerMove)
       window.removeEventListener('pointerup', handlePointerUp)
@@ -1283,11 +1302,12 @@ function InlinePlayground() {
   useEffect(() => {
     if (!canvasRef.current) return
     const width = canvasRef.current.offsetWidth
+    const dpr = Math.min(window.devicePixelRatio || 1, 2)
 
     const globe = createGlobe(canvasRef.current, {
-      devicePixelRatio: 2,
-      width: width * 2,
-      height: width * 2,
+      devicePixelRatio: dpr,
+      width: width * dpr,
+      height: width * dpr,
       phi: 0,
       theta: 0.2,
       dark: 0,
