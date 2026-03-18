@@ -479,6 +479,99 @@ export const satelliteMarkers = [
   { id: 'sat-16', location: [5.0, -150.0] as [number, number] },
 ]
 
+// Showcase: CDN (Vercel-style edge network)
+export const cdnMarkers = [
+  {
+    id: 'cdn-iad',
+    location: [38.95, -77.45] as [number, number],
+    region: 'iad1',
+  },
+  {
+    id: 'cdn-sfo',
+    location: [37.62, -122.38] as [number, number],
+    region: 'sfo1',
+  },
+  {
+    id: 'cdn-cdg',
+    location: [49.01, 2.55] as [number, number],
+    region: 'cdg1',
+  },
+  {
+    id: 'cdn-hnd',
+    location: [35.55, 139.78] as [number, number],
+    region: 'hnd1',
+  },
+  {
+    id: 'cdn-syd',
+    location: [-33.95, 151.18] as [number, number],
+    region: 'syd1',
+  },
+  {
+    id: 'cdn-gru',
+    location: [-23.43, -46.47] as [number, number],
+    region: 'gru1',
+  },
+  {
+    id: 'cdn-sin',
+    location: [1.36, 103.99] as [number, number],
+    region: 'sin1',
+  },
+  {
+    id: 'cdn-arn',
+    location: [59.65, 17.93] as [number, number],
+    region: 'arn1',
+  },
+  {
+    id: 'cdn-dub',
+    location: [53.43, -6.25] as [number, number],
+    region: 'dub1',
+  },
+  {
+    id: 'cdn-bom',
+    location: [19.09, 72.87] as [number, number],
+    region: 'bom1',
+  },
+]
+
+export const cdnArcs = [
+  {
+    id: 'cdn-arc-1',
+    from: [38.95, -77.45] as [number, number], // IAD
+    to: [49.01, 2.55] as [number, number], // CDG
+    traffic: '2.4 TB/s',
+  },
+  {
+    id: 'cdn-arc-2',
+    from: [37.62, -122.38] as [number, number], // SFO
+    to: [35.55, 139.78] as [number, number], // HND
+    traffic: '1.8 TB/s',
+  },
+  {
+    id: 'cdn-arc-3',
+    from: [49.01, 2.55] as [number, number], // CDG
+    to: [1.36, 103.99] as [number, number], // SIN
+    traffic: '1.2 TB/s',
+  },
+  {
+    id: 'cdn-arc-4',
+    from: [38.95, -77.45] as [number, number], // IAD
+    to: [-23.43, -46.47] as [number, number], // GRU
+    traffic: '890 GB/s',
+  },
+  {
+    id: 'cdn-arc-5',
+    from: [35.55, 139.78] as [number, number], // HND
+    to: [-33.95, 151.18] as [number, number], // SYD
+    traffic: '720 GB/s',
+  },
+  {
+    id: 'cdn-arc-6',
+    from: [49.01, 2.55] as [number, number], // CDG
+    to: [19.09, 72.87] as [number, number], // BOM
+    traffic: '650 GB/s',
+  },
+]
+
 // Showcase: Weather emojis
 export const weatherMarkers = [
   {
@@ -653,10 +746,21 @@ export const showcaseConfigs: Record<string, ShowcaseConfig> = {
     markerSize: 0.025,
     markerElevation: 0.12,
   },
+  cdn: {
+    theta: 0.2,
+    dark: 0,
+    mapBrightness: 10,
+    markerColor: [0, 0, 0],
+    baseColor: [1, 1, 1],
+    arcColor: [0, 0, 0],
+    markerSize: 0.012,
+    markerElevation: 0.02,
+  },
 }
 
 export const showcases = [
   { name: 'COBE v2', key: 'default' },
+  { name: '▲ CDN', key: 'cdn' },
   { name: 'Stickers', key: 'stickers' },
   { name: 'Labels', key: 'labels' },
   { name: 'Satellites', key: 'satellites' },
@@ -679,6 +783,7 @@ export function getShowcaseMarkers(key: ShowcaseKey, size: number) {
     { id: string; location: [number, number] }[]
   > = {
     default: showcaseDefaultMarkers,
+    cdn: cdnMarkers,
     stickers: stickerMarkers,
     live: liveMarkers,
     interactive: interactiveMarkers,
@@ -707,6 +812,9 @@ export function getShowcaseArcs(key: ShowcaseKey) {
   }
   if (key === 'flights') {
     return flightArcs.map((a) => ({ ...a }))
+  }
+  if (key === 'cdn') {
+    return cdnArcs.map((a) => ({ ...a }))
   }
   return []
 }

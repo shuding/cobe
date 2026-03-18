@@ -24,6 +24,8 @@ import {
   labelMarkers,
   satelliteMarkers,
   weatherMarkers,
+  cdnMarkers,
+  cdnArcs,
 } from './showcases-data'
 
 const installCommands = {
@@ -202,6 +204,9 @@ function Showcases() {
   const phiOffsetRef = useRef(0)
   const thetaOffsetRef = useRef(0)
   const [liveViewers, setLiveViewers] = useState(2847)
+  const [cdnTraffic, setCdnTraffic] = useState(() =>
+    cdnArcs.map((a, i) => ({ id: a.id, value: [420, 380, 290, 185, 156, 134][i] || 100 }))
+  )
   const isPausedRef = useRef(false)
   const speedRef = useRef(1)
   const accumulatedRef = useRef(0)
@@ -322,6 +327,19 @@ function Showcases() {
     return () => clearInterval(interval)
   }, [])
 
+  // Self-updating CDN traffic
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCdnTraffic((data) =>
+        data.map((t) => ({
+          ...t,
+          value: Math.max(50, t.value + Math.floor(Math.random() * 21) - 10),
+        }))
+      )
+    }, 250)
+    return () => clearInterval(interval)
+  }, [])
+
   // Self-updating analytics
   useEffect(() => {
     const interval = setInterval(() => {
@@ -386,6 +404,7 @@ function Showcases() {
       labels: labelMarkers,
       satellites: satelliteMarkers,
       weather: weatherMarkers,
+      cdn: cdnMarkers,
     }
 
     // Pre-build arc arrays (static)
@@ -395,6 +414,11 @@ function Showcases() {
       id: a.id,
     }))
     const flightArcsData = flightArcs.map((a) => ({
+      from: a.from,
+      to: a.to,
+      id: a.id,
+    }))
+    const cdnArcsData = cdnArcs.map((a) => ({
       from: a.from,
       to: a.to,
       id: a.id,
@@ -433,6 +457,7 @@ function Showcases() {
       const s = showcaseRef.current
       if (s === 'default') return defaultArcs
       if (s === 'flights') return flightArcsData
+      if (s === 'cdn') return cdnArcsData
       return emptyArcs
     }
 
@@ -812,6 +837,48 @@ function Showcases() {
               </div>
             ))}
 
+          {/* CDN */}
+          {activeShowcase === 'cdn' && (
+            <>
+              {cdnMarkers.map((m) => (
+                <div
+                  key={m.id}
+                  className='showcase-cdn'
+                  style={
+                    {
+                      positionAnchor: `--cobe-${m.id}`,
+                      opacity: `var(--cobe-visible-${m.id}, 0)`,
+                      filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
+                    } as React.CSSProperties
+                  }
+                >
+                  <div className='showcase-cdn-pyramid'>
+                    <div className='showcase-cdn-pyramid-face' />
+                    <div className='showcase-cdn-pyramid-face' />
+                    <div className='showcase-cdn-pyramid-face' />
+                    <div className='showcase-cdn-pyramid-face' />
+                  </div>
+                  <span className='showcase-cdn-label'>{m.region}</span>
+                </div>
+              ))}
+              {cdnTraffic.map((t) => (
+                <div
+                  key={t.id}
+                  className='showcase-cdn-arc-label'
+                  style={
+                    {
+                      positionAnchor: `--cobe-arc-${t.id}`,
+                      opacity: `var(--cobe-visible-arc-${t.id}, 0)`,
+                      filter: `blur(calc((1 - var(--cobe-visible-arc-${t.id}, 0)) * 8px))`,
+                    } as React.CSSProperties
+                  }
+                >
+                  {t.value}k req/s
+                </div>
+              ))}
+            </>
+          )}
+
           {/* Weather */}
           {activeShowcase === 'weather' &&
             weatherMarkers.map((m) => (
@@ -844,7 +911,8 @@ function Showcases() {
                   setActiveShowcase(s.key)
                   setExpanded(null)
                   accumulatedRef.current = 0
-                  if (progressBarRef.current) progressBarRef.current.style.width = '0%'
+                  if (progressBarRef.current)
+                    progressBarRef.current.style.width = '0%'
                 }}
                 aria-label={s.name}
               >
@@ -854,10 +922,7 @@ function Showcases() {
             ))}
           </div>
           <div className='showcase-progress'>
-            <span
-              ref={progressBarRef}
-              className='showcase-progress-bar'
-            />
+            <span ref={progressBarRef} className='showcase-progress-bar' />
           </div>
           <div className='showcase-nav'>
             <button
@@ -870,7 +935,8 @@ function Showcases() {
                 )
                 setExpanded(null)
                 accumulatedRef.current = 0
-                if (progressBarRef.current) progressBarRef.current.style.width = '0%'
+                if (progressBarRef.current)
+                  progressBarRef.current.style.width = '0%'
               }}
               aria-label='Previous'
             >
@@ -887,7 +953,8 @@ function Showcases() {
                 setActiveShowcase(showcases[(idx + 1) % showcases.length].key)
                 setExpanded(null)
                 accumulatedRef.current = 0
-                if (progressBarRef.current) progressBarRef.current.style.width = '0%'
+                if (progressBarRef.current)
+                  progressBarRef.current.style.width = '0%'
               }}
               aria-label='Next'
             >
