@@ -50,7 +50,12 @@ export default (canvas, opts) => {
   const webgl2 = !!gl
   if (!gl) gl = canvas.getContext('webgl', contextOpts)
 
-  if (!gl) return { destroy: () => {}, update: () => {} }
+  if (!gl) {
+    console.warn(
+      'COBE: WebGL is not supported in this browser or device. The globe will not be rendered.',
+    )
+    return { destroy: () => {}, update: () => {} }
+  }
 
   const instExt = webgl2 ? null : gl.getExtension('ANGLE_instanced_arrays')
 
@@ -87,7 +92,12 @@ export default (canvas, opts) => {
   const markerProgram = createProgram(gl, MARKER_VERT, MARKER_FRAG)
   const arcProgram = createProgram(gl, ARC_VERT, ARC_FRAG)
 
-  if (!globeProgram) return { destroy: () => {}, update: () => {} }
+  if (!globeProgram) {
+    console.warn(
+      'COBE: Failed to compile WebGL shaders. The globe will not be rendered.',
+    )
+    return { destroy: () => {}, update: () => {} }
+  }
 
   // Buffers
   const quadBuffer = gl.createBuffer()
@@ -591,10 +601,29 @@ export default (canvas, opts) => {
   // Initialize
   update({ markers, arcs })
 
+  // Handle WebGL context loss
+  const onContextLost = (e) => {
+    e.preventDefault()
+    console.warn(
+      'COBE: WebGL context lost. The globe will stop rendering. This can happen due to GPU resource limits or device sleep.',
+    )
+  }
+  const onContextRestored = () => {
+    console.warn(
+      'COBE: WebGL context restored. Please re-create the globe instance to resume rendering.',
+    )
+  }
+  canvas.addEventListener('webglcontextlost', onContextLost)
+  canvas.addEventListener('webglcontextrestored', onContextRestored)
+
   // Return public API
   return {
     update,
     destroy: () => {
+      // Clean up event listeners
+      canvas.removeEventListener('webglcontextlost', onContextLost)
+      canvas.removeEventListener('webglcontextrestored', onContextRestored)
+
       // Clean up WebGL resources
       gl.deleteBuffer(quadBuffer)
       gl.deleteBuffer(arcSegmentBuffer)
