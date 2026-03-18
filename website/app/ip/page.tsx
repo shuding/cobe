@@ -69,7 +69,7 @@ export default async function IpPage() {
         >
           {city}, {country}
         </h2>
-        <IpGlobe lat={lat} lon={lon} />
+        <IpGlobe lat={lat} lon={lon} city={city} />
         <p
           style={{
             fontFamily: 'var(--font-mono), monospace',
