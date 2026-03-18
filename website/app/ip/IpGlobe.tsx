@@ -38,7 +38,13 @@ export function IpGlobe({ lat, lon }: IpGlobeProps) {
   }, [lat, lon])
 
   return (
-    <div className='ip-globe-wrap'>
+    <div
+      style={{
+        width: '100%',
+        aspectRatio: '1',
+        position: 'relative',
+      }}
+    >
       <canvas
         ref={canvasRef}
         className='globe-canvas'

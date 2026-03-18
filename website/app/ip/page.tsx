@@ -2,39 +2,121 @@ import { headers } from 'next/headers'
 import type { Metadata } from 'next'
 import { IpGlobe } from './IpGlobe'
 
-export const metadata: Metadata = {
-  title: 'Your Location',
-}
-
-export default async function IpPage() {
+async function getLocation() {
   const h = await headers()
-
   const rawLat = h.get('x-vercel-ip-latitude')
   const rawLon = h.get('x-vercel-ip-longitude')
   const rawCity = h.get('x-vercel-ip-city')
   const rawCountry = h.get('x-vercel-ip-country')
+  return {
+    lat: rawLat ? parseFloat(rawLat) : 37.78,
+    lon: rawLon ? parseFloat(rawLon) : -122.44,
+    city: rawCity ? decodeURIComponent(rawCity) : 'San Francisco',
+    country: rawCountry ?? 'US',
+  }
+}
 
-  const lat = rawLat ? parseFloat(rawLat) : 37.78
-  const lon = rawLon ? parseFloat(rawLon) : -122.44
-  const city = rawCity ? decodeURIComponent(rawCity) : 'San Francisco'
-  const country = rawCountry ?? 'US'
+export async function generateMetadata(): Promise<Metadata> {
+  const { city, country } = await getLocation()
+  return { title: `${city}, ${country}` }
+}
+
+export default async function IpPage() {
+  const { lat, lon, city, country } = await getLocation()
 
   return (
-    <div className='ip-page'>
-      <div className='hero'>
-        <div className='ip-header'>
-          <span className='ip-label'>you are in</span>
-          <span className='ip-city'>
-            {city}, {country}
-          </span>
-        </div>
-        <div className='hero-globe'>
-          <IpGlobe lat={lat} lon={lon} />
-        </div>
-        <div className='ip-coords'>
+    <div
+      style={{
+        minHeight: '100svh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '0 1.5rem',
+      }}
+    >
+      <div
+        style={{
+          width: '100%',
+          maxWidth: 640,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <p
+          style={{
+            fontFamily: 'var(--font-mono), monospace',
+            fontSize: '0.65rem',
+            color: 'var(--text-dim)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.12em',
+            margin: 0,
+          }}
+        >
+          you are in
+        </p>
+        <h2
+          style={{
+            fontFamily: 'var(--font-pixel-line), sans-serif',
+            fontSize: 'min(10vw, 2.8em)',
+            fontWeight: 400,
+            letterSpacing: '0.08em',
+            color: 'var(--ink)',
+            margin: '0.25rem 0 1rem',
+            textAlign: 'center',
+          }}
+        >
+          {city}, {country}
+        </h2>
+        <IpGlobe lat={lat} lon={lon} />
+        <p
+          style={{
+            fontFamily: 'var(--font-mono), monospace',
+            fontSize: '0.7rem',
+            color: 'var(--text-dim)',
+            letterSpacing: '0.08em',
+            marginTop: '1rem',
+            textAlign: 'center',
+          }}
+        >
           {Math.abs(lat).toFixed(4)}°{lat >= 0 ? 'N' : 'S'},{' '}
           {Math.abs(lon).toFixed(4)}°{lon >= 0 ? 'E' : 'W'}
-        </div>
+        </p>
+        <p
+          style={{
+            fontFamily: 'var(--font-mono), monospace',
+            fontSize: '0.65rem',
+            color: 'var(--text-dim)',
+            letterSpacing: '0.06em',
+            marginTop: '2rem',
+            textAlign: 'center',
+            lineHeight: 1.6,
+          }}
+        >
+          {'Powered by '}
+          <a href='https://github.com/shuding/cobe' style={{ color: 'inherit' }}>
+            COBE
+          </a>
+          {' + '}
+          <a href='https://nextjs.org' style={{ color: 'inherit' }}>
+            Next.js
+          </a>
+          {' using '}
+          <a
+            href='https://vercel.com/docs/edge-network/headers#x-vercel-ip-city'
+            style={{ color: 'inherit' }}
+          >
+            Vercel geolocation
+          </a>
+          {' · '}
+          <a
+            href='https://github.com/shuding/cobe/blob/main/website/app/ip/page.tsx'
+            style={{ color: 'inherit' }}
+          >
+            view page source
+          </a>
+        </p>
       </div>
     </div>
   )
