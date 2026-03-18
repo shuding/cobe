@@ -2,13 +2,13 @@
 
 <p align="center">A <b>lightweight (5kB)</b> WebGL globe lib. The name "COBE" stands for <a href="https://en.wikipedia.org/wiki/Cosmic_Background_Explorer" target="_blank">Cosmic Background Explorer</a>.</p>
 
+<p align="center">
+  <img src="demo.gif" alt="COBE demo" width="600" />
+</p>
+
 ---
 
 - [**Demo** and configurations](https://cobe.vercel.app)
-- Use with React: https://codesandbox.io/s/eager-sky-r2q0g
-- Use with vanilla JS: https://codesandbox.io/s/peaceful-gwen-m579y
-- Use with Vue3: https://stackblitz.com/edit/vitejs-vite-l5a8xk?file=src/App.vue
-- Use with Svelte: https://codesandbox.io/s/great-visvesvaraya-78yf6?file=/App.svelte
 
 ## Quick Start
 
@@ -65,12 +65,8 @@ const globe = createGlobe(canvas, {
   },
 })
 
-// `globe` will be a Phenomenon (https://github.com/vaneenige/phenomenon) instance.
-// To pause requestAnimationFrame:
-// `globe.toggle()`
-// To remove the instance:
+// To destroy the instance and bindings:
 // `globe.destroy()`
-// ...
 ```
 
 ## Bindable Markers
