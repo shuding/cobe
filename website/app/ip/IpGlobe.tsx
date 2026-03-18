@@ -12,8 +12,8 @@ export function IpGlobe({ lat, lon }: IpGlobeProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
-    const phi = -(lon * Math.PI) / 180
-    const theta = (lat * Math.PI) / 180 * 0.5
+    const phi = Math.PI / 2 - (lon * Math.PI) / 180
+    const theta = (lat * Math.PI) / 180
 
     const globe = createGlobe(canvasRef.current!, {
       devicePixelRatio: 2,

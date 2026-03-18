@@ -95,24 +95,24 @@ export default async function IpPage() {
           }}
         >
           {'Powered by '}
-          <a href='https://github.com/shuding/cobe' style={{ color: 'inherit' }}>
+          <a href='https://github.com/shuding/cobe' style={{ color: 'inherit', textDecoration: 'underline' }}>
             COBE
           </a>
           {' + '}
-          <a href='https://nextjs.org' style={{ color: 'inherit' }}>
+          <a href='https://nextjs.org' style={{ color: 'inherit', textDecoration: 'underline' }}>
             Next.js
           </a>
           {' using '}
           <a
-            href='https://vercel.com/docs/edge-network/headers#x-vercel-ip-city'
-            style={{ color: 'inherit' }}
+            href='https://vercel.com/kb/guide/geo-ip-headers-geolocation-vercel-functions'
+            style={{ color: 'inherit', textDecoration: 'underline' }}
           >
             Vercel geolocation
           </a>
           {' · '}
           <a
             href='https://github.com/shuding/cobe/blob/main/website/app/ip/page.tsx'
-            style={{ color: 'inherit' }}
+            style={{ color: 'inherit', textDecoration: 'underline' }}
           >
             view page source
           </a>
