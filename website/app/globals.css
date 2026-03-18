@@ -1615,7 +1615,7 @@ code {
   background: var(--bg);
 }
 
-.showcases-grid-page h1 {
+.showcases-grid-page > h1 {
   font-family: var(--font-mono), monospace;
   font-size: 0.75rem;
   font-weight: 400;
@@ -1667,6 +1667,153 @@ code {
   margin-top: 0.75rem;
   text-align: center;
 }
+
+/* ── Showcases Phase Animation Page ─────────────────── */
+
+.showcases-phase-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  padding: 2rem;
+  overflow: hidden;
+}
+
+.showcases-phase-grid {
+  display: grid;
+  gap: 1.5rem;
+  justify-items: center;
+  align-items: center;
+  position: absolute;
+  visibility: hidden;
+}
+
+.showcases-phase-grid.showcases-phase-active {
+  position: relative;
+  visibility: visible;
+}
+
+/* Single globe - large */
+.showcases-phase-1 {
+  grid-template-columns: 1fr;
+}
+
+.showcases-phase-1 .showcase-phase-item {
+  width: min(70vw, 70vh);
+  max-width: 600px;
+}
+
+/* Two globes - side by side */
+.showcases-phase-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.showcases-phase-2 .showcase-phase-item {
+  width: min(40vw, 40vh);
+  max-width: 400px;
+}
+
+/* Four globes - 2x2 grid */
+.showcases-phase-4 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.showcases-phase-4 .showcase-phase-item {
+  width: min(35vw, 35vh);
+  max-width: 320px;
+}
+
+/* Nine globes - 3x3 grid */
+.showcases-phase-9 {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.showcases-phase-9 .showcase-phase-item {
+  width: min(25vw, 25vh);
+  max-width: 240px;
+}
+
+.showcase-phase-item {
+  aspect-ratio: 1;
+  position: relative;
+}
+
+.showcase-phase-globe {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  user-select: none;
+  contain: layout style;
+}
+
+.showcase-phase-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* Text phase */
+.showcases-phase-text {
+  font-family: var(--font-sans), sans-serif;
+  font-size: clamp(1.5rem, 5vw, 4rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-align: center;
+}
+
+/* Scale down overlays for smaller globes */
+.showcases-phase-9 .globe-overlay h1 {
+  font-size: min(10vw, 2rem);
+}
+
+.showcases-phase-9 .orbit-ring {
+  display: none;
+}
+
+.showcases-phase-4 .globe-overlay h1 {
+  font-size: min(12vw, 2.5rem);
+}
+
+.showcases-phase-2 .globe-overlay h1 {
+  font-size: min(14vw, 3.5rem);
+}
+
+/* Hide labels on smaller phases to reduce clutter */
+.showcases-phase-9 .showcase-default-label,
+.showcases-phase-9 .arc-label,
+.showcases-phase-4 .showcase-default-label,
+.showcases-phase-4 .arc-label {
+  display: none;
+}
+
+/* Scale down showcase overlays for grid phases */
+.showcases-phase-9 .showcase-sticker { font-size: 1rem; }
+.showcases-phase-9 .showcase-live { transform: scale(0.7); }
+.showcases-phase-9 .showcase-interactive { transform: scale(0.7); }
+.showcases-phase-9 .showcase-polaroid { transform: scale(0.5); }
+.showcases-phase-9 .showcase-pulse { transform: scale(0.6); }
+.showcases-phase-9 .showcase-bar { transform: scale(0.6); }
+.showcases-phase-9 .showcase-analytics { transform: scale(0.6); }
+.showcases-phase-9 .showcase-label { font-size: 0.5rem; }
+.showcases-phase-9 .showcase-cdn { transform: scale(0.6); }
+.showcases-phase-9 .showcase-satellite { font-size: 1rem; }
+.showcases-phase-9 .showcase-weather { font-size: 1rem; }
+.showcases-phase-9 .showcase-flight { font-size: 0.8rem; }
+
+.showcases-phase-4 .showcase-sticker { font-size: 1.4rem; }
+.showcases-phase-4 .showcase-live { transform: scale(0.8); }
+.showcases-phase-4 .showcase-interactive { transform: scale(0.8); }
+.showcases-phase-4 .showcase-polaroid { transform: scale(0.6); }
+.showcases-phase-4 .showcase-pulse { transform: scale(0.7); }
+.showcases-phase-4 .showcase-bar { transform: scale(0.7); }
+.showcases-phase-4 .showcase-analytics { transform: scale(0.7); }
+.showcases-phase-4 .showcase-label { font-size: 0.6rem; }
+.showcases-phase-4 .showcase-cdn { transform: scale(0.7); }
+.showcases-phase-4 .showcase-satellite { font-size: 1.2rem; }
+.showcases-phase-4 .showcase-weather { font-size: 1.2rem; }
+.showcases-phase-4 .showcase-flight { font-size: 1rem; }
 
 /* ── Footer ──────────────────────────────── */
 

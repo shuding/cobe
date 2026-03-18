@@ -1,9 +1,8 @@
 'use client'
 
 import createGlobe from 'cobe'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
-  showcases,
   showcaseConfigs,
   getShowcaseMarkers,
   getShowcaseArcs,
@@ -22,9 +21,38 @@ import {
   labelMarkers,
   satelliteMarkers,
   weatherMarkers,
+  cdnMarkers,
 } from '../showcases-data'
 
-function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
+// Phase definitions: which showcases appear in each phase
+const phases: { showcases: ShowcaseKey[]; duration: number }[] = [
+  { showcases: ['default'], duration: 1500 },
+  { showcases: ['cdn', 'stickers'], duration: 2000 },
+  { showcases: ['labels', 'satellites', 'polaroids', 'live'], duration: 3000 },
+  {
+    showcases: [
+      'flights',
+      'interactive',
+      'analytics',
+      'pulse',
+      'weather',
+      'bars',
+      'polaroids',
+      'cdn',
+      'stickers',
+    ],
+    duration: 4000,
+  },
+  { showcases: [], duration: 3000 }, // Text phase
+]
+
+function ShowcaseGlobe({
+  showcaseKey,
+  instanceKey,
+}: {
+  showcaseKey: ShowcaseKey
+  instanceKey: string
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const config = showcaseConfigs[showcaseKey]
 
@@ -32,7 +60,10 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
     if (!canvasRef.current) return
     let phi = 0
     const width = canvasRef.current.offsetWidth
-    const dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 640 ? 1.8 : 2)
+    const dpr = Math.min(
+      window.devicePixelRatio || 1,
+      window.innerWidth < 640 ? 1.8 : 2,
+    )
 
     const globe = createGlobe(canvasRef.current, {
       devicePixelRatio: dpr,
@@ -67,7 +98,6 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
     }
     animate()
 
-    setTimeout(() => canvasRef.current && (canvasRef.current.style.opacity = '1'))
     return () => {
       cancelAnimationFrame(animationId)
       globe.destroy()
@@ -75,14 +105,24 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
   }, [showcaseKey, config])
 
   return (
-    <div className='showcase-grid-item'>
-      <div className='showcase-grid-globe'>
+    <div className='showcase-phase-item'>
+      <div className='showcase-phase-globe'>
         <svg width='0' height='0' style={{ position: 'absolute' }}>
           <defs>
-            <filter id={`sticker-outline-${showcaseKey}`}>
-              <feMorphology in='SourceAlpha' result='Dilated' operator='dilate' radius='2' />
+            <filter id='sticker-outline'>
+              <feMorphology
+                in='SourceAlpha'
+                result='Dilated'
+                operator='dilate'
+                radius='2'
+              />
               <feFlood floodColor='#ffffff' result='OutlineColor' />
-              <feComposite in='OutlineColor' in2='Dilated' operator='in' result='Outline' />
+              <feComposite
+                in='OutlineColor'
+                in2='Dilated'
+                operator='in'
+                result='Outline'
+              />
               <feMerge>
                 <feMergeNode in='Outline' />
                 <feMergeNode in='SourceGraphic' />
@@ -90,7 +130,7 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
             </filter>
           </defs>
         </svg>
-        <canvas ref={canvasRef} className='showcase-grid-canvas' />
+        <canvas ref={canvasRef} className='showcase-phase-canvas' />
 
         {/* Default */}
         {showcaseKey === 'default' && (
@@ -102,12 +142,12 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
               <svg className='orbit-svg' viewBox='0 0 300 300'>
                 <defs>
                   <path
-                    id={`orbitPath-${showcaseKey}`}
+                    id={`orbitPath-${instanceKey}`}
                     d='M 150,150 m -130,0 a 130,130 0 1,0 260,0 a 130,130 0 1,0 -260,0'
                   />
                 </defs>
                 <text className='orbit-text'>
-                  <textPath href={`#orbitPath-${showcaseKey}`}>
+                  <textPath href={`#orbitPath-${instanceKey}`}>
                     {'The 5KB Globe Lib · '.repeat(10)}
                   </textPath>
                 </text>
@@ -117,11 +157,13 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
               <div
                 key={m.id}
                 className='showcase-default-label'
-                style={{
-                  positionAnchor: `--cobe-${m.id}`,
-                  opacity: `var(--cobe-visible-${m.id}, 0)`,
-                  filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
-                } as React.CSSProperties}
+                style={
+                  {
+                    positionAnchor: `--cobe-${m.id}`,
+                    opacity: `var(--cobe-visible-${m.id}, 0)`,
+                    filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
+                  } as React.CSSProperties
+                }
               >
                 {m.label}
               </div>
@@ -130,11 +172,13 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
               <div
                 key={a.id}
                 className='arc-label'
-                style={{
-                  positionAnchor: `--cobe-arc-${a.id}`,
-                  opacity: `var(--cobe-visible-arc-${a.id}, 0)`,
-                  filter: `blur(calc((1 - var(--cobe-visible-arc-${a.id}, 0)) * 8px))`,
-                } as React.CSSProperties}
+                style={
+                  {
+                    positionAnchor: `--cobe-arc-${a.id}`,
+                    opacity: `var(--cobe-visible-arc-${a.id}, 0)`,
+                    filter: `blur(calc((1 - var(--cobe-visible-arc-${a.id}, 0)) * 8px))`,
+                  } as React.CSSProperties
+                }
               >
                 {a.label}
               </div>
@@ -148,10 +192,12 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
             <div
               key={m.id}
               className='showcase-sticker'
-              style={{
-                positionAnchor: `--cobe-${m.id}`,
-                opacity: `var(--cobe-visible-${m.id}, 0)`,
-              } as React.CSSProperties}
+              style={
+                {
+                  positionAnchor: `--cobe-${m.id}`,
+                  opacity: `var(--cobe-visible-${m.id}, 0)`,
+                } as React.CSSProperties
+              }
             >
               {m.sticker}
             </div>
@@ -163,11 +209,13 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
             <div
               key={m.id}
               className='showcase-live'
-              style={{
-                positionAnchor: `--cobe-${m.id}`,
-                opacity: `var(--cobe-visible-${m.id}, 0)`,
-                filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
-              } as React.CSSProperties}
+              style={
+                {
+                  positionAnchor: `--cobe-${m.id}`,
+                  opacity: `var(--cobe-visible-${m.id}, 0)`,
+                  filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
+                } as React.CSSProperties
+              }
             >
               <span className='showcase-live-dot' />
               <span className='showcase-live-text'>LIVE</span>
@@ -180,11 +228,13 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
             <div
               key={m.id}
               className='showcase-interactive'
-              style={{
-                positionAnchor: `--cobe-${m.id}`,
-                opacity: `var(--cobe-visible-${m.id}, 0)`,
-                filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
-              } as React.CSSProperties}
+              style={
+                {
+                  positionAnchor: `--cobe-${m.id}`,
+                  opacity: `var(--cobe-visible-${m.id}, 0)`,
+                  filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
+                } as React.CSSProperties
+              }
             >
               <span className='showcase-interactive-name'>{m.name}</span>
             </div>
@@ -196,12 +246,14 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
             <div
               key={m.id}
               className='showcase-polaroid'
-              style={{
-                positionAnchor: `--cobe-${m.id}`,
-                opacity: `var(--cobe-visible-${m.id}, 0)`,
-                filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
-                '--polaroid-rotate': `${m.rotate}deg`,
-              } as React.CSSProperties}
+              style={
+                {
+                  positionAnchor: `--cobe-${m.id}`,
+                  opacity: `var(--cobe-visible-${m.id}, 0)`,
+                  filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
+                  '--polaroid-rotate': `${m.rotate}deg`,
+                } as React.CSSProperties
+              }
             >
               <img src={m.image} alt={m.caption} />
               <span className='showcase-polaroid-caption'>{m.caption}</span>
@@ -214,12 +266,14 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
             <div
               key={m.id}
               className='showcase-pulse'
-              style={{
-                positionAnchor: `--cobe-${m.id}`,
-                opacity: `var(--cobe-visible-${m.id}, 0)`,
-                filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
-                '--delay': `${m.delay}s`,
-              } as React.CSSProperties}
+              style={
+                {
+                  positionAnchor: `--cobe-${m.id}`,
+                  opacity: `var(--cobe-visible-${m.id}, 0)`,
+                  filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
+                  '--delay': `${m.delay}s`,
+                } as React.CSSProperties
+              }
             >
               <span className='showcase-pulse-ring' />
               <span className='showcase-pulse-ring' />
@@ -233,15 +287,20 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
             <div
               key={m.id}
               className='showcase-bar'
-              style={{
-                positionAnchor: `--cobe-${m.id}`,
-                opacity: `var(--cobe-visible-${m.id}, 0)`,
-                filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
-              } as React.CSSProperties}
+              style={
+                {
+                  positionAnchor: `--cobe-${m.id}`,
+                  opacity: `var(--cobe-visible-${m.id}, 0)`,
+                  filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
+                } as React.CSSProperties
+              }
             >
               <span className='showcase-bar-label'>{m.label}</span>
               <span className='showcase-bar-track'>
-                <span className='showcase-bar-fill' style={{ '--value': `${m.value}%` } as React.CSSProperties} />
+                <span
+                  className='showcase-bar-fill'
+                  style={{ '--value': `${m.value}%` } as React.CSSProperties}
+                />
               </span>
               <span className='showcase-bar-value'>{m.value}%</span>
             </div>
@@ -253,14 +312,18 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
             <div
               key={m.id}
               className='showcase-analytics'
-              style={{
-                positionAnchor: `--cobe-${m.id}`,
-                opacity: `var(--cobe-visible-${m.id}, 0)`,
-                filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
-              } as React.CSSProperties}
+              style={
+                {
+                  positionAnchor: `--cobe-${m.id}`,
+                  opacity: `var(--cobe-visible-${m.id}, 0)`,
+                  filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
+                } as React.CSSProperties
+              }
             >
               <span className='showcase-analytics-count'>{m.visitors}</span>
-              <span className={`showcase-analytics-trend ${m.trend >= 0 ? 'up' : 'down'}`}>
+              <span
+                className={`showcase-analytics-trend ${m.trend >= 0 ? 'up' : 'down'}`}
+              >
                 {m.trend >= 0 ? '↑' : '↓'} {Math.abs(m.trend)}%
               </span>
             </div>
@@ -272,10 +335,12 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
             <div
               key={a.id}
               className='showcase-flight'
-              style={{
-                positionAnchor: `--cobe-arc-${a.id}`,
-                opacity: `var(--cobe-visible-arc-${a.id}, 0)`,
-              } as React.CSSProperties}
+              style={
+                {
+                  positionAnchor: `--cobe-arc-${a.id}`,
+                  opacity: `var(--cobe-visible-arc-${a.id}, 0)`,
+                } as React.CSSProperties
+              }
             >
               ✈️
             </div>
@@ -287,13 +352,15 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
             <div
               key={m.id}
               className='showcase-label'
-              style={{
-                positionAnchor: `--cobe-${m.id}`,
-                opacity: `var(--cobe-visible-${m.id}, 0)`,
-                filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
-                '--label-color': m.color,
-                '--label-rotate': `${m.rotate}deg`,
-              } as React.CSSProperties}
+              style={
+                {
+                  positionAnchor: `--cobe-${m.id}`,
+                  opacity: `var(--cobe-visible-${m.id}, 0)`,
+                  filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
+                  '--label-color': m.color,
+                  '--label-rotate': `${m.rotate}deg`,
+                } as React.CSSProperties
+              }
             >
               {m.text}
             </div>
@@ -305,11 +372,13 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
             <div
               key={m.id}
               className='showcase-satellite'
-              style={{
-                positionAnchor: `--cobe-${m.id}`,
-                opacity: `var(--cobe-visible-${m.id}, 0)`,
-                filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
-              } as React.CSSProperties}
+              style={
+                {
+                  positionAnchor: `--cobe-${m.id}`,
+                  opacity: `var(--cobe-visible-${m.id}, 0)`,
+                  filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
+                } as React.CSSProperties
+              }
             >
               🛰️
             </div>
@@ -321,32 +390,77 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
             <div
               key={m.id}
               className='showcase-weather'
-              style={{
-                positionAnchor: `--cobe-${m.id}`,
-                opacity: `var(--cobe-visible-${m.id}, 0)`,
-                filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
-              } as React.CSSProperties}
+              style={
+                {
+                  positionAnchor: `--cobe-${m.id}`,
+                  opacity: `var(--cobe-visible-${m.id}, 0)`,
+                  filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
+                } as React.CSSProperties
+              }
             >
               {m.emoji}
             </div>
           ))}
-      </div>
-      <div className='showcase-grid-title'>
-        {showcases.find((s) => s.key === showcaseKey)?.name}
+
+        {/* CDN */}
+        {showcaseKey === 'cdn' &&
+          cdnMarkers.map((m) => (
+            <div
+              key={m.id}
+              className='showcase-cdn'
+              style={
+                {
+                  positionAnchor: `--cobe-${m.id}`,
+                  opacity: `var(--cobe-visible-${m.id}, 0)`,
+                  filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
+                } as React.CSSProperties
+              }
+            >
+              <div className='showcase-cdn-pyramid'>
+                <div className='showcase-cdn-pyramid-face' />
+                <div className='showcase-cdn-pyramid-face' />
+                <div className='showcase-cdn-pyramid-face' />
+                <div className='showcase-cdn-pyramid-face' />
+              </div>
+              <span className='showcase-cdn-label'>{m.region}</span>
+            </div>
+          ))}
       </div>
     </div>
   )
 }
 
 export default function ShowcasesGrid() {
+  const [phase, setPhase] = useState(0)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setPhase((p) => (p + 1) % phases.length)
+    }, phases[phase].duration)
+    return () => clearTimeout(timer)
+  }, [phase])
+
   return (
-    <div className='showcases-grid-page'>
-      <h1>All Showcases</h1>
-      <div className='showcases-grid'>
-        {showcases.map((showcase) => (
-          <ShowcaseGlobe key={showcase.key} showcaseKey={showcase.key} />
-        ))}
-      </div>
+    <div className='showcases-phase-page'>
+      {/* Render all phases, show only the current one */}
+      {phases.map((p, phaseIndex) => (
+        <div
+          key={phaseIndex}
+          className={`showcases-phase-grid showcases-phase-${p.showcases.length}${phase === phaseIndex ? ' showcases-phase-active' : ''}`}
+        >
+          {p.showcases.length === 0 ? (
+            <div className='showcases-phase-text'>cobe.vercel.app</div>
+          ) : (
+            p.showcases.map((key, i) => (
+              <ShowcaseGlobe
+                key={`${phaseIndex}-${key}-${i}`}
+                showcaseKey={key}
+                instanceKey={`${phaseIndex}-${key}-${i}`}
+              />
+            ))
+          )}
+        </div>
+      ))}
     </div>
   )
 }
