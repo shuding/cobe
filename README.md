@@ -42,12 +42,21 @@ const globe = createGlobe(canvas, {
   markerColor: [1, 0.5, 1],
   glowColor: [1, 1, 1],
   offset: [0, 0],
-  // You can specify a custom color for each marker using the color property
-  // If not specified, markers will use the global markerColor
   markers: [
-    { location: [37.7595, -122.4367], size: 0.03 }, // Uses global markerColor
-    { location: [40.7128, -74.006], size: 0.1, color: [1, 0, 0] }, // Custom red color
+    { location: [37.7595, -122.4367], size: 0.03 },
+    { location: [40.7128, -74.006], size: 0.1, color: [1, 0, 0] }, // custom color
   ],
+  arcs: [
+    {
+      from: [37.7595, -122.4367],
+      to: [40.7128, -74.006],
+      color: [1, 0.5, 0.5], // custom color (optional)
+    },
+  ],
+  arcColor: [1, 0.5, 1],
+  arcWidth: 0.5,
+  arcHeight: 0.3,
+  markerElevation: 0.02,
   onRender: (state) => {
     // Called on every animation frame.
     // `state` will be an empty object, return updated params.
@@ -63,6 +72,28 @@ const globe = createGlobe(canvas, {
 // `globe.destroy()`
 // ...
 ```
+
+## Bindable Markers
+
+Markers can have an `id` property for CSS Anchor Positioning:
+
+```js
+markers: [
+  { location: [37.7595, -122.4367], size: 0.03, id: 'sf' },
+]
+```
+
+```css
+.marker-label {
+  position: absolute;
+  position-anchor: --cobe-sf;
+  bottom: anchor(top);
+  left: anchor(center);
+  opacity: var(--cobe-visible-sf, 0);
+}
+```
+
+The globe exposes `--cobe-{id}` anchor names and `--cobe-visible-{id}` CSS variables (0 when behind globe, 1 when visible).
 
 ## Acknowledgment
 
