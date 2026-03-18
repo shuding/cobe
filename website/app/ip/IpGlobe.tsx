@@ -13,7 +13,7 @@ export function IpGlobe({ lat, lon, city }: IpGlobeProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
-    const phi = Math.PI / 2 - (lon * Math.PI) / 180
+    const phi = -(lon * Math.PI) / 180 - Math.PI / 2
     const theta = (lat * Math.PI) / 180
 
     const globe = createGlobe(canvasRef.current!, {
