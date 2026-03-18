@@ -1852,6 +1852,15 @@ code {
 
 /* ── /ip page ─────────────────────────────── */
 
+.ip-page {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1.5rem;
+}
+
 .ip-header {
   display: flex;
   flex-direction: column;
@@ -1881,48 +1890,6 @@ code {
   width: 100%;
   aspect-ratio: 1;
   position: relative;
-}
-
-.ip-globe {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  contain: layout style;
-}
-
-.ip-marker-label {
-  position: absolute;
-  bottom: anchor(top);
-  left: anchor(center);
-  translate: -50% 0;
-  margin-bottom: 8px;
-  padding: 0.2rem 0.5rem;
-  background: var(--ink);
-  color: var(--bg);
-  font-family: var(--font-mono), monospace;
-  font-size: 0.6rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  pointer-events: none;
-  z-index: 10;
-  transition: opacity 0.8s;
-}
-
-.ip-marker-label::after {
-  content: '';
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translate3d(-50%, -1px, 0);
-  border: 5px solid transparent;
-  border-top-color: var(--ink);
-}
-
-@supports not (anchor-name: --test) {
-  .ip-marker-label {
-    display: none;
-  }
 }
 
 .ip-coords {

@@ -20,7 +20,7 @@ export default async function IpPage() {
   const country = rawCountry ?? 'US'
 
   return (
-    <div className='page'>
+    <div className='ip-page'>
       <div className='hero'>
         <div className='ip-header'>
           <span className='ip-label'>you are in</span>
@@ -29,7 +29,7 @@ export default async function IpPage() {
           </span>
         </div>
         <div className='hero-globe'>
-          <IpGlobe lat={lat} lon={lon} city={city} />
+          <IpGlobe lat={lat} lon={lon} />
         </div>
         <div className='ip-coords'>
           {Math.abs(lat).toFixed(4)}°{lat >= 0 ? 'N' : 'S'},{' '}
