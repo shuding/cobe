@@ -1,6 +1,6 @@
 {
   "name": "cobe",
-  "version": "0.6.5",
+  "version": "2.0.0",
   "type": "module",
   "main": "./dist/index.esm.js",
   "files": [
@@ -17,8 +17,6 @@
     "esbuild": "^0.13.14",
     "glslx": "^0.3.0",
     "next": "^12.2.4",
-    "nextra": "2.0.0-alpha.50",
-    "nextra-theme-docs": "2.0.0-alpha.53",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "terser": "^5.46.0",
