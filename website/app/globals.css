@@ -88,12 +88,14 @@ code {
 .globe-overlay {
   width: 100%;
   top: 50%;
-  transform: translateY(-50%) translateZ(2px);
+  -webkit-transform: translateY(-50%);
+  transform: translateY(-50%);
   text-align: center;
   color: var(--ink);
   pointer-events: none;
   user-select: none;
   position: absolute;
+  z-index: 2;
   animation: fade-in 1.5s ease 0.2s both;
 }
 
@@ -113,17 +115,17 @@ code {
   position: absolute;
   inset: -2%;
   pointer-events: none;
-  transform-style: preserve-3d;
+  z-index: 1;
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 40%, black 48%, black 100%);
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 40%, black 48%, black 100%);
 }
 
 .orbit-svg {
   width: 100%;
   height: 100%;
-  transform: rotateX(62deg);
   -webkit-transform: rotateX(62deg);
+  transform: rotateX(62deg);
   animation: orbit-spin 30s linear infinite, fade-in 1.7s ease .5s both;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
 }
 
 .orbit-text {
@@ -520,9 +522,7 @@ code {
   max-width: 520px;
   aspect-ratio: 1;
   position: relative;
-  transform-style: preserve-3d;
   user-select: none;
-  contain: layout style;
 }
 
 .showcases-canvas {
@@ -533,7 +533,6 @@ code {
   transition: opacity 0.8s ease;
   border-radius: 50%;
   cursor: grab;
-  transform: translateZ(1px);
   touch-action: none;
 }
 
@@ -1326,7 +1325,7 @@ code {
   }
 
   .globe-overlay h1 {
-    font-size: min(18vw, 4.5em);
+    font-size: min(14vw, 3.2em);
   }
 
   .section {
@@ -1464,6 +1463,28 @@ code {
 
   .showcase-weather {
     font-size: 1.4rem;
+  }
+
+  /* Slower blur transitions on mobile */
+  .showcase-default-label,
+  .arc-label,
+  .marker-tooltip,
+  .showcase-sticker,
+  .showcase-live,
+  .showcase-interactive,
+  .showcase-polaroid,
+  .showcase-pulse,
+  .showcase-bar,
+  .showcase-analytics,
+  .showcase-flight,
+  .showcase-label,
+  .showcase-satellite,
+  .showcase-weather {
+    transition-duration: 0.5s;
+  }
+
+  .orbit-text {
+    font-size: 12px;
   }
 }
 

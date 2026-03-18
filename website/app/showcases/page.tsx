@@ -32,11 +32,12 @@ function ShowcaseGlobe({ showcaseKey }: { showcaseKey: ShowcaseKey }) {
     if (!canvasRef.current) return
     let phi = 0
     const width = canvasRef.current.offsetWidth
+    const dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 640 ? 1.8 : 2)
 
     const globe = createGlobe(canvasRef.current, {
-      devicePixelRatio: 2,
-      width: width * 2,
-      height: width * 2,
+      devicePixelRatio: dpr,
+      width: width,
+      height: width,
       phi: 0,
       theta: config.theta,
       dark: config.dark,

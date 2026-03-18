@@ -67,8 +67,6 @@ export function createAnchorManager(wrapper) {
         delete visibilityVars['--cobe-visible-' + key]
       }
     }
-
-    updateStyleTag()
   }
 
   function a(arcs, project) {
@@ -99,8 +97,6 @@ export function createAnchorManager(wrapper) {
         delete visibilityVars['--cobe-visible-arc-' + key]
       }
     }
-
-    updateStyleTag()
   }
 
   function r() {
@@ -113,5 +109,5 @@ export function createAnchorManager(wrapper) {
     styleEl.remove()
   }
 
-  return { m, a, r }
+  return { m, a, r, s: updateStyleTag }
 }

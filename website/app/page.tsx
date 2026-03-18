@@ -194,7 +194,7 @@ function Showcases() {
   const [activeShowcase, setActiveShowcase] = useState<ShowcaseKey>('default')
   const showcaseRef = useRef<ShowcaseKey>('default')
   const [expanded, setExpanded] = useState<string | null>(null)
-  const [progress, setProgress] = useState(0)
+  const progressBarRef = useRef<HTMLSpanElement>(null)
   const pointerInteracting = useRef<{ x: number; y: number } | null>(null)
   const lastPointer = useRef<{ x: number; y: number; t: number } | null>(null)
   const dragOffset = useRef({ phi: 0, theta: 0 })
@@ -286,12 +286,19 @@ function Showcases() {
     }
   }, [handlePointerMove, handlePointerUp])
 
+  const currentActiveShowcase = useRef<ShowcaseKey>('default')
   useEffect(() => {
-    const duration = 4000
+    currentActiveShowcase.current = activeShowcase
+  }, [activeShowcase])
+
+  useEffect(() => {
+    const duration = currentActiveShowcase.current === 'default' ? 6000 : 4000
     const interval = setInterval(() => {
       if (isPausedRef.current) return
       accumulatedRef.current += 50
-      setProgress(accumulatedRef.current / duration)
+      if (progressBarRef.current) {
+        progressBarRef.current.style.width = `${(accumulatedRef.current / duration) * 100}%`
+      }
       if (accumulatedRef.current >= duration) {
         setActiveShowcase((current) => {
           const idx = showcases.findIndex((s) => s.key === current)
@@ -299,6 +306,7 @@ function Showcases() {
         })
         setExpanded(null)
         accumulatedRef.current = 0
+        if (progressBarRef.current) progressBarRef.current.style.width = '0%'
       }
     }, 50)
     return () => clearInterval(interval)
@@ -396,7 +404,11 @@ function Showcases() {
     // Cache for markers with size
     let cachedShowcase: ShowcaseKey | null = null
     let cachedSize = 0
-    let cachedMarkers: { location: [number, number]; size: number; id: string }[] = []
+    let cachedMarkers: {
+      location: [number, number]
+      size: number
+      id: string
+    }[] = []
 
     const getMarkers = () => {
       const s = showcaseRef.current
@@ -424,11 +436,14 @@ function Showcases() {
       return emptyArcs
     }
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 2)
+    const dpr = Math.min(
+      window.devicePixelRatio || 1,
+      window.innerWidth < 640 ? 1.8 : 2,
+    )
     const globe = createGlobe(canvasRef.current, {
       devicePixelRatio: dpr,
-      width: width * dpr,
-      height: width * dpr,
+      width: width,
+      height: width,
       phi: 0,
       theta: 0.2,
       dark: 0,
@@ -829,6 +844,7 @@ function Showcases() {
                   setActiveShowcase(s.key)
                   setExpanded(null)
                   accumulatedRef.current = 0
+                  if (progressBarRef.current) progressBarRef.current.style.width = '0%'
                 }}
                 aria-label={s.name}
               >
@@ -839,8 +855,8 @@ function Showcases() {
           </div>
           <div className='showcase-progress'>
             <span
+              ref={progressBarRef}
               className='showcase-progress-bar'
-              style={{ width: `${progress * 100}%` }}
             />
           </div>
           <div className='showcase-nav'>
@@ -854,6 +870,7 @@ function Showcases() {
                 )
                 setExpanded(null)
                 accumulatedRef.current = 0
+                if (progressBarRef.current) progressBarRef.current.style.width = '0%'
               }}
               aria-label='Previous'
             >
@@ -870,6 +887,7 @@ function Showcases() {
                 setActiveShowcase(showcases[(idx + 1) % showcases.length].key)
                 setExpanded(null)
                 accumulatedRef.current = 0
+                if (progressBarRef.current) progressBarRef.current.style.width = '0%'
               }}
               aria-label='Next'
             >
@@ -1302,12 +1320,15 @@ function InlinePlayground() {
   useEffect(() => {
     if (!canvasRef.current) return
     const width = canvasRef.current.offsetWidth
-    const dpr = Math.min(window.devicePixelRatio || 1, 2)
+    const dpr = Math.min(
+      window.devicePixelRatio || 1,
+      window.innerWidth < 640 ? 1.8 : 2,
+    )
 
     const globe = createGlobe(canvasRef.current, {
       devicePixelRatio: dpr,
-      width: width * dpr,
-      height: width * dpr,
+      width: width,
+      height: width,
       phi: 0,
       theta: 0.2,
       dark: 0,

@@ -399,6 +399,7 @@ export default (canvas, opts) => {
     // Update anchor positions
     anchorManager.m(markers, project)
     anchorManager.a(arcs, projectArcMidpoint)
+    anchorManager.s()
 
     // Set viewport
     gl.viewport(0, 0, canvas.width, canvas.height)
