@@ -5,7 +5,7 @@
 <p align="center">High perf, zero deps, ~5KB.</p>
 
 <p align="center">
-  <img src="demo.gif" alt="COBE demo" width="600" />
+  <video src="ideas-1_4x.mp4" poster="card.png" autoplay loop muted playsinline width="600"></video>
 </p>
 
 <p align="center">A WebGL globe lib. The name "COBE" stands for <a href="https://en.wikipedia.org/wiki/Cosmic_Background_Explorer" target="_blank">Cosmic Background Explorer</a>.</p>
