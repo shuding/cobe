@@ -1,14 +1,16 @@
 [![COBE](card.png)](https://cobe.vercel.app)
 
-<p align="center">A <b>lightweight (5kB)</b> WebGL globe lib. The name "COBE" stands for <a href="https://en.wikipedia.org/wiki/Cosmic_Background_Explorer" target="_blank">Cosmic Background Explorer</a>.</p>
+<p align="center">Use any DOM element as bindable markers.<br/>CSS transitions, animations, filters, interactivity, all just work.</p>
+
+<p align="center">High perf, zero deps, ~5KB.</p>
+
+<p align="center">
+  <video src="ideas-1_4x.mp4" poster="card.png" autoplay loop muted playsinline width="600"></video>
+</p>
 
 ---
 
 - [**Demo** and configurations](https://cobe.vercel.app)
-- Use with React: https://codesandbox.io/s/eager-sky-r2q0g
-- Use with vanilla JS: https://codesandbox.io/s/peaceful-gwen-m579y
-- Use with Vue3: https://stackblitz.com/edit/vitejs-vite-l5a8xk?file=src/App.vue
-- Use with Svelte: https://codesandbox.io/s/great-visvesvaraya-78yf6?file=/App.svelte
 
 ## Quick Start
 
@@ -42,12 +44,21 @@ const globe = createGlobe(canvas, {
   markerColor: [1, 0.5, 1],
   glowColor: [1, 1, 1],
   offset: [0, 0],
-  // You can specify a custom color for each marker using the color property
-  // If not specified, markers will use the global markerColor
   markers: [
-    { location: [37.7595, -122.4367], size: 0.03 }, // Uses global markerColor
-    { location: [40.7128, -74.006], size: 0.1, color: [1, 0, 0] }, // Custom red color
+    { location: [37.7595, -122.4367], size: 0.03 },
+    { location: [40.7128, -74.006], size: 0.1, color: [1, 0, 0] }, // custom color
   ],
+  arcs: [
+    {
+      from: [37.7595, -122.4367],
+      to: [40.7128, -74.006],
+      color: [1, 0.5, 0.5], // custom color (optional)
+    },
+  ],
+  arcColor: [1, 0.5, 1],
+  arcWidth: 0.5,
+  arcHeight: 0.3,
+  markerElevation: 0.02,
   onRender: (state) => {
     // Called on every animation frame.
     // `state` will be an empty object, return updated params.
@@ -56,13 +67,62 @@ const globe = createGlobe(canvas, {
   },
 })
 
-// `globe` will be a Phenomenon (https://github.com/vaneenige/phenomenon) instance.
-// To pause requestAnimationFrame:
-// `globe.toggle()`
-// To remove the instance:
+// To destroy the instance and bindings:
 // `globe.destroy()`
-// ...
 ```
+
+## Arcs
+
+Arcs connect two locations on the globe:
+
+```js
+arcs: [
+  {
+    from: [37.7595, -122.4367],
+    to: [35.6762, 139.6503],
+    color: [1, 0.5, 0.5], // optional, uses arcColor if not set
+  },
+]
+```
+
+## Bindable Markers & Arcs
+
+Markers and arcs can have an `id` property for [CSS Anchor Positioning](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_anchor_positioning):
+
+```js
+markers: [
+  { location: [37.7595, -122.4367], size: 0.03, id: 'sf' },
+],
+arcs: [
+  { from: [37.7595, -122.4367], to: [35.6762, 139.6503], id: 'sf-tokyo' },
+]
+```
+
+```css
+.marker-label {
+  position: absolute;
+  position-anchor: --cobe-sf;
+  bottom: anchor(top);
+  left: anchor(center);
+  opacity: var(--cobe-visible-sf, 0);
+  filter: blur(calc((1 - var(--cobe-visible-sf, 0)) * 8px));
+  transition: opacity 0.3s, filter 0.3s;
+}
+
+.arc-label {
+  position: absolute;
+  position-anchor: --cobe-arc-sf-tokyo;
+  bottom: anchor(top);
+  left: anchor(center);
+  opacity: var(--cobe-visible-arc-sf-tokyo, 0);
+}
+```
+
+The globe exposes:
+- `--cobe-{id}` / `--cobe-arc-{id}` — CSS anchor names for positioning
+- `--cobe-visible-{id}` / `--cobe-visible-arc-{id}` — visibility variable (0 when behind globe, 1 when visible)
+
+Use the visibility variable to drive opacity, blur, scale, or any CSS property for smooth transitions.
 
 ## Acknowledgment
 
