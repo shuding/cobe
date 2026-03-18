@@ -18,9 +18,9 @@ export function createAnchorManager(wrapper) {
   function updateStyleTag() {
     let vars = ''
     for (let key in visibilityVars) {
-      vars += `${key}:${visibilityVars[key]};`
+      vars += key + ':' + visibilityVars[key] + ';'
     }
-    styleEl.textContent = `:root{${vars}}`
+    styleEl.textContent = ':root{' + vars + '}'
   }
 
   function updateAnchor(anchors, key, anchorName, position) {
@@ -42,9 +42,9 @@ export function createAnchorManager(wrapper) {
   function m(markers, project) {
     const activeKeys = {}
 
-    markers.forEach((marker) => {
+    for (let marker of markers) {
       const key = marker.id
-      if (!key) return
+      if (!key) continue
 
       const pos = project(marker.location)
 
@@ -53,12 +53,11 @@ export function createAnchorManager(wrapper) {
       updateAnchor(markerAnchors, key, `--cobe-${key}`, pos)
 
       if (pos.visible) {
-        // Invalid CSS value
         visibilityVars['--cobe-visible-' + key] = 'N'
       } else {
         delete visibilityVars['--cobe-visible-' + key]
       }
-    })
+    }
 
     for (const key in markerAnchors) {
       if (!activeKeys[key]) {
@@ -72,9 +71,9 @@ export function createAnchorManager(wrapper) {
   function a(arcs, project) {
     const activeKeys = {}
 
-    arcs.forEach((arc) => {
+    for (let arc of arcs) {
       const key = arc.id
-      if (!key) return
+      if (!key) continue
 
       const pos = project(arc)
 
@@ -83,12 +82,11 @@ export function createAnchorManager(wrapper) {
       updateAnchor(arcAnchors, key, `--cobe-arc-${key}`, pos)
 
       if (pos.visible) {
-        // Invalid CSS value
         visibilityVars['--cobe-visible-arc-' + key] = 'N'
       } else {
         delete visibilityVars['--cobe-visible-arc-' + key]
       }
-    })
+    }
 
     for (const key in arcAnchors) {
       if (!activeKeys[key]) {

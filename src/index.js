@@ -29,7 +29,6 @@ function latLonTo3D([lat, lon]) {
   return [-cosLat * cos(lonRad), sin(latRad), cosLat * sin(lonRad)]
 }
 
-const emptyGlobe = { destroy: () => {}, update: () => {} }
 
 /**
  * Create COBE globe
@@ -51,7 +50,7 @@ export default (canvas, opts) => {
   const webgl2 = !!gl
   if (!gl) gl = canvas.getContext('webgl', contextOpts)
 
-  if (!gl) return emptyGlobe
+  if (!gl) return { destroy: () => {}, update: () => {} }
 
   const instExt = webgl2 ? null : gl.getExtension('ANGLE_instanced_arrays')
 
@@ -88,7 +87,7 @@ export default (canvas, opts) => {
   const markerProgram = createProgram(gl, MARKER_VERT, MARKER_FRAG)
   const arcProgram = createProgram(gl, ARC_VERT, ARC_FRAG)
 
-  if (!globeProgram) return emptyGlobe
+  if (!globeProgram) return { destroy: () => {}, update: () => {} }
 
   // Buffers
   const quadBuffer = gl.createBuffer()

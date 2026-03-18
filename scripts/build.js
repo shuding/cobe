@@ -115,6 +115,8 @@ esbuild
     const result = await minify(fs.readFileSync('dist/index.esm.js', 'utf-8'), {
       compress: {
         unsafe: true,
+        passes: 2,
+        pure_getters: true,
       },
     })
     // Just overwrite the file
