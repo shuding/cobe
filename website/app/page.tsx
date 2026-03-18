@@ -237,7 +237,7 @@ function Showcases() {
     if (pointerInteracting.current !== null) {
       const deltaX = e.clientX - pointerInteracting.current.x
       const deltaY = e.clientY - pointerInteracting.current.y
-      dragOffset.current = { phi: deltaX / 300, theta: deltaY / 600 }
+      dragOffset.current = { phi: deltaX / 300, theta: deltaY / 1000 }
 
       // Track velocity (clamped)
       const now = Date.now()
@@ -256,7 +256,7 @@ function Showcases() {
             -maxVelocity,
             Math.min(
               maxVelocity,
-              ((e.clientY - lastPointer.current.y) / dt) * 0.15,
+              ((e.clientY - lastPointer.current.y) / dt) * 0.08,
             ),
           ),
         }

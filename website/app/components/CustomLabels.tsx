@@ -156,6 +156,27 @@ createGlobe(canvas, {
     description:
       'Labels are regular DOM elements. Add click handlers, hover states, animations, or nest complex components. Use `pointer-events: auto` for interactive labels.',
   },
+  {
+    key: 'browser-support',
+    name: 'Browser Support',
+    code: `/* Hide labels in browsers without anchor positioning */
+@supports not (anchor-name: --test) {
+  .marker-label,
+  .arc-label {
+    display: none;
+  }
+}
+
+/* Alternative: show labels without positioning */
+@supports not (anchor-name: --test) {
+  .marker-label {
+    position: static;
+    /* Render as a list or different layout */
+  }
+}`,
+    description:
+      'CSS Anchor Positioning is supported in Chrome 125+, Edge 125+, Firefox 147+, and Safari 26+. Use `@supports` to hide labels or provide a fallback for older browsers.',
+  },
 ]
 
 export function CustomLabels() {
