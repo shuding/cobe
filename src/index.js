@@ -279,8 +279,8 @@ export default (canvas, opts) => {
     const rz = -sy * cx * p[0] + sx * p[1] + cy * cx * p[2]
 
     return [
-      ((rx / aspect) * scaleOpt + offsetOpt[0] / canvas.width + 1) / 2,
-      (-ry * scaleOpt - offsetOpt[1] / canvas.height + 1) / 2,
+      ((rx / aspect) * scaleOpt + offsetOpt[0] * scaleOpt * dpr / canvas.width + 1) / 2,
+      (-ry * scaleOpt + offsetOpt[1] * scaleOpt * dpr / canvas.height + 1) / 2,
       rz >= 0 || rx * rx + ry * ry >= 0.64, // visible if in front OR outside globe silhouette
     ]
   }

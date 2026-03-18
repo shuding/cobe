@@ -1281,11 +1281,16 @@ function InlinePlayground() {
     useState<keyof typeof playgroundPresets>('default')
   const [markerPreset, setMarkerPreset] =
     useState<keyof typeof markerPresets>('World Cities')
+  const [phi, setPhi] = useState(0)
+  const [theta, setTheta] = useState(0.2)
   const [dark, setDark] = useState(0)
   const [diffuse, setDiffuse] = useState(1.2)
+  const [mapSamples, setMapSamples] = useState(16000)
   const [mapBrightness, setMapBrightness] = useState(6)
-  const [theta, setTheta] = useState(0.2)
+  const [mapBaseBrightness, setMapBaseBrightness] = useState(0)
   const [scale, setScale] = useState(1)
+  const [offsetX, setOffsetX] = useState(0)
+  const [offsetY, setOffsetY] = useState(0)
   const [markerSize, setMarkerSize] = useState(0.04)
   const [markerElevation, setMarkerElevation] = useState(0)
   const [showArcs, setShowArcs] = useState(true)
@@ -1294,11 +1299,16 @@ function InlinePlayground() {
   const [autoRotate, setAutoRotate] = useState(false)
 
   const stateRef = useRef({
+    phi,
+    theta,
     dark,
     diffuse,
+    mapSamples,
     mapBrightness,
-    theta,
+    mapBaseBrightness,
     scale,
+    offsetX,
+    offsetY,
     markerSize,
     markerElevation,
     showArcs,
@@ -1314,11 +1324,16 @@ function InlinePlayground() {
 
   useEffect(() => {
     stateRef.current = {
+      phi,
+      theta,
       dark,
       diffuse,
+      mapSamples,
       mapBrightness,
-      theta,
+      mapBaseBrightness,
       scale,
+      offsetX,
+      offsetY,
       markerSize,
       markerElevation,
       showArcs,
@@ -1332,11 +1347,16 @@ function InlinePlayground() {
       arcs: markerPresets[markerPreset].arcs,
     }
   }, [
+    phi,
+    theta,
     dark,
     diffuse,
+    mapSamples,
     mapBrightness,
-    theta,
+    mapBaseBrightness,
     scale,
+    offsetX,
+    offsetY,
     markerSize,
     markerElevation,
     showArcs,
@@ -1419,12 +1439,15 @@ function InlinePlayground() {
         phiRef.current += 0.003
       }
       globe.update({
-        phi: phiRef.current + dragOffset.current.phi,
+        phi: s.phi + phiRef.current + dragOffset.current.phi,
         theta: s.theta + thetaOffsetRef.current + dragOffset.current.theta,
         scale: s.scale,
+        offset: [s.offsetX, s.offsetY],
         dark: s.dark,
         diffuse: s.diffuse,
+        mapSamples: s.mapSamples,
         mapBrightness: s.mapBrightness,
+        mapBaseBrightness: s.mapBaseBrightness,
         baseColor: s.baseColor,
         markerColor: s.markerColor,
         glowColor: s.glowColor,
@@ -1483,6 +1506,32 @@ function InlinePlayground() {
         </div>
         <div className='playground-controls'>
           <div className='playground-control'>
+            <label>
+              phi <code>{phi.toFixed(2)}</code>
+            </label>
+            <input
+              type='range'
+              min='0'
+              max='6.28'
+              step='0.01'
+              value={phi}
+              onChange={(e) => setPhi(parseFloat(e.target.value))}
+            />
+          </div>
+          <div className='playground-control'>
+            <label>
+              theta <code>{theta.toFixed(2)}</code>
+            </label>
+            <input
+              type='range'
+              min='-0.5'
+              max='0.5'
+              step='0.01'
+              value={theta}
+              onChange={(e) => setTheta(parseFloat(e.target.value))}
+            />
+          </div>
+          <div className='playground-control'>
             <label>Theme</label>
             <select
               value={preset}
@@ -1539,11 +1588,24 @@ function InlinePlayground() {
           </div>
           <div className='playground-control'>
             <label>
-              mapBrightness <code>{mapBrightness.toFixed(0)}</code>
+              mapSamples <code>{mapSamples}</code>
             </label>
             <input
               type='range'
-              min='1'
+              min='1000'
+              max='40000'
+              step='1000'
+              value={mapSamples}
+              onChange={(e) => setMapSamples(parseFloat(e.target.value))}
+            />
+          </div>
+          <div className='playground-control'>
+            <label>
+              mapBrightness <code>{mapBrightness.toFixed(1)}</code>
+            </label>
+            <input
+              type='range'
+              min='0'
               max='12'
               step='0.5'
               value={mapBrightness}
@@ -1552,15 +1614,15 @@ function InlinePlayground() {
           </div>
           <div className='playground-control'>
             <label>
-              theta <code>{theta.toFixed(2)}</code>
+              mapBaseBrightness <code>{mapBaseBrightness.toFixed(2)}</code>
             </label>
             <input
               type='range'
-              min='-0.5'
-              max='0.5'
+              min='0'
+              max='1'
               step='0.01'
-              value={theta}
-              onChange={(e) => setTheta(parseFloat(e.target.value))}
+              value={mapBaseBrightness}
+              onChange={(e) => setMapBaseBrightness(parseFloat(e.target.value))}
             />
           </div>
           <div className='playground-control'>
@@ -1574,6 +1636,32 @@ function InlinePlayground() {
               step='0.05'
               value={scale}
               onChange={(e) => setScale(parseFloat(e.target.value))}
+            />
+          </div>
+          <div className='playground-control'>
+            <label>
+              offset[0] <code>{offsetX}</code>
+            </label>
+            <input
+              type='range'
+              min='-200'
+              max='200'
+              step='10'
+              value={offsetX}
+              onChange={(e) => setOffsetX(parseFloat(e.target.value))}
+            />
+          </div>
+          <div className='playground-control'>
+            <label>
+              offset[1] <code>{offsetY}</code>
+            </label>
+            <input
+              type='range'
+              min='-200'
+              max='200'
+              step='10'
+              value={offsetY}
+              onChange={(e) => setOffsetY(parseFloat(e.target.value))}
             />
           </div>
           <div className='playground-control'>

@@ -82,7 +82,7 @@ void vertex() {
     : vec2(1.0, 0.0);
 
   float aspect = uResolution.x / uResolution.y;
-  vec2 baseScreenPos = rotatedPoint.xy * vec2(1.0 / aspect, 1.0) * scale + offset / uResolution;
+  vec2 baseScreenPos = rotatedPoint.xy * vec2(1.0 / aspect, 1.0) * scale + offset * vec2(1.0, -1.0) * scale / uResolution;
 
   // Offset in screen space
   vec2 screenPos = baseScreenPos + screenPerp * aArcWidth * aPosition.y * scale;

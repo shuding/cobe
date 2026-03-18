@@ -36,7 +36,7 @@ void vertex() {
   }
 
   float ia = uResolution.y / uResolution.x;
-  vec2 pos = (rp.xy + aPosition * aMarkerSize * 2.0) * vec2(ia, 1.0) * scale + offset / uResolution;
+  vec2 pos = (rp.xy + aPosition * aMarkerSize * 2.0) * vec2(ia, 1.0) * scale + offset * vec2(1.0, -1.0) * scale / uResolution;
   gl_Position = vec4(pos, 0.0, 1.0);
 
   vUV = aPosition;

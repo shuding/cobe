@@ -50,7 +50,6 @@ vec3 nearestFibonacciLattice(vec3 p, out float m) {
     if (idx > dots) continue;
 
     float a = idx, b = 0.0;
-    if (a >= 32768.0) a -= 32768.0, b += 0.737743;
     if (a >= 16384.0) a -= 16384.0, b += 0.868872;
     if (a >= 8192.0) a -= 8192.0, b += 0.934436;
     if (a >= 4096.0) a -= 4096.0, b += 0.467218;
