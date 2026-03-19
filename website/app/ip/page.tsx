@@ -9,16 +9,16 @@ async function getLocation() {
   const rawCity = h.get('x-vercel-ip-city')
   const rawCountry = h.get('x-vercel-ip-country')
   return {
-    lat: rawLat ? parseFloat(rawLat) : 37.78,
-    lon: rawLon ? parseFloat(rawLon) : -122.44,
-    city: rawCity ? decodeURIComponent(rawCity) : 'San Francisco',
-    country: rawCountry ?? 'US',
+    lat: rawLat ? parseFloat(rawLat) : null,
+    lon: rawLon ? parseFloat(rawLon) : null,
+    city: rawCity ? decodeURIComponent(rawCity) : null,
+    country: rawCountry ?? null,
   }
 }
 
 export async function generateMetadata(): Promise<Metadata> {
   const { city, country } = await getLocation()
-  return { title: `${city}, ${country}` }
+  return { title: city && country ? `${city}, ${country}` : 'Where Are You?' }
 }
 
 export default async function IpPage() {
@@ -67,22 +67,24 @@ export default async function IpPage() {
             textAlign: 'center',
           }}
         >
-          {city}, {country}
+          {city && country ? `${city}, ${country}` : 'Unknown Location'}
         </h2>
         <IpGlobe lat={lat} lon={lon} city={city} />
-        <p
-          style={{
-            fontFamily: 'var(--font-mono), monospace',
-            fontSize: '0.7rem',
-            color: 'var(--text-dim)',
-            letterSpacing: '0.08em',
-            marginTop: '1rem',
-            textAlign: 'center',
-          }}
-        >
-          {Math.abs(lat).toFixed(4)}°{lat >= 0 ? 'N' : 'S'},{' '}
-          {Math.abs(lon).toFixed(4)}°{lon >= 0 ? 'E' : 'W'}
-        </p>
+        {lat !== null && lon !== null && (
+          <p
+            style={{
+              fontFamily: 'var(--font-mono), monospace',
+              fontSize: '0.7rem',
+              color: 'var(--text-dim)',
+              letterSpacing: '0.08em',
+              marginTop: '1rem',
+              textAlign: 'center',
+            }}
+          >
+            {Math.abs(lat).toFixed(4)}°{lat >= 0 ? 'N' : 'S'},{' '}
+            {Math.abs(lon).toFixed(4)}°{lon >= 0 ? 'E' : 'W'}
+          </p>
+        )}
         <p
           style={{
             fontFamily: 'var(--font-mono), monospace',

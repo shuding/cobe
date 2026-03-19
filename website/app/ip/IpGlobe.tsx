@@ -4,9 +4,9 @@ import createGlobe from 'cobe'
 import { useEffect, useRef } from 'react'
 
 interface IpGlobeProps {
-  lat: number
-  lon: number
-  city: string
+  lat: number | null
+  lon: number | null
+  city: string | null
 }
 
 const EASING_FACTOR = 0.05
@@ -18,8 +18,9 @@ export function IpGlobe({ lat, lon, city }: IpGlobeProps) {
   useEffect(() => {
     if (!canvasRef.current) return
 
-    const targetPhi = -(lon * Math.PI) / 180 - Math.PI / 2
-    const targetTheta = (lat * Math.PI) / 180
+    const targetPhi = lon !== null ? -(lon * Math.PI) / 180 - Math.PI / 2 : -Math.PI / 2
+    const targetTheta = lat !== null ? (lat * Math.PI) / 180 : 0
+    const hasLocation = lat !== null && lon !== null
 
     // Start slightly offset so the globe eases into position
     let currentPhi = targetPhi - 0.15
@@ -43,7 +44,7 @@ export function IpGlobe({ lat, lon, city }: IpGlobeProps) {
       glowColor: [0.94, 0.93, 0.91],
       markerElevation: 0,
       opacity: 0.7,
-      markers: [{ location: [lat, lon], size: 0.03, id: 'city' }],
+      markers: hasLocation ? [{ location: [lat!, lon!], size: 0.03, id: 'city' }] : [],
     })
 
     let animationId = 0
@@ -115,7 +116,7 @@ export function IpGlobe({ lat, lon, city }: IpGlobeProps) {
           } as React.CSSProperties
         }
       >
-        {city}
+        {city ?? ''}
       </div>
     </div>
   )
