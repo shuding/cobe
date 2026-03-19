@@ -9,7 +9,8 @@ interface IpGlobeProps {
   city: string
 }
 
-const ANIMATION_DELTA = 0.006
+const EASING_FACTOR = 0.05
+const STOP_THRESHOLD = 0.0001
 
 export function IpGlobe({ lat, lon, city }: IpGlobeProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -20,9 +21,9 @@ export function IpGlobe({ lat, lon, city }: IpGlobeProps) {
     const targetPhi = -(lon * Math.PI) / 180 - Math.PI / 2
     const targetTheta = (lat * Math.PI) / 180
 
-    // Start slightly offset so the globe animates into position
-    let currentPhi = targetPhi - 0.6
-    let currentTheta = targetTheta - 0.15
+    // Start slightly offset so the globe eases into position
+    let currentPhi = targetPhi - 0.15
+    let currentTheta = targetTheta - 0.04
 
     const width = canvasRef.current.offsetWidth
     const dpr = Math.min(window.devicePixelRatio || 1, 2)
@@ -53,9 +54,10 @@ export function IpGlobe({ lat, lon, city }: IpGlobeProps) {
       const dPhi = targetPhi - currentPhi
       const dTheta = targetTheta - currentTheta
 
-      if (Math.abs(dPhi) > ANIMATION_DELTA || Math.abs(dTheta) > ANIMATION_DELTA) {
-        currentPhi += Math.sign(dPhi) * Math.min(Math.abs(dPhi), ANIMATION_DELTA)
-        currentTheta += Math.sign(dTheta) * Math.min(Math.abs(dTheta), ANIMATION_DELTA)
+      if (Math.abs(dPhi) > STOP_THRESHOLD || Math.abs(dTheta) > STOP_THRESHOLD) {
+        // Ease toward target: advance a fixed percentage of remaining distance each frame
+        currentPhi += dPhi * EASING_FACTOR
+        currentTheta += dTheta * EASING_FACTOR
         globe.update({ phi: currentPhi, theta: currentTheta })
         animationId = requestAnimationFrame(animate)
       } else {
