@@ -9,35 +9,70 @@ interface IpGlobeProps {
   city: string
 }
 
+const ANIMATION_DELTA = 0.006
+
 export function IpGlobe({ lat, lon, city }: IpGlobeProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
-    const phi = -(lon * Math.PI) / 180 - Math.PI / 2
-    const theta = (lat * Math.PI) / 180
+    if (!canvasRef.current) return
 
-    const globe = createGlobe(canvasRef.current!, {
-      devicePixelRatio: 2,
-      width: 600 * 2,
-      height: 600 * 2,
-      phi,
-      theta,
+    const targetPhi = -(lon * Math.PI) / 180 - Math.PI / 2
+    const targetTheta = (lat * Math.PI) / 180
+
+    // Start slightly offset so the globe animates into position
+    let currentPhi = targetPhi - 0.6
+    let currentTheta = targetTheta - 0.15
+
+    const width = canvasRef.current.offsetWidth
+    const dpr = Math.min(window.devicePixelRatio || 1, 2)
+
+    const globe = createGlobe(canvasRef.current, {
+      devicePixelRatio: dpr,
+      width: width,
+      height: width,
+      phi: currentPhi,
+      theta: currentTheta,
       dark: 0,
-      diffuse: 1.2,
+      diffuse: 1.5,
       mapSamples: 16000,
-      mapBrightness: 6,
+      mapBrightness: 10,
       baseColor: [1, 1, 1],
-      markerColor: [0.2, 0.4, 1],
-      glowColor: [1, 1, 1],
+      markerColor: [0.3, 0.45, 0.85],
+      glowColor: [0.94, 0.93, 0.91],
       markerElevation: 0,
+      opacity: 0.7,
       markers: [{ location: [lat, lon], size: 0.03, id: 'city' }],
     })
 
-    setTimeout(() => {
-      if (canvasRef.current) canvasRef.current.style.opacity = '1'
-    }, 100)
+    let animationId = 0
+    let destroyed = false
 
-    return () => globe.destroy()
+    function animate() {
+      if (destroyed) return
+      const dPhi = targetPhi - currentPhi
+      const dTheta = targetTheta - currentTheta
+
+      if (Math.abs(dPhi) > ANIMATION_DELTA || Math.abs(dTheta) > ANIMATION_DELTA) {
+        currentPhi += Math.sign(dPhi) * Math.min(Math.abs(dPhi), ANIMATION_DELTA)
+        currentTheta += Math.sign(dTheta) * Math.min(Math.abs(dTheta), ANIMATION_DELTA)
+        globe.update({ phi: currentPhi, theta: currentTheta })
+        animationId = requestAnimationFrame(animate)
+      } else {
+        globe.update({ phi: targetPhi, theta: targetTheta })
+      }
+    }
+
+    setTimeout(() => {
+      if (!destroyed && canvasRef.current) canvasRef.current.style.opacity = '1'
+      animate()
+    })
+
+    return () => {
+      destroyed = true
+      cancelAnimationFrame(animationId)
+      globe.destroy()
+    }
   }, [lat, lon])
 
   return (
@@ -52,8 +87,6 @@ export function IpGlobe({ lat, lon, city }: IpGlobeProps) {
       <canvas
         ref={canvasRef}
         className='globe-canvas'
-        width={600 * 2}
-        height={600 * 2}
         style={{ opacity: 0, transition: 'opacity 1.2s ease' }}
       />
       <div
