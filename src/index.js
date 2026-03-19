@@ -188,6 +188,9 @@ export default (canvas, opts) => {
     gl.UNSIGNED_BYTE,
     new Uint8Array([0, 0, 0]),
   )
+  // Set filtering for placeholder (no mipmaps)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
 
   const image = new Image()
   image.onload = () => {
@@ -416,6 +419,12 @@ export default (canvas, opts) => {
     gl.bindBuffer(gl.ARRAY_BUFFER, quadBuffer)
     gl.enableVertexAttribArray(globePositionAttrib)
     gl.vertexAttribPointer(globePositionAttrib, 2, gl.FLOAT, false, 0, 0)
+    // Reset divisor to 0 for non-instanced draw (may have been set by previous frame's instanced draws)
+    if (webgl2) {
+      gl.vertexAttribDivisor(globePositionAttrib, 0)
+    } else if (instExt) {
+      instExt.vertexAttribDivisorANGLE(globePositionAttrib, 0)
+    }
 
     // Set uniforms
     gl.uniform2f(
@@ -442,6 +451,10 @@ export default (canvas, opts) => {
     )
     gl.uniform1f(globeUniforms[GLOBE_F_mapBaseBrightness], mapBaseBrightness)
     gl.uniform1i(globeUniforms[GLOBE_F_uTexture], 0)
+
+    // Bind texture to unit 0
+    gl.activeTexture(gl.TEXTURE0)
+    gl.bindTexture(gl.TEXTURE_2D, texture)
 
     gl.drawArrays(gl.TRIANGLES, 0, 6)
 
