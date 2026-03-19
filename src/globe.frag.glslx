@@ -1,54 +1,33 @@
 export void fragment();
 
-uniform vec2 uResolution;
-uniform vec2 offset;
-uniform vec2 rotation;        // (phi, theta)
-uniform float dots;
-uniform float scale;
-uniform vec3 baseColor;
-uniform vec3 glowColor;
-uniform vec4 renderParams;    // (dotsBrightness, diffuse, dark, opacity)
-uniform float mapBaseBrightness;
+uniform vec2 uResolution, offset, rotation;
+uniform float dots, scale, mapBaseBrightness;
+uniform vec3 baseColor, glowColor;
+uniform vec4 renderParams;
 uniform sampler2D uTexture;
 
-const float sqrt5 = 2.236068;
-const float PI = 3.141593;
-const float kTau = 6.283185;
-const float kPhi = 1.618034;
-const float r = 0.8;
+const float sqrt5 = 2.236068, PI = 3.141593, kTau = 6.283185, kPhi = 1.618034, kPhiMinus1 = 0.618034, rSq = 0.64;
 
 float byDots;
 
 mat3 rotate(float theta, float phi) {
-  float cx = cos(theta);
-  float cy = cos(phi);
-  float sx = sin(theta);
-  float sy = sin(phi);
-  return mat3(
-    cy, sy * sx, -sy * cx,
-    0.0, cx, sx,
-    sy, cy * -sx, cy * cx
-  );
+  float cx = cos(theta), cy = cos(phi), sx = sin(theta), sy = sin(phi);
+  return mat3(cy, sy * sx, -sy * cx, 0.0, cx, sx, sy, cy * -sx, cy * cx);
 }
 
 vec3 nearestFibonacciLattice(vec3 p, out float m) {
   p = p.xzy;
-
   float k = max(2.0, floor(log2(sqrt5 * dots * PI * (1.0 - p.z * p.z)) * 0.72021));
-
   vec2 f = floor(pow(kPhi, k) / sqrt5 * vec2(1.0, kPhi) + 0.5);
-  vec2 br1 = fract((f + 1.0) * (kPhi - 1.0)) * kTau - 3.883222;
-  vec2 br2 = -2.0 * f;
+  vec2 br1 = fract((f + 1.0) * kPhiMinus1) * kTau - 3.883222, br2 = -2.0 * f;
   vec2 sp = vec2(atan(p.y, p.x), p.z - 1.0);
   vec2 c = floor(vec2(br2.y * sp.x - br1.y * (sp.y * dots + 1.0), -br2.x * sp.x + br1.x * (sp.y * dots + 1.0)) / (br1.x * br2.y - br2.x * br1.y));
-
   float mindist = PI;
   vec3 minip;
   for (float s = 0.0; s < 4.0; s += 1.0) {
     vec2 o = vec2(mod(s, 2.0), floor(s * 0.5));
     float idx = dot(f, c + o);
     if (idx > dots) continue;
-
     float a = idx, b = 0.0;
     if (a >= 16384.0) a -= 16384.0, b += 0.868872;
     if (a >= 8192.0) a -= 8192.0, b += 0.934436;
@@ -65,69 +44,39 @@ vec3 nearestFibonacciLattice(vec3 p, out float m) {
     if (a >= 4.0) a -= 4.0, b += 0.472136;
     if (a >= 2.0) a -= 2.0, b += 0.236068;
     if (a >= 1.0) a -= 1.0, b += 0.618034;
-
-    float theta = fract(b) * kTau;
-
-    float cosphi = 1.0 - 2.0 * idx * byDots;
-    float sinphi = sqrt(1.0 - cosphi * cosphi);
-    vec3 sample = vec3(cos(theta) * sinphi, sin(theta) * sinphi, cosphi);
-
-    float dist = length(p - sample);
-
-    if (dist < mindist) {
-      mindist = dist;
-      minip = sample;
-    }
+    float theta = fract(b) * kTau, cosphi = 1.0 - 2.0 * idx * byDots, sinphi = sqrt(1.0 - cosphi * cosphi);
+    vec3 sam = vec3(cos(theta) * sinphi, sin(theta) * sinphi, cosphi);
+    float dist = length(p - sam);
+    if (dist < mindist) { mindist = dist; minip = sam; }
   }
-
   m = mindist;
   return minip.xzy;
 }
 
 void fragment() {
   byDots = 1.0 / dots;
-
-  vec2 invResolution = 1.0 / uResolution;
-
-  vec2 uv = ((gl_FragCoord.xy * invResolution) * 2.0 - 1.0) / scale - offset * vec2(1.0, -1.0) * invResolution;
-  uv.x *= uResolution.x * invResolution.y;
-
-  float l = dot(uv, uv);
-  float glowFactor = 0.0;
-
+  vec2 invRes = 1.0 / uResolution;
+  vec2 uv = ((gl_FragCoord.xy * invRes) * 2.0 - 1.0) / scale - offset * vec2(1.0, -1.0) * invRes;
+  uv.x *= uResolution.x * invRes.y;
+  float l = dot(uv, uv), glowFactor = 0.0;
   vec4 color = vec4(0.0);
-
-  if (l <= r*r) {
+  if (l <= rSq) {
     float dis;
     vec4 layer = vec4(0.0);
-    vec3 p = normalize(vec3(uv, sqrt(r*r - l)));
+    vec3 p = normalize(vec3(uv, sqrt(rSq - l)));
     mat3 rot = rotate(rotation.y, rotation.x);
     float dotNL = p.z;
-
     vec3 gP = nearestFibonacciLattice(p * rot, dis);
-
-    float gPhi = asin(gP.y);
-    float gTheta = acos(-gP.x / cos(gPhi));
+    float gPhi = asin(gP.y), gTheta = acos(-gP.x / cos(gPhi));
     if (gP.z < 0.0) gTheta = -gTheta;
-
     float mapColor = max(texture2D(uTexture, vec2(((gTheta * 0.5) / PI), -(gPhi / PI + 0.5))).x, mapBaseBrightness);
-
-    float sample = mapColor
-      * smoothstep(0.008, 0.0, dis) // v
-      * pow(dotNL, renderParams.y) // lighting
-      * renderParams.x;
-    layer += vec4(baseColor
-      * (mix((1.0 - sample) * pow(dotNL, 0.4), sample, renderParams.z) + 0.1) // colorFactor, dark
-      + pow(1.0 - dotNL, 4.0) * glowColor // glow
-    , 1.0);
-
+    float sam = mapColor * smoothstep(0.008, 0.0, dis) * pow(dotNL, renderParams.y) * renderParams.x;
+    layer += vec4(baseColor * (mix((1.0 - sam) * pow(dotNL, 0.4), sam, renderParams.z) + 0.1) + pow(1.0 - dotNL, 4.0) * glowColor, 1.0);
     color += layer * (1.0 + renderParams.w) * 0.5;
-
-    glowFactor = (1.0 - l) * (1.0 - l) * smoothstep(0.0, 1.0, 0.2 / (l - r*r));
+    glowFactor = (1.0 - l) * (1.0 - l) * smoothstep(0.0, 1.0, 0.2 / (l - rSq));
   } else {
-    float outD = sqrt(0.2 / (l - r*r));
+    float outD = sqrt(0.2 / (l - rSq));
     glowFactor = smoothstep(0.5, 1.0, outD / (outD + 1.0));
   }
-
   gl_FragColor = color + vec4(glowFactor * glowColor, glowFactor);
 }
