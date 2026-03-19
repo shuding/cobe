@@ -20,7 +20,6 @@ function compileShader(filename) {
   const result = glslx.compile(source, {
     format: 'json',
     renaming: 'all',
-    disableRewriting: true,
   })
 
   if (result.log) {
@@ -43,7 +42,6 @@ function compileShaderPair(filename) {
   const result = glslx.compile(source, {
     format: 'json',
     renaming: 'all',
-    disableRewriting: true,
   })
 
   if (result.log) {
