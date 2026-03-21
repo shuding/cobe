@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COBE Preview</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: sans-serif;
+      color: #fff;
+    }
+    h1 { font-size: 2rem; margin-bottom: 0.5rem; letter-spacing: 0.1em; }
+    p { color: #888; margin-bottom: 2rem; font-size: 0.9rem; }
+    canvas { width: 500px; height: 500px; cursor: grab; }
+    canvas:active { cursor: grabbing; }
+  </style>
+</head>
+<body>
+  <h1>COBE</h1>
+  <p>The 5KB WebGL Globe</p>
+  <canvas id="globe" width="1000" height="1000"></canvas>
+
+  <script type="module">
+    import createGlobe from './dist/index.esm.js'
+
+    const canvas = document.getElementById('globe')
+    let phi = 0
+    let isDragging = false
+    let lastX = 0
+
+    const globe = createGlobe(canvas, {
+      devicePixelRatio: 2,
+      width: 1000,
+      height: 1000,
+      phi: 0,
+      theta: 0.2,
+      dark: 1,
+      diffuse: 1.2,
+      mapSamples: 16000,
+      mapBrightness: 6,
+      baseColor: [0.3, 0.3, 1],
+      markerColor: [0.2, 0.8, 1],
+      glowColor: [0.2, 0.4, 1],
+      markers: [
+        { location: [37.78, -122.44], size: 0.05 },
+        { location: [40.71, -74.01], size: 0.05 },
+        { location: [35.68, 139.76], size: 0.05 },
+        { location: [51.51, -0.12], size: 0.05 },
+        { location: [-33.87, 151.21], size: 0.05 },
+      ],
+      onRender(state) {
+        if (!isDragging) phi += 0.005
+        state.phi = phi
+      },
+    })
+
+    canvas.addEventListener('mousedown', (e) => {
+      isDragging = true
+      lastX = e.clientX
+    })
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return
+      phi += (e.clientX - lastX) * 0.005
+      lastX = e.clientX
+    })
+    window.addEventListener('mouseup', () => { isDragging = false })
+  </script>
+</body>
+</html>
