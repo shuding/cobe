@@ -201,6 +201,8 @@ export default (canvas, opts) => {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
     gl.activeTexture(gl.TEXTURE0)
     gl.bindTexture(gl.TEXTURE_2D, texture)
+    // Re-render so the land texture is visible immediately
+    update({})
   }
   image.src = __TEXTURE__
 
