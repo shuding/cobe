@@ -144,6 +144,8 @@ export default (canvas, opts) => {
     MARKER_aMarkerSize,
     MARKER_aMarkerColor,
     MARKER_aHasColor,
+    MARKER_aMarkerElevation,
+    MARKER_aHasElevation,
   ])
 
   // Arc uniforms
@@ -212,8 +214,8 @@ export default (canvas, opts) => {
   function updateMarkers(newMarkers) {
     markers = newMarkers
 
-    // 8 floats per marker: x, y, z, size, r, g, b, hasColor
-    const markerData = new Float32Array(markers.length * 8)
+    // 10 floats per marker: x, y, z, size, r, g, b, hasColor, elevation, hasElevation
+    const markerData = new Float32Array(markers.length * 10)
 
     markers.forEach((m, i) => {
       markerData.set(
@@ -222,8 +224,10 @@ export default (canvas, opts) => {
           m.size,
           ...(m.color || [0, 0, 0]),
           m.color ? 1 : 0,
+          m.elevation ?? 0,
+          m.elevation != null ? 1 : 0,
         ],
-        i * 8,
+        i * 10,
       )
     })
 
@@ -292,10 +296,12 @@ export default (canvas, opts) => {
 
   /**
    * Project a location to screen coordinates
+   * @param {[number, number]} location
+   * @param {number} [elevation] - per-marker elevation override
    */
-  function project(location) {
+  function project(location, elevation) {
     const pos3D = latLonTo3D(location)
-    const r = GLOBE_R + markerElevation
+    const r = GLOBE_R + (elevation != null ? elevation : markerElevation)
     const elevatedPos = [pos3D[0] * r, pos3D[1] * r, pos3D[2] * r]
 
     const rotated = applyRotation(elevatedPos)
@@ -551,7 +557,7 @@ export default (canvas, opts) => {
 
       // Bind instance buffer
       gl.bindBuffer(gl.ARRAY_BUFFER, markerInstanceBuffer)
-      const markerStride = 8 * 4 // 8 floats * 4 bytes
+      const markerStride = 10 * 4 // 10 floats * 4 bytes
 
       setupInstancedAttribute(
         markerAttribs[MARKER_aMarkerPos],
@@ -579,6 +585,20 @@ export default (canvas, opts) => {
         1,
         markerStride,
         28,
+        1,
+      )
+      setupInstancedAttribute(
+        markerAttribs[MARKER_aMarkerElevation],
+        1,
+        markerStride,
+        32,
+        1,
+      )
+      setupInstancedAttribute(
+        markerAttribs[MARKER_aHasElevation],
+        1,
+        markerStride,
+        36,
         1,
       )
 
