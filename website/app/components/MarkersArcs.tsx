@@ -9,14 +9,16 @@ const markersArcsTabs = [
     name: 'Markers',
     code: `markers: [
   // Basic marker
-  { location: [37.78, -122.44], size: 0.03 },
+  { location: [37.78, -122.44], size: 0.03, id: 'sf' },
+  // With per-marker elevation override
+  { location: [40.71, -74.01], size: 0.03, id: 'nyc', elevation: 0.12 },
   // With custom color (RGB 0-1)
   { location: [51.51, -0.13], size: 0.05, color: [1, 0, 0] },
   // With id for CSS anchoring
   { location: [35.68, 139.65], size: 0.04, id: 'tokyo' }
 ]`,
     description:
-      'Place dots on the globe using `[latitude, longitude]`. Size is relative to globe radius (0.01-0.1). Colors override the global `markerColor`.',
+      'Place dots on the globe using `[latitude, longitude]`. Size is relative to globe radius (0.01-0.1). Colors override the global `markerColor`. `elevation` overrides the global `markerElevation` for a single marker.',
   },
   {
     key: 'arcs',

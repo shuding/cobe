@@ -1207,6 +1207,41 @@ const markerPresets = {
       },
     ],
   },
+  'Different Elevations': {
+    markers: [
+      {
+        id: 'pg-elev-sf',
+        location: [37.78, -122.44] as [number, number],
+        label: 'San Francisco',
+        elevation: 0.02,
+      },
+      {
+        id: 'pg-elev-nyc',
+        location: [40.71, -74.01] as [number, number],
+        label: 'New York',
+        elevation: 0.06,
+      },
+      {
+        id: 'pg-elev-london',
+        location: [51.51, -0.13] as [number, number],
+        label: 'London',
+        elevation: 0.1,
+      },
+      {
+        id: 'pg-elev-tokyo',
+        location: [35.68, 139.65] as [number, number],
+        label: 'Tokyo',
+        elevation: 0.14,
+      },
+      {
+        id: 'pg-elev-sydney',
+        location: [-33.87, 151.21] as [number, number],
+        label: 'Sydney',
+        elevation: 0.18,
+      },
+    ],
+    arcs: [],
+  },
   'Data Centers': {
     markers: [
       {
