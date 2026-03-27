@@ -2,6 +2,7 @@ export interface Marker {
   location: [number, number]
   size: number
   color?: [number, number, number]
+  elevation?: number
   id?: string
 }
 
@@ -10,6 +11,8 @@ export interface Arc {
   to: [number, number]
   color?: [number, number, number]
   id?: string
+  fromElevation?: number
+  toElevation?: number
 }
 
 export interface COBEOptions {

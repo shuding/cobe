@@ -19,6 +19,10 @@ attribute float aArcHeight;
 attribute float aArcWidth;
 attribute vec3 aArcColor;
 attribute float aHasColor;
+attribute float aArcFromElevation;
+attribute float aArcFromHasElevation;
+attribute float aArcToElevation;
+attribute float aArcToHasElevation;
 
 // Uniforms
 uniform float phi;
@@ -53,9 +57,10 @@ vec3 bezierTangent(vec3 p0, vec3 p1, vec3 p2, float t) {
 void vertex() {
   mat3 rot = rotate(theta, phi);
 
-  float endpointR = GLOBE_R + markerElevation;
-  vec3 from = aArcFrom * endpointR;
-  vec3 to = aArcTo * endpointR;
+  float fromR = aArcFromHasElevation > 0.5 ? GLOBE_R + aArcFromElevation : GLOBE_R + markerElevation;
+  float toR = aArcToHasElevation > 0.5 ? GLOBE_R + aArcToElevation : GLOBE_R + markerElevation;
+  vec3 from = aArcFrom * fromR;
+  vec3 to = aArcTo * toR;
 
   vec3 midSum = aArcFrom + aArcTo;
   float midLen = length(midSum);
