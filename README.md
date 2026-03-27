@@ -47,6 +47,7 @@ const globe = createGlobe(canvas, {
   markers: [
     { location: [37.7595, -122.4367], size: 0.03 },
     { location: [40.7128, -74.006], size: 0.1, color: [1, 0, 0] }, // custom color
+    { location: [51.5074, -0.1278], size: 0.05, elevation: 0.15 }, // custom elevation
   ],
   arcs: [
     {

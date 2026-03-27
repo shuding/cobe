@@ -144,7 +144,7 @@ const apiOptions = [
   {
     name: 'markers',
     type: 'Marker[]',
-    desc: '{ location: [lat, lon], size, color?, id? }',
+    desc: '{ location: [lat, lon], size, color?, elevation?, id? }',
   },
   {
     name: 'arcs',
@@ -161,7 +161,7 @@ const apiOptions = [
   {
     name: 'markerElevation',
     type: 'number',
-    desc: 'Marker height above surface (0 to 0.2)',
+    desc: 'Default marker height above surface (0 to 0.2). Overridable per marker via elevation.',
   },
   { name: 'scale', type: 'number', desc: 'Globe scale multiplier (default 1)' },
   { name: 'offset', type: '[x,y]', desc: 'Pixel offset from center [x, y]' },
@@ -1206,6 +1206,41 @@ const markerPresets = {
         to: [25.25, 55.36] as [number, number],
       },
     ],
+  },
+  'Different Elevations': {
+    markers: [
+      {
+        id: 'pg-elev-sf',
+        location: [37.78, -122.44] as [number, number],
+        label: 'San Francisco',
+        elevation: 0.02,
+      },
+      {
+        id: 'pg-elev-nyc',
+        location: [40.71, -74.01] as [number, number],
+        label: 'New York',
+        elevation: 0.06,
+      },
+      {
+        id: 'pg-elev-london',
+        location: [51.51, -0.13] as [number, number],
+        label: 'London',
+        elevation: 0.1,
+      },
+      {
+        id: 'pg-elev-tokyo',
+        location: [35.68, 139.65] as [number, number],
+        label: 'Tokyo',
+        elevation: 0.14,
+      },
+      {
+        id: 'pg-elev-sydney',
+        location: [-33.87, 151.21] as [number, number],
+        label: 'Sydney',
+        elevation: 0.18,
+      },
+    ],
+    arcs: [],
   },
   'Data Centers': {
     markers: [
