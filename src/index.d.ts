@@ -11,6 +11,8 @@ export interface Arc {
   to: [number, number]
   color?: [number, number, number]
   id?: string
+  fromElevation?: number
+  toElevation?: number
 }
 
 export interface COBEOptions {

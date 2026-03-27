@@ -168,6 +168,10 @@ export default (canvas, opts) => {
     ARC_aArcWidth,
     ARC_aArcColor,
     ARC_aHasColor,
+    ARC_aArcFromElevation,
+    ARC_aArcFromHasElevation,
+    ARC_aArcToElevation,
+    ARC_aArcToHasElevation,
   ])
 
   // Globe attribute
@@ -245,8 +249,8 @@ export default (canvas, opts) => {
     arcs = newArcs
     validArcCount = arcs.length
 
-    // 12 floats per arc: from(3), to(3), height, width, color(3), hasColor
-    const arcData = new Float32Array(arcs.length * 12)
+    // 16 floats per arc: from(3), to(3), height, width, color(3), hasColor, fromElevation, hasFromElevation, toElevation, hasToElevation
+    const arcData = new Float32Array(arcs.length * 16)
 
     arcs.forEach((arc, i) => {
       arcData.set(
@@ -257,8 +261,12 @@ export default (canvas, opts) => {
           arcWidth * 0.005,
           ...(arc.color || [0, 0, 0]),
           arc.color ? 1 : 0,
+          arc.fromElevation ?? 0,
+          arc.fromElevation != null ? 1 : 0,
+          arc.toElevation ?? 0,
+          arc.toElevation != null ? 1 : 0,
         ],
-        i * 12,
+        i * 16,
       )
     })
 
@@ -489,7 +497,7 @@ export default (canvas, opts) => {
 
       // Bind instance buffer
       gl.bindBuffer(gl.ARRAY_BUFFER, arcInstanceBuffer)
-      const arcStride = 12 * 4 // 12 floats * 4 bytes
+      const arcStride = 16 * 4 // 16 floats * 4 bytes
 
       setupInstancedAttribute(arcAttribs[ARC_aArcFrom], 3, arcStride, 0, 1)
       setupInstancedAttribute(arcAttribs[ARC_aArcTo], 3, arcStride, 12, 1)
@@ -497,6 +505,10 @@ export default (canvas, opts) => {
       setupInstancedAttribute(arcAttribs[ARC_aArcWidth], 1, arcStride, 28, 1)
       setupInstancedAttribute(arcAttribs[ARC_aArcColor], 3, arcStride, 32, 1)
       setupInstancedAttribute(arcAttribs[ARC_aHasColor], 1, arcStride, 44, 1)
+      setupInstancedAttribute(arcAttribs[ARC_aArcFromElevation], 1, arcStride, 48, 1)
+      setupInstancedAttribute(arcAttribs[ARC_aArcFromHasElevation], 1, arcStride, 52, 1)
+      setupInstancedAttribute(arcAttribs[ARC_aArcToElevation], 1, arcStride, 56, 1)
+      setupInstancedAttribute(arcAttribs[ARC_aArcToHasElevation], 1, arcStride, 60, 1)
 
       // Set uniforms
       gl.uniform1f(arcUniforms[ARC_phi], phi)
