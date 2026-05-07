@@ -122,6 +122,19 @@ The globe exposes:
 - `--cobe-{id}` / `--cobe-arc-{id}` — CSS anchor names for positioning
 - `--cobe-visible-{id}` / `--cobe-visible-arc-{id}` — visibility variable (0 when behind globe, 1 when visible)
 
+
+## Examples for Vue and Svelte
+
+Example integrations for Vue and Svelte are available in the `examples/vue/GlobeExample.vue` and `examples/svelte/GlobeExample.svelte` files.
+
+These examples show how to use the globe visualization in Vue and Svelte apps, including proper cleanup by calling `.destroy()` when the component unmounts to avoid memory leaks.
+
+### Usage
+
+- Copy the example file into your Vue or Svelte project.
+- Make sure to import `createGlobe` from the library.
+- The globe instance will be cleaned up automatically when the component is destroyed.
+
 Use the visibility variable to drive opacity, blur, scale, or any CSS property for smooth transitions.
 
 ## Acknowledgment
