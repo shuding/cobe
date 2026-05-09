@@ -86,7 +86,16 @@ export function IpGlobe({ lat, lon, city }: IpGlobeProps) {
         position: 'relative',
       }}
     >
-      <style>{`@supports not (anchor-name: --test) { .ip-city-label { display: none; } }`}</style>
+      <style>{`
+        @supports not (anchor-name: --test) {
+          .ip-city-label {
+            left: var(--label-x);
+            top: var(--label-y);
+            bottom: auto;
+            right: auto;
+          }
+        }
+      `}</style>
       <canvas
         ref={canvasRef}
         className='globe-canvas'
@@ -99,8 +108,7 @@ export function IpGlobe({ lat, lon, city }: IpGlobeProps) {
             position: 'absolute',
             bottom: 'anchor(top)',
             left: 'anchor(center)',
-            translate: '-50% 0',
-            marginBottom: '8px',
+            translate: '-50% calc(-100% - 8px)',
             padding: '0.15rem 0.35rem',
             background: 'var(--ink)',
             color: 'var(--bg)',
@@ -111,6 +119,8 @@ export function IpGlobe({ lat, lon, city }: IpGlobeProps) {
             whiteSpace: 'nowrap',
             pointerEvents: 'none',
             positionAnchor: '--cobe-city',
+            '--label-x': 'var(--cobe-city-x)',
+            '--label-y': 'var(--cobe-city-y)',
             opacity: 'var(--cobe-visible-city, 0)',
             transition: 'opacity 0.8s',
           } as React.CSSProperties

@@ -73,20 +73,24 @@ markers: [
 
 // 2. COBE creates CSS variables automatically:
 // --cobe-{id} (anchor position)
+// --cobe-{id}-x / --cobe-{id}-y (screen position fallback)
 // --cobe-visible-{id} (0 when hidden, 1 when visible)
 
 // 3. Position elements using CSS anchor functions
 <div style={{
   position: 'absolute',
   positionAnchor: '--cobe-sf',
+  '--label-x': 'var(--cobe-sf-x)',
+  '--label-y': 'var(--cobe-sf-y)',
   bottom: 'anchor(top)',
   left: 'anchor(center)',
+  translate: '-50% calc(-100% - 8px)',
   opacity: 'var(--cobe-visible-sf, 0)'
 }}>
   San Francisco
 </div>`,
     description:
-      'The `positionAnchor` property links DOM elements to markers. Use `anchor()` for positioning and visibility variables for fade effects.',
+      'The `positionAnchor` property links DOM elements to markers. Add `--label-x`/`--label-y` from COBE variables so `@supports not (anchor-name: --x)` fallback can keep labels positioned in non-Chromium browsers.',
   },
   {
     key: 'dynamic',
