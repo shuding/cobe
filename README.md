@@ -120,9 +120,50 @@ arcs: [
 
 The globe exposes:
 - `--cobe-{id}` / `--cobe-arc-{id}` — CSS anchor names for positioning
+- `--cobe-{id}-x` / `--cobe-{id}-y` — marker screen position as a percentage of the wrapper (also published for arcs as `--cobe-arc-{id}-x` / `--cobe-arc-{id}-y`)
 - `--cobe-visible-{id}` / `--cobe-visible-arc-{id}` — visibility variable (0 when behind globe, 1 when visible)
 
 Use the visibility variable to drive opacity, blur, scale, or any CSS property for smooth transitions.
+
+### Browser support and fallback
+
+CSS Anchor Positioning currently ships only in Chromium. On Safari, Firefox, and every iOS browser (which all use WebKit), `anchor()` is silently ignored. The position variables above let you author a one-line fallback so labels still follow markers everywhere. The label must live inside the same wrapper element that contains the canvas, since the values are percentages relative to that wrapper:
+
+```css
+.marker-label {
+  position: absolute;
+
+  /* Chromium: CSS Anchor Positioning */
+  position-anchor: --cobe-sf;
+  bottom: anchor(top);
+  left: anchor(center);
+
+  /* Safari / Firefox / iOS fallback */
+  @supports not (anchor-name: --x) {
+    left: var(--cobe-sf-x);
+    top: var(--cobe-sf-y);
+    transform: translate(-50%, -100%);
+  }
+
+  opacity: var(--cobe-visible-sf, 0);
+  transition: opacity 0.3s;
+}
+
+.arc-label {
+  position: absolute;
+  position-anchor: --cobe-arc-sf-tokyo;
+  bottom: anchor(top);
+  left: anchor(center);
+
+  @supports not (anchor-name: --x) {
+    left: var(--cobe-arc-sf-tokyo-x);
+    top: var(--cobe-arc-sf-tokyo-y);
+    transform: translate(-50%, -100%);
+  }
+
+  opacity: var(--cobe-visible-arc-sf-tokyo, 0);
+}
+```
 
 ## Acknowledgment
 
