@@ -230,7 +230,10 @@ code {
   .showcase-cdn,
   .showcase-cdn-arc-label,
   .playground-marker-label {
-    display: none;
+    left: var(--label-x);
+    top: var(--label-y);
+    bottom: auto;
+    right: auto;
   }
 }
 
