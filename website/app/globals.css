@@ -231,9 +231,7 @@ code {
   .showcase-cdn-arc-label,
   .playground-marker-label {
     left: var(--label-x);
-    top: var(--label-y);
-    bottom: auto;
-    right: auto;
+    bottom: calc(100% - var(--label-y));
   }
 }
 
