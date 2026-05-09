@@ -52,6 +52,9 @@ export function createAnchorManager(wrapper) {
 
       updateAnchor(markerAnchors, key, `--cobe-${key}`, pos)
 
+      visibilityVars['--cobe-' + key + '-x'] = pos.x * 100 + '%'
+      visibilityVars['--cobe-' + key + '-y'] = pos.y * 100 + '%'
+
       if (pos.visible) {
         visibilityVars['--cobe-visible-' + key] = 'N'
       } else {
@@ -64,6 +67,8 @@ export function createAnchorManager(wrapper) {
         markerAnchors[key].remove()
         delete markerAnchors[key]
         delete visibilityVars['--cobe-visible-' + key]
+        delete visibilityVars['--cobe-' + key + '-x']
+        delete visibilityVars['--cobe-' + key + '-y']
       }
     }
   }
@@ -81,6 +86,9 @@ export function createAnchorManager(wrapper) {
 
       updateAnchor(arcAnchors, key, `--cobe-arc-${key}`, pos)
 
+      visibilityVars['--cobe-arc-' + key + '-x'] = pos.x * 100 + '%'
+      visibilityVars['--cobe-arc-' + key + '-y'] = pos.y * 100 + '%'
+
       if (pos.visible) {
         visibilityVars['--cobe-visible-arc-' + key] = 'N'
       } else {
@@ -93,6 +101,8 @@ export function createAnchorManager(wrapper) {
         arcAnchors[key].remove()
         delete arcAnchors[key]
         delete visibilityVars['--cobe-visible-arc-' + key]
+        delete visibilityVars['--cobe-arc-' + key + '-x']
+        delete visibilityVars['--cobe-arc-' + key + '-y']
       }
     }
   }
