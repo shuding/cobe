@@ -20,7 +20,14 @@ export function createAnchorManager(wrapper) {
     for (let key in visibilityVars) {
       vars += key + ':' + visibilityVars[key] + ';'
     }
-    styleEl.textContent = ':root{' + vars + '}'
+    // Only rewrite the <style> when its content actually changed. Reassigning textContent
+    // swaps a document-level stylesheet, which invalidates style and layout for the whole
+    // page; doing it every frame is expensive. When the visible marker set is unchanged
+    // frame to frame, skip the write.
+    const next = ':root{' + vars + '}'
+    if (next !== styleEl.textContent) {
+      styleEl.textContent = next
+    }
   }
 
   function updateAnchor(anchors, key, anchorName, position) {
