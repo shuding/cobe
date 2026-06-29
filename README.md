@@ -124,6 +124,10 @@ The globe exposes:
 
 Use the visibility variable to drive opacity, blur, scale, or any CSS property for smooth transitions.
 
+## Events
+
+When an anchor is updated (such as position or visibility), the anchor emits a bubbling `anchorUpdate` event. This event can then be captured from the globe wrapper to monitor anchor changes from JavaScript to run functions such as custom animations.
+
 ## Acknowledgment
 
 This project is inspired & based on the great work of:
