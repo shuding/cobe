@@ -12,6 +12,12 @@ export interface Arc {
   id?: string
 }
 
+export type AnchorUpdateEvent = CustomEventInit<{
+  key?: string;
+  anchorName?: string;
+  position?: { x: number; y: number; visible: number };
+}>;
+
 export interface COBEOptions {
   width: number
   height: number
