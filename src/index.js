@@ -55,9 +55,11 @@ export default (canvas, opts) => {
   const instExt = webgl2 ? null : gl.getExtension('ANGLE_instanced_arrays')
 
   // Device pixel ratio
-  const dpr = opts.devicePixelRatio || 1
-  canvas.width = opts.width * dpr
-  canvas.height = opts.height * dpr
+  let dpr = opts.devicePixelRatio || 1
+  let width = opts.width
+  let height = opts.height
+  canvas.width = width * dpr
+  canvas.height = height * dpr
 
   // State
   let phi = opts.phi || 0
@@ -376,9 +378,22 @@ export default (canvas, opts) => {
     if (state.markers) updateMarkers(state.markers)
     if (state.arcs) updateArcs(state.arcs)
 
-    if (state.width && state.height) {
-      canvas.width = state.width * dpr
-      canvas.height = state.height * dpr
+    let shouldResize = false
+    if (state.devicePixelRatio != UNDEFINED) {
+      dpr = state.devicePixelRatio
+      shouldResize = true
+    }
+    if (state.width != UNDEFINED) {
+      width = state.width
+      shouldResize = true
+    }
+    if (state.height != UNDEFINED) {
+      height = state.height
+      shouldResize = true
+    }
+    if (shouldResize) {
+      canvas.width = width * dpr
+      canvas.height = height * dpr
     }
 
     // Update appearance options
