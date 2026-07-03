@@ -11,6 +11,7 @@
   "license": "MIT",
   "scripts": {
     "build": "node scripts/build.js && cp src/index.d.ts dist/index.d.ts",
+    "test": "node --test",
     "chrome:debug": "open -na \"Google Chrome\" --args --new-window --disable-frame-rate-limit --user-data-dir=\"/tmp/chrome_dev_session\" --disable-web-security http://localhost:3000/playground"
   },
   "devDependencies": {
