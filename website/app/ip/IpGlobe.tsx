@@ -90,9 +90,7 @@ export function IpGlobe({ lat, lon, city }: IpGlobeProps) {
         @supports not (anchor-name: --test) {
           .ip-city-label {
             left: var(--label-x);
-            top: var(--label-y);
-            bottom: auto;
-            right: auto;
+            bottom: calc(100% - var(--label-y));
           }
         }
       `}</style>
@@ -108,7 +106,8 @@ export function IpGlobe({ lat, lon, city }: IpGlobeProps) {
             position: 'absolute',
             bottom: 'anchor(top)',
             left: 'anchor(center)',
-            translate: '-50% calc(-100% - 8px)',
+            translate: '-50% 0',
+            marginBottom: '8px',
             padding: '0.15rem 0.35rem',
             background: 'var(--ink)',
             color: 'var(--bg)',

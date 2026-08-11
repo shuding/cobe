@@ -84,7 +84,8 @@ markers: [
   '--label-y': 'var(--cobe-sf-y)',
   bottom: 'anchor(top)',
   left: 'anchor(center)',
-  translate: '-50% calc(-100% - 8px)',
+  translate: '-50% 0',
+  marginBottom: '8px',
   opacity: 'var(--cobe-visible-sf, 0)'
 }}>
   San Francisco

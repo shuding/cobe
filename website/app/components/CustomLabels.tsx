@@ -45,7 +45,8 @@ createGlobe(canvas, {
   position: absolute;
   bottom: anchor(top);
   left: anchor(center);
-  translate: -50% calc(-100% - 8px);
+  translate: -50% 0;
+  margin-bottom: 8px;
   padding: 0.25rem 0.5rem;
   background: #1a1a1a;
   color: #fff;
@@ -59,9 +60,7 @@ createGlobe(canvas, {
 @supports not (anchor-name: --x) {
   .marker-label {
     left: var(--label-x);
-    top: var(--label-y);
-    bottom: auto;
-    right: auto;
+    bottom: calc(100% - var(--label-y));
   }
 }`,
     description:
@@ -100,7 +99,8 @@ createGlobe(canvas, {
   position: absolute;
   bottom: anchor(top);
   left: anchor(center);
-  translate: -50% calc(-100% - 8px);
+  translate: -50% 0;
+  margin-bottom: 8px;
   padding: 0.3rem 0.6rem;
   background: #fff;
   color: #1a1a1a;
@@ -112,9 +112,7 @@ createGlobe(canvas, {
 @supports not (anchor-name: --x) {
   .arc-label {
     left: var(--label-x);
-    top: var(--label-y);
-    bottom: auto;
-    right: auto;
+    bottom: calc(100% - var(--label-y));
   }
 }`,
     description:
@@ -186,9 +184,7 @@ createGlobe(canvas, {
   .marker-label,
   .arc-label {
     left: var(--label-x);
-    top: var(--label-y);
-    bottom: auto;
-    right: auto;
+    bottom: calc(100% - var(--label-y));
   }
 }`,
     description:
