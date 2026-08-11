@@ -129,7 +129,7 @@ Use the visibility variable to drive opacity, blur, scale, or any CSS property f
 
 ### Browser support and fallback
 
-CSS Anchor Positioning currently ships only in Chromium. On Safari, Firefox, and every iOS browser (which all use WebKit), `anchor()` is silently ignored. The position variables above let you author a two-property fallback so labels still follow markers everywhere. Unlike the anchor names, the position variables are set on the canvas's parent element instead of `:root`, so each globe on the page keeps its own values. The label must be a descendant of that element, both to inherit the variables and because they are percentages of its box:
+CSS Anchor Positioning is supported in Chrome 125+, Edge 125+, Safari 26+, and Firefox 147+. Anywhere older, `anchor()` is silently ignored and labels collapse into a corner. That includes every browser on an older iOS — Chrome, Edge, and Firefox on iOS all use WebKit, so switching browsers is not a workaround there. The position variables above let you author a two-property fallback so labels still follow markers on those browsers. Unlike the anchor names, the position variables are set on the canvas's parent element instead of `:root`, so each globe on the page keeps its own values. The label must be a descendant of that element, both to inherit the variables and because they are percentages of its box:
 
 ```css
 .marker-label {
