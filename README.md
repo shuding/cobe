@@ -104,6 +104,7 @@ arcs: [
   position-anchor: --cobe-sf;
   bottom: anchor(top);
   left: anchor(center);
+  translate: -50% 0;
   opacity: var(--cobe-visible-sf, 0);
   filter: blur(calc((1 - var(--cobe-visible-sf, 0)) * 8px));
   transition: opacity 0.3s, filter 0.3s;
@@ -114,6 +115,7 @@ arcs: [
   position-anchor: --cobe-arc-sf-tokyo;
   bottom: anchor(top);
   left: anchor(center);
+  translate: -50% 0;
   opacity: var(--cobe-visible-arc-sf-tokyo, 0);
 }
 ```
@@ -127,24 +129,16 @@ Use the visibility variable to drive opacity, blur, scale, or any CSS property f
 
 ### Browser support and fallback
 
-CSS Anchor Positioning currently ships only in Chromium. On Safari, Firefox, and every iOS browser (which all use WebKit), `anchor()` is silently ignored. The position variables above let you author a one-line fallback so labels still follow markers everywhere. Unlike the anchor names, the position variables are set on the canvas's parent element instead of `:root`, so each globe on the page keeps its own values. The label must be a descendant of that element, both to inherit the variables and because they are percentages of its box:
+CSS Anchor Positioning currently ships only in Chromium. On Safari, Firefox, and every iOS browser (which all use WebKit), `anchor()` is silently ignored. The position variables above let you author a two-property fallback so labels still follow markers everywhere. Unlike the anchor names, the position variables are set on the canvas's parent element instead of `:root`, so each globe on the page keeps its own values. The label must be a descendant of that element, both to inherit the variables and because they are percentages of its box:
 
 ```css
 .marker-label {
   position: absolute;
-
-  /* Chromium: CSS Anchor Positioning */
   position-anchor: --cobe-sf;
   bottom: anchor(top);
   left: anchor(center);
-
-  /* Safari / Firefox / iOS fallback */
-  @supports not (anchor-name: --x) {
-    left: var(--cobe-sf-x);
-    top: var(--cobe-sf-y);
-    transform: translate(-50%, -100%);
-  }
-
+  translate: -50% 0;
+  margin-bottom: 8px;
   opacity: var(--cobe-visible-sf, 0);
   transition: opacity 0.3s;
 }
@@ -154,16 +148,26 @@ CSS Anchor Positioning currently ships only in Chromium. On Safari, Firefox, and
   position-anchor: --cobe-arc-sf-tokyo;
   bottom: anchor(top);
   left: anchor(center);
-
-  @supports not (anchor-name: --x) {
-    left: var(--cobe-arc-sf-tokyo-x);
-    top: var(--cobe-arc-sf-tokyo-y);
-    transform: translate(-50%, -100%);
-  }
-
+  translate: -50% 0;
+  margin-bottom: 8px;
   opacity: var(--cobe-visible-arc-sf-tokyo, 0);
 }
+
+/* Browsers without CSS Anchor Positioning */
+@supports not (anchor-name: --x) {
+  .marker-label {
+    left: var(--cobe-sf-x);
+    bottom: calc(100% - var(--cobe-sf-y));
+  }
+
+  .arc-label {
+    left: var(--cobe-arc-sf-tokyo-x);
+    bottom: calc(100% - var(--cobe-arc-sf-tokyo-y));
+  }
+}
 ```
+
+The fallback overrides `bottom` rather than setting `top`, so `translate` and `margin-bottom` keep their meaning and both code paths place the label identically — nothing above needs to change for Chromium. Keep the `@supports` block after the rules it overrides, and at the top level rather than nested: CSS Nesting is itself unsupported on some of the browsers this fallback targets.
 
 ## Acknowledgment
 
