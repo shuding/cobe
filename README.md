@@ -120,14 +120,14 @@ arcs: [
 
 The globe exposes:
 - `--cobe-{id}` / `--cobe-arc-{id}` — CSS anchor names for positioning
-- `--cobe-{id}-x` / `--cobe-{id}-y` — marker screen position as a percentage of the wrapper (also published for arcs as `--cobe-arc-{id}-x` / `--cobe-arc-{id}-y`)
+- `--cobe-{id}-x` / `--cobe-{id}-y` — marker screen position as a percentage, set on the canvas's parent element (also published for arcs as `--cobe-arc-{id}-x` / `--cobe-arc-{id}-y`)
 - `--cobe-visible-{id}` / `--cobe-visible-arc-{id}` — visibility variable (0 when behind globe, 1 when visible)
 
 Use the visibility variable to drive opacity, blur, scale, or any CSS property for smooth transitions.
 
 ### Browser support and fallback
 
-CSS Anchor Positioning currently ships only in Chromium. On Safari, Firefox, and every iOS browser (which all use WebKit), `anchor()` is silently ignored. The position variables above let you author a one-line fallback so labels still follow markers everywhere. The label must live inside the same wrapper element that contains the canvas, since the values are percentages relative to that wrapper:
+CSS Anchor Positioning currently ships only in Chromium. On Safari, Firefox, and every iOS browser (which all use WebKit), `anchor()` is silently ignored. The position variables above let you author a one-line fallback so labels still follow markers everywhere. Unlike the anchor names, the position variables are set on the canvas's parent element instead of `:root`, so each globe on the page keeps its own values. The label must be a descendant of that element, both to inherit the variables and because they are percentages of its box:
 
 ```css
 .marker-label {
