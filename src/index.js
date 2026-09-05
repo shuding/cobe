@@ -610,6 +610,8 @@ export default (canvas, opts) => {
   return {
     update,
     destroy: () => {
+      image.onload = null
+      gl.deleteTexture(texture)
       // Clean up WebGL resources
       gl.deleteBuffer(quadBuffer)
       gl.deleteBuffer(arcSegmentBuffer)

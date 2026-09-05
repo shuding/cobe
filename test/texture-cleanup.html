@@ -1,0 +1,39 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>COBE texture cleanup</title>
+<pre id="result">Running…</pre>
+<script type="module">
+  import createGlobe from '../dist/index.esm.js'
+
+  // Hold the texture load so destruction is tested before its callback runs.
+  const NativeImage = window.Image
+  const images = []
+  window.Image = class extends NativeImage {
+    constructor() {
+      super()
+      images.push(this)
+    }
+    set src(value) {}
+  }
+  const canvas = document.createElement('canvas')
+  const gl = canvas.getContext('webgl')
+  if (!gl) throw new Error('WebGL is required')
+  let deletedTextures = 0
+  const deleteTexture = gl.deleteTexture.bind(gl)
+  gl.deleteTexture = (texture) => {
+    deletedTextures++
+    deleteTexture(texture)
+  }
+  const globe = createGlobe(canvas, {
+    width: 64, height: 64, devicePixelRatio: 1, phi: 0, theta: 0,
+    mapSamples: 1000, mapBrightness: 1, diffuse: 1, dark: 1,
+    baseColor: [1, 1, 1], markerColor: [0, 1, 0], glowColor: [0, 0, 0],
+  })
+  globe.destroy()
+  window.Image = NativeImage
+  const loadHandlerCleared = images.length === 1 && images[0].onload === null
+  const passed = deletedTextures === 1 && loadHandlerCleared
+  document.querySelector('#result').textContent = JSON.stringify({ passed, deletedTextures, loadHandlerCleared }, null, 2)
+  document.documentElement.dataset.result = passed ? 'pass' : 'fail'
+  if (!passed) throw new Error('destroy() retained texture resources')
+</script>
