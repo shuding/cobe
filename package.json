@@ -7,10 +7,39 @@
     "dist/**"
   ],
   "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.esm.js"
+    },
+    "./lite": {
+      "types": "./dist/lite.d.ts",
+      "import": "./dist/lite.js"
+    },
+    "./fly": {
+      "types": "./dist/fly.d.ts",
+      "import": "./dist/fly.js"
+    },
+    "./pick": {
+      "types": "./dist/pick.d.ts",
+      "import": "./dist/pick.js"
+    }
+  },
+  "workspaces": [
+    "website"
+  ],
   "repository": "shuding/cobe",
   "license": "MIT",
   "scripts": {
-    "build": "node scripts/build.js && cp src/index.d.ts dist/index.d.ts",
+    "dev": "npm run build:lib && npm run dev --workspace=cobe-site",
+    "build": "npm run build:lib && npm run build --workspace=cobe-site",
+    "start": "npm run start --workspace=cobe-site",
+    "build:lib": "node scripts/build.js",
+    "test": "node test/pick.test.mjs",
+    "size": "node scripts/size.js",
+    "check": "npm run build:lib && npm test && npm run size",
+    "prepublishOnly": "npm run check",
     "chrome:debug": "open -na \"Google Chrome\" --args --new-window --disable-frame-rate-limit --user-data-dir=\"/tmp/chrome_dev_session\" --disable-web-security http://localhost:3000/playground"
   },
   "devDependencies": {

@@ -1,0 +1,255 @@
+/* Scoped to the docs route. Uses the site's tokens where they exist, with
+   fallbacks so this page renders correctly on its own. */
+
+.dp {
+  --dp-border: var(--border, oklch(0.9 0.005 80));
+  --dp-dim: var(--text-dim, oklch(0.55 0.02 250));
+  --dp-ink: var(--ink, #243ab0);
+  --dp-panel: var(--bg-elevated, oklch(0.97 0.005 250));
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 56px 24px 96px;
+}
+
+.dp-head {
+  border-bottom: 1px solid var(--dp-border);
+  padding-bottom: 28px;
+  margin-bottom: 40px;
+}
+
+.dp-title {
+  font-size: 30px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.dp-tagline {
+  color: var(--dp-dim);
+  margin-top: 8px;
+}
+
+.dp-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.dp-badge {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid var(--dp-border);
+  border-radius: 999px;
+  padding: 3px 10px;
+  color: var(--dp-dim);
+}
+
+.dp h2 {
+  font-size: 19px;
+  margin: 52px 0 12px;
+  scroll-margin-top: 24px;
+}
+
+.dp h3 {
+  font-size: 15px;
+  margin: 28px 0 8px;
+  font-family: var(--font-mono), monospace;
+  color: var(--dp-ink);
+}
+
+.dp p {
+  margin: 12px 0;
+}
+
+.dp ul.dp-bullets {
+  margin: 12px 0 12px 20px;
+}
+
+.dp ul.dp-bullets li {
+  margin: 5px 0;
+}
+
+.dp-toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  font-size: 13px;
+  margin-top: 18px;
+}
+
+/* ── Tables ─────────────────────────────── */
+
+.dp-tablewrap {
+  overflow-x: auto;
+  margin: 16px 0;
+  border: 1px solid var(--dp-border);
+  border-radius: 8px;
+}
+
+.dp-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13px;
+  min-width: 460px;
+}
+
+.dp-table th,
+.dp-table td {
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--dp-border);
+  vertical-align: top;
+}
+
+.dp-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.dp-table th {
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--dp-dim);
+  background: var(--dp-panel);
+  white-space: nowrap;
+}
+
+.dp-table code {
+  white-space: nowrap;
+}
+
+.dp-num {
+  font-family: var(--font-mono), monospace;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.dp-win {
+  color: #197b3f;
+}
+
+.dp-note {
+  border-left: 2px solid var(--dp-border);
+  padding: 2px 0 2px 14px;
+  color: var(--dp-dim);
+  font-size: 13px;
+  margin: 16px 0;
+}
+
+/* ── Demo ───────────────────────────────── */
+
+.fd {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  margin: 24px 0 8px;
+  padding: 20px;
+  border: 1px solid var(--dp-border);
+  border-radius: 12px;
+  background: var(--dp-panel);
+}
+
+.fd-stage {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.fd-canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  touch-action: none;
+  contain: layout paint;
+}
+
+.fd-readout {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-top: 6px;
+  min-height: 36px;
+}
+
+.fd-readout span {
+  color: var(--dp-dim);
+}
+
+.fd-side {
+  flex: 1 1 200px;
+  min-width: 190px;
+}
+
+.fd-hint {
+  font-size: 12px;
+  color: var(--dp-dim);
+  margin: 0 0 14px;
+  line-height: 1.5;
+}
+
+.fd-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fd-city {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  width: 100%;
+  padding: 5px 9px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.fd-city:hover {
+  border-color: var(--dp-border);
+}
+
+.fd-city-on {
+  border-color: var(--dp-ink);
+  color: var(--dp-ink);
+}
+
+.fd-cc {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  color: var(--dp-dim);
+}
+
+.fd-reset {
+  margin-top: 12px;
+  padding: 5px 10px;
+  border: 1px solid var(--dp-border);
+  border-radius: 6px;
+  background: none;
+  font: inherit;
+  font-size: 12px;
+  color: var(--dp-dim);
+  cursor: pointer;
+}
+
+.fd-reset:hover {
+  color: var(--dp-ink);
+  border-color: var(--dp-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fd-canvas {
+    /* The idle spin is JS-driven; this only softens the CSS side. */
+    transition: none;
+  }
+}

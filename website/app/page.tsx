@@ -965,6 +965,8 @@ function Showcases() {
       </div>
       <p className='hero-tagline'>COBE: The 5KB WebGL globe</p>
       <div className='hero-links'>
+        <a href='/docs'>Docs</a>
+        <span className='hero-links-sep'>/</span>
         <a
           href='https://github.com/shuding/cobe'
           target='_blank'
