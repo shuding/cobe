@@ -600,6 +600,8 @@ function Showcases() {
                   style={
                     {
                       positionAnchor: `--cobe-${m.id}`,
+                      '--label-x': `var(--cobe-${m.id}-x)`,
+                      '--label-y': `var(--cobe-${m.id}-y)`,
                       opacity: `var(--cobe-visible-${m.id}, 0)`,
                       filter: `blur(var(--cobe-visible-${m.id}, 10px))`,
                     } as React.CSSProperties
@@ -615,6 +617,8 @@ function Showcases() {
                   style={
                     {
                       positionAnchor: `--cobe-arc-${a.id}`,
+                      '--label-x': `var(--cobe-arc-${a.id}-x)`,
+                      '--label-y': `var(--cobe-arc-${a.id}-y)`,
                       opacity: `var(--cobe-visible-arc-${a.id}, 0)`,
                       filter: `blur(var(--cobe-visible-arc-${a.id}, 10px))`,
                     } as React.CSSProperties
@@ -635,6 +639,8 @@ function Showcases() {
                 style={
                   {
                     positionAnchor: `--cobe-${m.id}`,
+                    '--label-x': `var(--cobe-${m.id}-x)`,
+                    '--label-y': `var(--cobe-${m.id}-y)`,
                     opacity: `var(--cobe-visible-${m.id}, 0)`,
                   } as React.CSSProperties
                 }
@@ -652,6 +658,8 @@ function Showcases() {
                 style={
                   {
                     positionAnchor: `--cobe-${m.id}`,
+                    '--label-x': `var(--cobe-${m.id}-x)`,
+                    '--label-y': `var(--cobe-${m.id}-y)`,
                     opacity: `var(--cobe-visible-${m.id}, 0)`,
                     filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
                   } as React.CSSProperties
@@ -677,6 +685,8 @@ function Showcases() {
                 style={
                   {
                     positionAnchor: `--cobe-${m.id}`,
+                    '--label-x': `var(--cobe-${m.id}-x)`,
+                    '--label-y': `var(--cobe-${m.id}-y)`,
                     opacity: `var(--cobe-visible-${m.id}, 0)`,
                     filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
                   } as React.CSSProperties
@@ -701,6 +711,8 @@ function Showcases() {
                 style={
                   {
                     positionAnchor: `--cobe-${m.id}`,
+                    '--label-x': `var(--cobe-${m.id}-x)`,
+                    '--label-y': `var(--cobe-${m.id}-y)`,
                     opacity: `var(--cobe-visible-${m.id}, 0)`,
                     filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
                     '--polaroid-rotate': `${m.rotate}deg`,
@@ -721,6 +733,8 @@ function Showcases() {
                 style={
                   {
                     positionAnchor: `--cobe-${m.id}`,
+                    '--label-x': `var(--cobe-${m.id}-x)`,
+                    '--label-y': `var(--cobe-${m.id}-y)`,
                     opacity: `var(--cobe-visible-${m.id}, 0)`,
                     filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
                     '--delay': `${m.delay}s`,
@@ -742,6 +756,8 @@ function Showcases() {
                 style={
                   {
                     positionAnchor: `--cobe-${m.id}`,
+                    '--label-x': `var(--cobe-${m.id}-x)`,
+                    '--label-y': `var(--cobe-${m.id}-y)`,
                     opacity: `var(--cobe-visible-${m.id}, 0)`,
                     filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
                   } as React.CSSProperties
@@ -767,6 +783,8 @@ function Showcases() {
                 style={
                   {
                     positionAnchor: `--cobe-${m.id}`,
+                    '--label-x': `var(--cobe-${m.id}-x)`,
+                    '--label-y': `var(--cobe-${m.id}-y)`,
                     opacity: `var(--cobe-visible-${m.id}, 0)`,
                     filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
                   } as React.CSSProperties
@@ -790,6 +808,8 @@ function Showcases() {
                 style={
                   {
                     positionAnchor: `--cobe-arc-${a.id}`,
+                    '--label-x': `var(--cobe-arc-${a.id}-x)`,
+                    '--label-y': `var(--cobe-arc-${a.id}-y)`,
                     opacity: `var(--cobe-visible-arc-${a.id}, 0)`,
                     // filter: `blur(calc((1 - var(--cobe-visible-arc-${a.id}, 0)) * 8px))`,
                   } as React.CSSProperties
@@ -808,6 +828,8 @@ function Showcases() {
                 style={
                   {
                     positionAnchor: `--cobe-${m.id}`,
+                    '--label-x': `var(--cobe-${m.id}-x)`,
+                    '--label-y': `var(--cobe-${m.id}-y)`,
                     opacity: `var(--cobe-visible-${m.id}, 0)`,
                     filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
                     '--label-color': m.color,
@@ -828,6 +850,8 @@ function Showcases() {
                 style={
                   {
                     positionAnchor: `--cobe-${m.id}`,
+                    '--label-x': `var(--cobe-${m.id}-x)`,
+                    '--label-y': `var(--cobe-${m.id}-y)`,
                     opacity: `var(--cobe-visible-${m.id}, 0)`,
                     filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
                   } as React.CSSProperties
@@ -847,6 +871,8 @@ function Showcases() {
                   style={
                     {
                       positionAnchor: `--cobe-${m.id}`,
+                      '--label-x': `var(--cobe-${m.id}-x)`,
+                      '--label-y': `var(--cobe-${m.id}-y)`,
                       opacity: `var(--cobe-visible-${m.id}, 0)`,
                       filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
                     } as React.CSSProperties
@@ -868,6 +894,8 @@ function Showcases() {
                   style={
                     {
                       positionAnchor: `--cobe-arc-${t.id}`,
+                      '--label-x': `var(--cobe-arc-${t.id}-x)`,
+                      '--label-y': `var(--cobe-arc-${t.id}-y)`,
                       opacity: `var(--cobe-visible-arc-${t.id}, 0)`,
                       filter: `blur(calc((1 - var(--cobe-visible-arc-${t.id}, 0)) * 8px))`,
                     } as React.CSSProperties
@@ -888,6 +916,8 @@ function Showcases() {
                 style={
                   {
                     positionAnchor: `--cobe-${m.id}`,
+                    '--label-x': `var(--cobe-${m.id}-x)`,
+                    '--label-y': `var(--cobe-${m.id}-y)`,
                     opacity: `var(--cobe-visible-${m.id}, 0)`,
                     filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
                   } as React.CSSProperties
@@ -1495,6 +1525,8 @@ function InlinePlayground() {
               style={
                 {
                   positionAnchor: `--cobe-${m.id}`,
+                  '--label-x': `var(--cobe-${m.id}-x)`,
+                  '--label-y': `var(--cobe-${m.id}-y)`,
                   opacity: `var(--cobe-visible-${m.id}, 0)`,
                   filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
                 } as React.CSSProperties

@@ -160,6 +160,8 @@ function ShowcaseGlobe({
                 style={
                   {
                     positionAnchor: `--cobe-${m.id}`,
+                    '--label-x': `var(--cobe-${m.id}-x)`,
+                    '--label-y': `var(--cobe-${m.id}-y)`,
                     opacity: `var(--cobe-visible-${m.id}, 0)`,
                     filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
                   } as React.CSSProperties
@@ -175,6 +177,8 @@ function ShowcaseGlobe({
                 style={
                   {
                     positionAnchor: `--cobe-arc-${a.id}`,
+                    '--label-x': `var(--cobe-arc-${a.id}-x)`,
+                    '--label-y': `var(--cobe-arc-${a.id}-y)`,
                     opacity: `var(--cobe-visible-arc-${a.id}, 0)`,
                     filter: `blur(calc((1 - var(--cobe-visible-arc-${a.id}, 0)) * 8px))`,
                   } as React.CSSProperties
@@ -195,6 +199,8 @@ function ShowcaseGlobe({
               style={
                 {
                   positionAnchor: `--cobe-${m.id}`,
+                  '--label-x': `var(--cobe-${m.id}-x)`,
+                  '--label-y': `var(--cobe-${m.id}-y)`,
                   opacity: `var(--cobe-visible-${m.id}, 0)`,
                 } as React.CSSProperties
               }
@@ -212,6 +218,8 @@ function ShowcaseGlobe({
               style={
                 {
                   positionAnchor: `--cobe-${m.id}`,
+                  '--label-x': `var(--cobe-${m.id}-x)`,
+                  '--label-y': `var(--cobe-${m.id}-y)`,
                   opacity: `var(--cobe-visible-${m.id}, 0)`,
                   filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
                 } as React.CSSProperties
@@ -231,6 +239,8 @@ function ShowcaseGlobe({
               style={
                 {
                   positionAnchor: `--cobe-${m.id}`,
+                  '--label-x': `var(--cobe-${m.id}-x)`,
+                  '--label-y': `var(--cobe-${m.id}-y)`,
                   opacity: `var(--cobe-visible-${m.id}, 0)`,
                   filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
                 } as React.CSSProperties
@@ -249,6 +259,8 @@ function ShowcaseGlobe({
               style={
                 {
                   positionAnchor: `--cobe-${m.id}`,
+                  '--label-x': `var(--cobe-${m.id}-x)`,
+                  '--label-y': `var(--cobe-${m.id}-y)`,
                   opacity: `var(--cobe-visible-${m.id}, 0)`,
                   filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
                   '--polaroid-rotate': `${m.rotate}deg`,
@@ -269,6 +281,8 @@ function ShowcaseGlobe({
               style={
                 {
                   positionAnchor: `--cobe-${m.id}`,
+                  '--label-x': `var(--cobe-${m.id}-x)`,
+                  '--label-y': `var(--cobe-${m.id}-y)`,
                   opacity: `var(--cobe-visible-${m.id}, 0)`,
                   filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
                   '--delay': `${m.delay}s`,
@@ -290,6 +304,8 @@ function ShowcaseGlobe({
               style={
                 {
                   positionAnchor: `--cobe-${m.id}`,
+                  '--label-x': `var(--cobe-${m.id}-x)`,
+                  '--label-y': `var(--cobe-${m.id}-y)`,
                   opacity: `var(--cobe-visible-${m.id}, 0)`,
                   filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
                 } as React.CSSProperties
@@ -315,6 +331,8 @@ function ShowcaseGlobe({
               style={
                 {
                   positionAnchor: `--cobe-${m.id}`,
+                  '--label-x': `var(--cobe-${m.id}-x)`,
+                  '--label-y': `var(--cobe-${m.id}-y)`,
                   opacity: `var(--cobe-visible-${m.id}, 0)`,
                   filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
                 } as React.CSSProperties
@@ -338,6 +356,8 @@ function ShowcaseGlobe({
               style={
                 {
                   positionAnchor: `--cobe-arc-${a.id}`,
+                  '--label-x': `var(--cobe-arc-${a.id}-x)`,
+                  '--label-y': `var(--cobe-arc-${a.id}-y)`,
                   opacity: `var(--cobe-visible-arc-${a.id}, 0)`,
                 } as React.CSSProperties
               }
@@ -355,6 +375,8 @@ function ShowcaseGlobe({
               style={
                 {
                   positionAnchor: `--cobe-${m.id}`,
+                  '--label-x': `var(--cobe-${m.id}-x)`,
+                  '--label-y': `var(--cobe-${m.id}-y)`,
                   opacity: `var(--cobe-visible-${m.id}, 0)`,
                   filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
                   '--label-color': m.color,
@@ -375,6 +397,8 @@ function ShowcaseGlobe({
               style={
                 {
                   positionAnchor: `--cobe-${m.id}`,
+                  '--label-x': `var(--cobe-${m.id}-x)`,
+                  '--label-y': `var(--cobe-${m.id}-y)`,
                   opacity: `var(--cobe-visible-${m.id}, 0)`,
                   filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
                 } as React.CSSProperties
@@ -393,6 +417,8 @@ function ShowcaseGlobe({
               style={
                 {
                   positionAnchor: `--cobe-${m.id}`,
+                  '--label-x': `var(--cobe-${m.id}-x)`,
+                  '--label-y': `var(--cobe-${m.id}-y)`,
                   opacity: `var(--cobe-visible-${m.id}, 0)`,
                   filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
                 } as React.CSSProperties
@@ -411,6 +437,8 @@ function ShowcaseGlobe({
               style={
                 {
                   positionAnchor: `--cobe-${m.id}`,
+                  '--label-x': `var(--cobe-${m.id}-x)`,
+                  '--label-y': `var(--cobe-${m.id}-y)`,
                   opacity: `var(--cobe-visible-${m.id}, 0)`,
                   filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
                 } as React.CSSProperties

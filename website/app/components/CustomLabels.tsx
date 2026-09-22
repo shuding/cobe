@@ -33,6 +33,8 @@ createGlobe(canvas, {
     className="marker-label"
     style={{
       positionAnchor: \`--cobe-\${m.id}\`,
+      '--label-x': \`var(--cobe-\${m.id}-x)\`,
+      '--label-y': \`var(--cobe-\${m.id}-y)\`,
       opacity: \`var(--cobe-visible-\${m.id}, 0)\`
     }}
   >
@@ -53,9 +55,16 @@ createGlobe(canvas, {
   white-space: nowrap;
   pointer-events: none;
   transition: opacity 0.3s;
+}
+
+@supports not (anchor-name: --x) {
+  .marker-label {
+    left: var(--label-x);
+    bottom: calc(100% - var(--label-y));
+  }
 }`,
     description:
-      'COBE creates `--cobe-{id}` anchor and `--cobe-visible-{id}` visibility variable for each marker with an ID. The visibility is 1 when facing the camera, 0 when hidden.',
+      'COBE creates `--cobe-{id}` anchor plus `--cobe-{id}-x/y` fallback variables and `--cobe-visible-{id}` visibility variable for each marker with an ID.',
   },
   {
     key: 'arc-labels',
@@ -78,6 +87,8 @@ createGlobe(canvas, {
     className="arc-label"
     style={{
       positionAnchor: \`--cobe-arc-\${a.id}\`,
+      '--label-x': \`var(--cobe-arc-\${a.id}-x)\`,
+      '--label-y': \`var(--cobe-arc-\${a.id}-y)\`,
       opacity: \`var(--cobe-visible-arc-\${a.id}, 0)\`
     }}
   >
@@ -96,6 +107,13 @@ createGlobe(canvas, {
   font-size: 0.7rem;
   border-radius: 6px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+@supports not (anchor-name: --x) {
+  .arc-label {
+    left: var(--label-x);
+    bottom: calc(100% - var(--label-y));
+  }
 }`,
     description:
       "Arc anchors use `--cobe-arc-{id}` prefix. The anchor is positioned at the arc's highest point (peak), ideal for flight paths.",
@@ -110,6 +128,8 @@ createGlobe(canvas, {
     className="marker-label"
     style={{
       positionAnchor: \`--cobe-\${m.id}\`,
+      '--label-x': \`var(--cobe-\${m.id}-x)\`,
+      '--label-y': \`var(--cobe-\${m.id}-y)\`,
       // Fade out when marker rotates to back of globe
       opacity: \`var(--cobe-visible-\${m.id}, 0)\`,
       // Blur when marker is hidden (fallback used when var is undefined)
@@ -159,23 +179,16 @@ createGlobe(canvas, {
   {
     key: 'browser-support',
     name: 'Browser Support',
-    code: `/* Hide labels in browsers without anchor positioning */
+    code: `/* Keep labels positioned in browsers without anchor positioning */
 @supports not (anchor-name: --test) {
   .marker-label,
   .arc-label {
-    display: none;
-  }
-}
-
-/* Alternative: show labels without positioning */
-@supports not (anchor-name: --test) {
-  .marker-label {
-    position: static;
-    /* Render as a list or different layout */
+    left: var(--label-x);
+    bottom: calc(100% - var(--label-y));
   }
 }`,
     description:
-      'CSS Anchor Positioning is supported in Chrome 125+, Edge 125+, Firefox 147+, and Safari 26+. Use `@supports` to hide labels or provide a fallback for older browsers.',
+      'Use `@supports not (anchor-name: --x)` to apply `--label-x` / `--label-y` fallback so labels keep tracking markers and arc peaks when `anchor()` is unavailable.',
   },
 ]
 
