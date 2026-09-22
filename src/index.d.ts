@@ -43,6 +43,29 @@ export interface COBEOptions {
 export interface Globe {
   update: (state: Partial<COBEOptions>) => void
   destroy: () => void
+  /**
+   * Project a location to normalized canvas coordinates. `x` and `y` are
+   * fractions of the canvas (0..1); `visible` is false when the point is
+   * hidden behind the globe.
+   */
+  project: (location: [number, number]) => {
+    x: number
+    y: number
+    visible: boolean
+  }
+  /**
+   * Current camera and marker state, as
+   * `[phi, theta, scale, offset, devicePixelRatio, markerElevation, markers]`.
+   */
+  state: () => [
+    number,
+    number,
+    number,
+    [number, number],
+    number,
+    number,
+    Marker[],
+  ]
 }
 
 export default function createGlobe(

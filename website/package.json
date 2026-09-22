@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "dependencies": {
-    "cobe": "workspace:*",
+    "cobe": "file:..",
     "geist": "^1.4.1",
     "leva": "^0.9.34",
     "next": "^16.1.6",

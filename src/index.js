@@ -17,6 +17,10 @@ const ARC_FRAG = __ARC_FRAG__
 
 const GLOBE_R = 0.8
 
+// __ARCS__ and __ANCHORS__ are build-time flags, replaced by literal booleans
+// at bundle time. Used directly at each site (rather than via a const) so
+// esbuild folds the branch and drops the shader strings it references.
+
 /**
  * Convert lat/lon to 3D position on unit sphere
  * @param {[number, number]} location - [latitude, longitude] in degrees
@@ -47,12 +51,15 @@ export default (canvas, opts) => {
   }
 
   let gl = canvas.getContext('webgl2', contextOpts)
-  const webgl2 = !!gl
-  if (!gl) gl = canvas.getContext('webgl', contextOpts)
+  // With __WEBGL1__ off, webgl2 is a literal true and every fallback branch
+  // below folds away at build time.
+  const webgl2 = __WEBGL1__ ? !!gl : true
+  if (__WEBGL1__ && !gl) gl = canvas.getContext('webgl', contextOpts)
 
   if (!gl) return { destroy: () => {}, update: () => {} }
 
-  const instExt = webgl2 ? null : gl.getExtension('ANGLE_instanced_arrays')
+  const instExt =
+    __WEBGL1__ && !webgl2 ? gl.getExtension('ANGLE_instanced_arrays') : null
 
   // Device pixel ratio
   const dpr = opts.devicePixelRatio || 1
@@ -72,9 +79,9 @@ export default (canvas, opts) => {
   let baseColor = opts.baseColor || [1, 1, 1]
   let markerColor = opts.markerColor || [1, 0.5, 0]
   let glowColor = opts.glowColor || [1, 1, 1]
-  let arcColor = opts.arcColor || [0.3, 0.6, 1]
-  let arcWidth = opts.arcWidth ?? 1
-  let arcHeight = opts.arcHeight ?? 0.2
+  let arcColor = __ARCS__ ? opts.arcColor || [0.3, 0.6, 1] : 0
+  let arcWidth = __ARCS__ ? opts.arcWidth ?? 1 : 0
+  let arcHeight = __ARCS__ ? opts.arcHeight ?? 0.2 : 0
   let diffuse = opts.diffuse || 1
   let dark = opts.dark || 0
   let opacity = opts.opacity ?? 1
@@ -85,7 +92,7 @@ export default (canvas, opts) => {
   // Create shader programs
   const globeProgram = createProgram(gl, GLOBE_VERT, GLOBE_FRAG)
   const markerProgram = createProgram(gl, MARKER_VERT, MARKER_FRAG)
-  const arcProgram = createProgram(gl, ARC_VERT, ARC_FRAG)
+  const arcProgram = __ARCS__ ? createProgram(gl, ARC_VERT, ARC_FRAG) : null
 
   if (!globeProgram) return { destroy: () => {}, update: () => {} }
 
@@ -98,19 +105,22 @@ export default (canvas, opts) => {
     gl.STATIC_DRAW,
   )
 
-  const arcSegmentBuffer = gl.createBuffer()
   const arcSegmentCount = 66 // (32 + 1) * 2
-  gl.bindBuffer(gl.ARRAY_BUFFER, arcSegmentBuffer)
-  const vertices = []
-  for (let i = 0; i <= 32; i++) {
-    const t = i / 32
-    vertices.push(t, -1, t, 1)
+  let arcSegmentBuffer = null
+  if (__ARCS__) {
+    arcSegmentBuffer = gl.createBuffer()
+    gl.bindBuffer(gl.ARRAY_BUFFER, arcSegmentBuffer)
+    const vertices = []
+    for (let i = 0; i <= 32; i++) {
+      const t = i / 32
+      vertices.push(t, -1, t, 1)
+    }
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
   }
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
 
   // Instance buffers
   const markerInstanceBuffer = gl.createBuffer()
-  const arcInstanceBuffer = gl.createBuffer()
+  const arcInstanceBuffer = __ARCS__ ? gl.createBuffer() : null
 
   // Globe uniforms
   const globeUniforms = getUniformLocations(gl, globeProgram, [
@@ -147,7 +157,7 @@ export default (canvas, opts) => {
   ])
 
   // Arc uniforms
-  const arcUniforms = getUniformLocations(gl, arcProgram, [
+  const arcUniforms = !__ARCS__ ? null : getUniformLocations(gl, arcProgram, [
     ARC_phi,
     ARC_theta,
     ARC_uResolution,
@@ -158,7 +168,7 @@ export default (canvas, opts) => {
   ])
 
   // Arc attributes
-  const arcAttribs = getAttribLocations(gl, arcProgram, [
+  const arcAttribs = !__ARCS__ ? null : getAttribLocations(gl, arcProgram, [
     ARC_aPosition,
     ARC_aArcFrom,
     ARC_aArcTo,
@@ -196,7 +206,8 @@ export default (canvas, opts) => {
   image.onload = () => {
     gl.bindTexture(gl.TEXTURE_2D, texture)
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image)
-    gl.generateMipmap(gl.TEXTURE_2D)
+    // No generateMipmap: MIN_FILTER is NEAREST, so a mipmap chain would be
+    // built and then never sampled.
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
     gl.activeTexture(gl.TEXTURE0)
@@ -238,6 +249,7 @@ export default (canvas, opts) => {
   let validArcCount = 0
 
   function updateArcs(newArcs) {
+    if (!__ARCS__) return
     arcs = newArcs
     validArcCount = arcs.length
 
@@ -306,6 +318,7 @@ export default (canvas, opts) => {
    * Project arc midpoint to screen coordinates
    */
   function projectArcMidpoint(arc) {
+    if (!__ARCS__) return null
     const fromDir = latLonTo3D(arc.from)
     const toDir = latLonTo3D(arc.to)
 
@@ -335,7 +348,7 @@ export default (canvas, opts) => {
 
     if (webgl2) {
       gl.vertexAttribDivisor(attrib, divisor)
-    } else if (instExt) {
+    } else if (__WEBGL1__ && instExt) {
       instExt.vertexAttribDivisorANGLE(attrib, divisor)
     }
   }
@@ -346,7 +359,7 @@ export default (canvas, opts) => {
   function drawInstanced(count) {
     if (webgl2) {
       gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, count)
-    } else if (instExt) {
+    } else if (__WEBGL1__ && instExt) {
       instExt.drawArraysInstancedANGLE(gl.TRIANGLES, 0, 6, count)
     } else {
       // Fallback: draw one at a time (slow)
@@ -358,12 +371,16 @@ export default (canvas, opts) => {
 
   const UNDEFINED = undefined
 
-  // Anchor elements
-  const wrapper = document.createElement('div')
-  wrapper.style.cssText = 'position:relative;width:100%;height:100%'
-  canvas.parentElement?.insertBefore(wrapper, canvas)
-  wrapper.append(canvas)
-  const anchorManager = createAnchorManager(wrapper)
+  // Anchor elements. Only the full build wraps the canvas in a positioned
+  // parent - the lite build leaves the caller's DOM alone.
+  let anchorManager = null
+  if (__ANCHORS__) {
+    const wrapper = document.createElement('div')
+    wrapper.style.cssText = 'position:relative;width:100%;height:100%'
+    canvas.parentElement?.insertBefore(wrapper, canvas)
+    wrapper.append(canvas)
+    anchorManager = createAnchorManager(wrapper)
+  }
 
   /**
    * Update state and trigger a re-render
@@ -374,7 +391,7 @@ export default (canvas, opts) => {
     if (state.phi != UNDEFINED) phi = state.phi
     if (state.theta != UNDEFINED) theta = state.theta
     if (state.markers) updateMarkers(state.markers)
-    if (state.arcs) updateArcs(state.arcs)
+    if (__ARCS__ && state.arcs) updateArcs(state.arcs)
 
     if (state.width && state.height) {
       canvas.width = state.width * dpr
@@ -389,9 +406,11 @@ export default (canvas, opts) => {
     if (state.baseColor != UNDEFINED) baseColor = state.baseColor
     if (state.markerColor != UNDEFINED) markerColor = state.markerColor
     if (state.glowColor != UNDEFINED) glowColor = state.glowColor
-    if (state.arcColor != UNDEFINED) arcColor = state.arcColor
-    if (state.arcWidth != UNDEFINED) arcWidth = state.arcWidth
-    if (state.arcHeight != UNDEFINED) arcHeight = state.arcHeight
+    if (__ARCS__) {
+      if (state.arcColor != UNDEFINED) arcColor = state.arcColor
+      if (state.arcWidth != UNDEFINED) arcWidth = state.arcWidth
+      if (state.arcHeight != UNDEFINED) arcHeight = state.arcHeight
+    }
     if (state.diffuse != UNDEFINED) diffuse = state.diffuse
     if (state.dark != UNDEFINED) dark = state.dark
     if (state.opacity != UNDEFINED) opacity = state.opacity
@@ -401,9 +420,11 @@ export default (canvas, opts) => {
       markerElevation = state.markerElevation
 
     // Update anchor positions
-    anchorManager.m(markers, project)
-    anchorManager.a(arcs, projectArcMidpoint)
-    anchorManager.s()
+    if (__ANCHORS__) {
+      anchorManager.m(markers, project)
+      anchorManager.a(arcs, projectArcMidpoint)
+      anchorManager.s()
+    }
 
     // Set viewport
     gl.viewport(0, 0, canvas.width, canvas.height)
@@ -424,7 +445,7 @@ export default (canvas, opts) => {
     // Reset divisor to 0 for non-instanced draw (may have been set by previous frame's instanced draws)
     if (webgl2) {
       gl.vertexAttribDivisor(globePositionAttrib, 0)
-    } else if (instExt) {
+    } else if (__WEBGL1__ && instExt) {
       instExt.vertexAttribDivisorANGLE(globePositionAttrib, 0)
     }
 
@@ -461,7 +482,7 @@ export default (canvas, opts) => {
     gl.drawArrays(gl.TRIANGLES, 0, 6)
 
     // === Pass 2: Arcs ===
-    if (arcProgram && validArcCount > 0) {
+    if (__ARCS__ && arcProgram && validArcCount > 0) {
       gl.useProgram(arcProgram)
 
       // Bind arc segment buffer for position (t, offset pairs along curve)
@@ -609,20 +630,30 @@ export default (canvas, opts) => {
   // Return public API
   return {
     update,
+    // Project [lat, lon] to normalized canvas coordinates ({ x, y, visible },
+    // each in 0..1). Exposed so custom labels and the opt-in pick layer can
+    // reuse the renderer's own transform instead of duplicating it.
+    project,
+    // Current camera and marker state, as
+    // [phi, theta, scale, offset, devicePixelRatio, markerElevation, markers].
+    // An array rather than an object to keep the bundle small. Read by the
+    // pick/fly layers, and by app code that needs to resume its own animation
+    // from wherever a flight left the globe.
+    state: () => [phi, theta, scaleOpt, offsetOpt, dpr, markerElevation, markers],
     destroy: () => {
       image.onload = null
       gl.deleteTexture(texture)
       // Clean up WebGL resources
       gl.deleteBuffer(quadBuffer)
-      gl.deleteBuffer(arcSegmentBuffer)
+      if (__ARCS__) gl.deleteBuffer(arcSegmentBuffer)
       gl.deleteBuffer(markerInstanceBuffer)
-      gl.deleteBuffer(arcInstanceBuffer)
+      if (__ARCS__) gl.deleteBuffer(arcInstanceBuffer)
       gl.deleteProgram(globeProgram)
       if (markerProgram) gl.deleteProgram(markerProgram)
-      if (arcProgram) gl.deleteProgram(arcProgram)
+      if (__ARCS__ && arcProgram) gl.deleteProgram(arcProgram)
 
       // Clean up anchor elements
-      anchorManager.r()
+      if (__ANCHORS__) anchorManager.r()
     },
   }
 }

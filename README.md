@@ -71,6 +71,44 @@ const globe = createGlobe(canvas, {
 // `globe.destroy()`
 ```
 
+## Click to Fly
+
+Markers are clickable, and the camera can animate to any location. Both live
+behind their own entry points, so you only pay for them if you use them.
+
+```js
+import createGlobe from 'cobe/lite'
+import { pick, flyTo } from 'cobe/pick'
+
+const globe = createGlobe(canvas, { /* ...options */ markers })
+
+const detach = pick(globe, canvas, {
+  onMarkerClick: (marker) => flyTo(globe, marker.location, { zoom: 1.25 }),
+  onGlobeClick: ([lat, lon]) => console.log(lat, lon),
+  onMarkerHover: (marker) => setTooltip(marker),
+})
+```
+
+`flyTo` rotates the short way round and is cancelled by the user grabbing the
+globe. If you only fly to places chosen from a list, import `cobe/fly` on its
+own and skip the hit-testing code entirely.
+
+## Imports and Size
+
+| Import | Brotli | Contains |
+| --- | --- | --- |
+| `cobe` | 5,203 B | Globe, markers, arcs, DOM anchors, WebGL1 fallback |
+| `cobe/lite` | 4,003 B | Globe and markers. WebGL2 only |
+| `cobe/fly` | 457 B | `flyTo`, `centerOn`, `cancelFly` |
+| `cobe/pick` | 1,155 B | `unproject`, `hitTest`, `pick`, with fly bundled in |
+
+`lite` + `pick` is 5,158 B: clicking a marker and flying to it now costs
+slightly less than 2.0.1 (5,177 B), which could do neither. `npm run size`
+enforces these budgets.
+
+Full documentation, with a live demo, is at
+[cobe.vercel.app/docs](https://cobe.vercel.app/docs).
+
 ## Arcs
 
 Arcs connect two locations on the globe:
