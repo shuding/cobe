@@ -53,7 +53,7 @@ export function createAnchorManager(wrapper) {
       const key = marker.id
       if (!key) continue
 
-      const pos = project(marker.location)
+      const pos = project(marker.location, marker.elevation)
 
       activeKeys[key] = 1
 

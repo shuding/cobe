@@ -144,7 +144,7 @@ const apiOptions = [
   {
     name: 'markers',
     type: 'Marker[]',
-    desc: '{ location: [lat, lon], size, color?, id? }',
+    desc: '{ location: [lat, lon], size, color?, elevation?, id? }',
   },
   {
     name: 'arcs',
@@ -161,7 +161,7 @@ const apiOptions = [
   {
     name: 'markerElevation',
     type: 'number',
-    desc: 'Marker height above surface (0 to 0.2)',
+    desc: 'Default marker height above surface (0 to 0.2). Overridable per marker via elevation.',
   },
   { name: 'scale', type: 'number', desc: 'Globe scale multiplier (default 1)' },
   { name: 'offset', type: '[x,y]', desc: 'Pixel offset from center [x, y]' },

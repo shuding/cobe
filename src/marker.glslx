@@ -12,6 +12,8 @@ attribute vec3 aMarkerPos;
 attribute float aMarkerSize;
 attribute vec3 aMarkerColor;
 attribute float aHasColor;
+attribute float aMarkerElevation;
+attribute float aHasElevation;
 
 uniform float phi;
 uniform float theta;
@@ -23,7 +25,8 @@ uniform float markerElevation;
 void vertex() {
   float cx = cos(theta), sx = sin(theta);
   float cy = cos(phi), sy = sin(phi);
-  vec3 p = aMarkerPos * (0.8 + markerElevation);
+  float elev = aHasElevation > 0.5 ? aMarkerElevation : markerElevation;
+  vec3 p = aMarkerPos * (0.8 + elev);
   vec3 rp = vec3(
     cy * p.x + sy * p.z,
     sy * sx * p.x + cx * p.y - cy * sx * p.z,
