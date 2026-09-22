@@ -2,6 +2,7 @@ export interface Marker {
   location: [number, number]
   size: number
   color?: [number, number, number]
+  elevation?: number
   id?: string
 }
 
