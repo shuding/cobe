@@ -44,6 +44,16 @@ export function createAnchorManager(wrapper) {
 
     anchor.style.left = position.x * 100 + '%'
     anchor.style.top = position.y * 100 + '%'
+    anchor.dispatchEvent(
+      new CustomEvent("anchorUpdate", {
+        bubbles: true,
+        detail: {
+          key,
+          anchorName,
+          position,
+        },
+      }),
+    );
   }
 
   function m(markers, project) {
