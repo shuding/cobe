@@ -107,7 +107,9 @@ void fragment() {
     vec3 gP = nearestFibonacciLattice(p * rot, dis);
 
     float gPhi = asin(gP.y);
-    float gTheta = acos(-gP.x / cos(gPhi));
+    // Clamped: rounding can push the ratio just past -1 for points on the
+    // prime meridian, and acos would return NaN, dropping a line of dots.
+    float gTheta = acos(clamp(-gP.x / cos(gPhi), -1.0, 1.0));
     if (gP.z < 0.0) gTheta = -gTheta;
 
     float mapColor = max(texture2D(uTexture, vec2(((gTheta * 0.5) / PI), -(gPhi / PI + 0.5))).x, mapBaseBrightness);
